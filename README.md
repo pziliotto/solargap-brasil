@@ -162,5 +162,7 @@ Os dados demográficos são provenientes do **Censo Demográfico 2022** do Insti
 ## 👩‍💻 Autoria
 
 **Pâmela Lima Ziliotto**
+
 Projeto de Bloco — Inteligência Artificial Aplicada à Ciência de Dados
+
 Tema: Desenvolvimento de Soluções Sustentáveis com ESG e a Agenda 2030
