@@ -1,0 +1,60 @@
+# ═══════════════════ Python ═══════════════════
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+.venv
+
+# ═══════════════════ Jupyter Notebooks ═══════════════════
+
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# ═══════════════════ IDEs ═══════════════════
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ═══════════════════ Dados ═══════════════════
+# Camada Bronze (raw)
+# Ignora tudo por padrão; libera apenas o que é pequeno.
+data/raw/*
+!data/raw/.gitkeep
+
+# IBGE — arquivos pequenos (UF ~0.01 MB, municípios ~1.9 MB)
+!data/raw/demografico_uf_2022.json
+!data/raw/demografico_municipio_2022.json
+
+# ANEEL — base completa tem ~103 MB e estoura o limite de 100 MB do
+# GitHub. Só a amostra usada pelo app demo é versionada.
+# Para obter a base completa: python -m src.data_acquisition.aneel
+!data/raw/amostra_*.parquet
+!data/raw/amostra_*.csv
+
+# ── Camada Silver (interim) ──
+# Sempre reproduzível a partir do raw + scripts de tratamento.
+data/interim/*
+!data/interim/.gitkeep
+
+# ── Camada Gold (processed) ──
+# VERSIONADA — é o que alimenta o dashboard. Nada a ignorar aqui.
+
+# ═══════════════════ LOGS ═══════════════════
+logs/
+*.log
+
+# ═══════════════════ OS ═══════════════════
+.DS_Store
+Thumbs.db
+
+# ═══════════════════ Outputs Gerados ═══════════════════
+outputs/quality_reports/
+
+# ═══════════════════ Environment variables ═══════════════════
+.env
+.env.local
