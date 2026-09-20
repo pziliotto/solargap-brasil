@@ -23,6 +23,7 @@ ENV/
 # ═══════════════════ Dados ═══════════════════
 # Camada Bronze (raw)
 # Ignora tudo por padrão; libera apenas o que é pequeno.
+# HTML de noticias fica em data/raw/html/ -> cache descartável
 data/raw/*
 !data/raw/.gitkeep
 
