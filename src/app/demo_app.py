@@ -54,12 +54,14 @@ st.divider()
 
 # 4. Links úteis
 st.sidebar.markdown("""
-**Fontes de dados**
-- [ANEEL — Geração Distribuída](https://dadosabertos.aneel.gov.br)
+### **Fontes de dados**
 - [ANEEL - Power BI MMGD](https://app.powerbi.com/view?r=eyJrIjoiY2VmMmUwN2QtYWFiOS00ZDE3LWI3NDMtZDk0NGI4MGU2NTkxIiwidCI6IjQwZDZmOWI4LWVjYTctNDZhMi05MmQ0LWVhNGU5YzAxNzBlMSIsImMiOjR9)
 - [IBGE — Censo 2022](https://www.ibge.gov.br/estatisticas/sociais/populacao/22827-censo-2022.html)
 - [Lei 14.300/2022](https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2022/lei/l14300.htm)
-
+### **Inspiração do projeto**
+- [ODS 7: Energia limpa e acessível (ONU Brasil)](https://brasil.un.org/pt-br/sdgs/7)
+- [Desertec: o debate sobre energia solar no Saara](https://www.desertec.org)
+- [EPE: estudos de micro e minigeração distribuída](https://www.epe.gov.br)
 """)
 
 # 5. Tabelas
