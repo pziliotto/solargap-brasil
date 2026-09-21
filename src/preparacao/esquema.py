@@ -33,6 +33,7 @@ COLUNAS_ANEEL = [
     "DscFonteGeracao",
     "DscClasseConsumo",
     "DthAtualizaCadastralEmpreend",
+    "SigTipoGeracao",
 ]
 
 # Renomeação para snake_case na camada Silver.
@@ -46,6 +47,7 @@ RENOMEAR_ANEEL = {
     "DscFonteGeracao": "fonte_geracao",
     "DscClasseConsumo": "classe_consumo",
     "DthAtualizaCadastralEmpreend": "data_conexao",
+    "SigTipoGeracao": "tipo_geracao",
 }
 
 # Mantido aqui para consulta; os scripts antigos têm cópia própria.

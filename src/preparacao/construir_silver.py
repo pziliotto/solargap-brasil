@@ -2,23 +2,36 @@
 PROJETO: SolarGap Brasil
 ARQUIVO: construir_silver.py
 AUTORA: Pâmela Lima Ziliotto
-CRIAÇÃO: 21/09/2026
-ATUALIZAÇÃO:
+CRIAÇÃO: 22/09/2026
+ATUALIZAÇÃO: 22/09/2026 — correções a partir do diagnostico_silver.py
 
 DESCRIÇÃO:
     Constrói a camada Silver (data/interim) a partir da camada Bronze (data/raw):
-    - MMGD/ANEEL: limpeza, tipagem e aplicação dos critérios de exclusão
-    - IBGE: achatamento dos JSONs de população (UF e município) em CSV.
+        - MMGD/ANEEL: limpeza, tipagem, correções e critérios de exclusão
+          documentados no Data Summary Report (seção 3.2);
+        - IBGE: achatamento dos JSONs de população (UF e município) em CSV.
 
 DECISÕES:
-    - Todas as fontes de geração são mantidas. Silver é dado limpo, não dado recortado:
-    o filtro de fonte solar é decisão análitica e fica na Gold.
-    - A base é lida e gravada em chunks (ParquetWriter), sem acumular os ~4,6 milhões
-    de registros em memória.
-    - Registros com potência inválida ou UF fora do cadastro são CONTADOS no log, mas
-    não descartados: não há critério documentado para isso ainda.
-    - Gravação em arquivo .parcial, renomeado só ao final (mesmo padrão do aneel.py):
-    uma execução interrompida nunca deixa Silver pela metade.
+    - Todas as fontes de geração são mantidas. Silver é dado limpo, não dado
+      recortado: o filtro de fonte solar é decisão analítica e fica na Gold.
+    - A base é lida e gravada em chunks (ParquetWriter), sem acumular os
+      ~4,6 milhões de registros em memória.
+    - Gravação em arquivo .parcial, renomeado só ao final (mesmo padrão do
+      aneel.py): uma execução interrompida nunca deixa Silver pela metade.
+
+CORREÇÕES (evidência no diagnostico_silver.py):
+    - Fonte imputada: registros sem DscFonteGeracao E sem SigTipoGeracao
+      (73.501, 99,8% no MA) recebem "Radiação solar". Justificativa: 99,98%
+      dos registros com fonte conhecida são solares e a distribuição de
+      potência do grupo é equivalente à dos solares. A coluna
+      fonte_imputada preserva a rastreabilidade e permite reverter a decisão.
+    - Código municipal com 6 dígitos (sem dígito verificador) é convertido
+      para 7 dígitos pela tabela do IBGE.
+    - UF ausente é recuperada pelo prefixo do código municipal.
+
+EXCLUSÕES:
+    - Sem data, ano 1900 (sentinela), ano anterior a 2012 (REN 482/2012);
+    - Potência nula ou <= 0: fisicamente inválida para usina conectada.
 
 SAÍDAS:
     data/interim/mmgd_silver.parquet
@@ -63,6 +76,9 @@ SAIDA_POP_MUNICIPIO = PASTA_INTERIM / "populacao_municipio_silver.csv"
 TAMANHO_CHUNK = 500_000
 SEPARADOR = ";"
 
+# código IBGE da UF -> sigla (inverso do cadastro do esquema)
+SIGLA_POR_COD = {cod: sigla for sigla, (cod, _) in esquema.UFS.items()}
+
 # Esquema fixo do Parquet: garante tipos idênticos em todos os chunks.
 SCHEMA_SILVER = pa.schema(
     [
@@ -71,7 +87,9 @@ SCHEMA_SILVER = pa.schema(
         ("cod_municipio", pa.int64()),
         ("potencia_kw", pa.float64()),
         ("fonte_geracao", pa.string()),
+        ("fonte_imputada", pa.bool_()),
         ("classe_consumo", pa.string()),
+        ("tipo_geracao", pa.string()),
         ("data_conexao", pa.timestamp("ns")),
         ("ano", pa.int64()),
     ]
@@ -140,7 +158,9 @@ def validar_populacao(df: pd.DataFrame, nivel: str, esperado: int) -> None:
     )
 
 
-def construir_populacao_silver() -> None:
+def construir_populacao_silver() -> pd.DataFrame:
+    """Grava a população por UF e município; devolve a tabela municipal,
+    usada depois para corrigir códigos municipais de 6 dígitos."""
     logging.info("--- IBGE: população ---")
 
     uf = ler_ibge_flat(ARQUIVO_IBGE_UF, "Unidade da Federação").rename(
@@ -148,8 +168,7 @@ def construir_populacao_silver() -> None:
     )
     validar_populacao(uf, "UF", esquema.TOTAL_UFS)
 
-    codigos_esperados = {cod for cod, _ in esquema.UFS.values()}
-    if set(uf["cod_uf"]) != codigos_esperados:
+    if set(uf["cod_uf"]) != set(SIGLA_POR_COD):
         logging.error("Códigos de UF do IBGE não batem com o cadastro do esquema.")
         sys.exit(1)
 
@@ -163,16 +182,20 @@ def construir_populacao_silver() -> None:
     logging.info("Salvo: %s", SAIDA_POP_UF)
     logging.info("Salvo: %s", SAIDA_POP_MUNICIPIO)
 
+    return municipio
+
 
 # ═══════════════════ ANEEL / MMGD ═══════════════════
 
 
-def tratar_chunk(chunk: pd.DataFrame, contagem: Counter) -> pd.DataFrame:
-    """Renomeia, tipa e filtra um bloco da base, acumulando contagens."""
+def tratar_chunk(
+    chunk: pd.DataFrame, contagem: Counter, municipio_7_digitos: dict[int, int]
+) -> pd.DataFrame:
+    """Renomeia, tipa, corrige e filtra um bloco da base, acumulando contagens."""
     df = chunk.rename(columns=esquema.RENOMEAR_ANEEL)
     contagem["lidos"] += len(df)
 
-    for coluna in ("sigla_uf", "fonte_geracao", "classe_consumo"):
+    for coluna in ("sigla_uf", "fonte_geracao", "classe_consumo", "tipo_geracao"):
         df[coluna] = df[coluna].str.strip()
     df["sigla_uf"] = df["sigla_uf"].str.upper()
 
@@ -192,7 +215,7 @@ def tratar_chunk(chunk: pd.DataFrame, contagem: Counter) -> pd.DataFrame:
     df["data_conexao"] = pd.to_datetime(df["data_conexao"], errors="coerce")
     df["ano"] = df["data_conexao"].dt.year.astype("Int64")
 
-    # Critérios de exclusão (Data Summary Report, seção 3.2)
+    # ── Exclusões temporais (Data Summary Report, seção 3.2) ──
     sem_data = df["ano"].isna()
     sentinela = (df["ano"] == esquema.ANO_SENTINELA).fillna(False)
     pre_marco = (df["ano"] < esquema.ANO_MINIMO).fillna(False) & ~sentinela
@@ -201,42 +224,90 @@ def tratar_chunk(chunk: pd.DataFrame, contagem: Counter) -> pd.DataFrame:
     contagem["sentinela_1900"] += int(sentinela.sum())
     contagem["pre_2012"] += int(pre_marco.sum())
 
-    df = df[~(sem_data | sentinela | pre_marco).astype(bool)]
+    df = df[~(sem_data | sentinela | pre_marco).astype(bool)].copy()
 
-    # Monitoramento: contado, não descartado.
-    contagem["potencia_invalida"] += int(
-        (df["potencia_kw"].isna() | (df["potencia_kw"] <= 0)).sum()
+    # ── Correção 1: código municipal de 6 dígitos -> 7 dígitos ──
+    seis_digitos = (df["cod_municipio"] < 1_000_000).fillna(False).astype(bool)
+    if seis_digitos.any():
+        corrigido = df.loc[seis_digitos, "cod_municipio"].map(municipio_7_digitos)
+        df.loc[seis_digitos, "cod_municipio"] = corrigido.astype("Int64")
+        contagem["municipio_corrigido"] += int(corrigido.notna().sum())
+
+    # ── Correção 2: UF ausente recuperada pelo prefixo do código municipal ──
+    sem_uf = (~df["sigla_uf"].isin(list(esquema.UFS))) & df["cod_municipio"].notna()
+    sem_uf = sem_uf.astype(bool)
+    if sem_uf.any():
+        cod_uf = (df.loc[sem_uf, "cod_municipio"] // 100_000).astype("Int64")
+        df.loc[sem_uf, "cod_uf"] = cod_uf
+        df.loc[sem_uf, "sigla_uf"] = cod_uf.map(SIGLA_POR_COD)
+        contagem["uf_recuperada"] += int(df.loc[sem_uf, "sigla_uf"].notna().sum())
+
+    # ── Correção 3: fonte imputada quando fonte E tipo de geração são nulos ──
+    imputar = (df["fonte_geracao"].isna() & df["tipo_geracao"].isna()).astype(bool)
+    df["fonte_imputada"] = imputar
+    df.loc[imputar, "fonte_geracao"] = esquema.FONTE_SOLAR
+    contagem["fonte_imputada"] += int(imputar.sum())
+
+    # ── Exclusão: potência nula ou <= 0 ──
+    potencia_invalida = (df["potencia_kw"].isna() | (df["potencia_kw"] <= 0)).astype(
+        bool
     )
+    contagem["potencia_invalida"] += int(potencia_invalida.sum())
+    df = df[~potencia_invalida]
+
+    # ── Monitoramento: contado, não descartado ──
     contagem["uf_fora_cadastro"] += int((~df["sigla_uf"].isin(list(esquema.UFS))).sum())
+    contagem["fonte_nula_restante"] += int(df["fonte_geracao"].isna().sum())
 
     contagem["mantidos"] += len(df)
     return df[SCHEMA_SILVER.names]
 
 
-def registrar_resumo(contagem: Counter, fontes: Counter) -> None:
+def registrar_resumo(contagem: Counter, fontes: Counter, imputados_uf: Counter) -> None:
     descartados = (
-        contagem["sem_data"] + contagem["sentinela_1900"] + contagem["pre_2012"]
+        contagem["sem_data"]
+        + contagem["sentinela_1900"]
+        + contagem["pre_2012"]
+        + contagem["potencia_invalida"]
     )
 
     logging.info("--- Resumo da Silver MMGD ---")
-    logging.info("Registros lidos ..........: %s", formatar(contagem["lidos"]))
-    logging.info("Descartados — sem data ...: %s", formatar(contagem["sem_data"]))
-    logging.info("Descartados — ano 1900 ...: %s", formatar(contagem["sentinela_1900"]))
-    logging.info("Descartados — antes 2012 .: %s", formatar(contagem["pre_2012"]))
-    logging.info("Registros mantidos .......: %s", formatar(contagem["mantidos"]))
+    logging.info("Registros lidos ..............: %s", formatar(contagem["lidos"]))
+    logging.info("Descartados — sem data .......: %s", formatar(contagem["sem_data"]))
+    logging.info(
+        "Descartados — ano 1900 .......: %s", formatar(contagem["sentinela_1900"])
+    )
+    logging.info("Descartados — antes 2012 .....: %s", formatar(contagem["pre_2012"]))
+    logging.info(
+        "Descartados — potência <= 0 ..: %s", formatar(contagem["potencia_invalida"])
+    )
+    logging.info("Registros mantidos ...........: %s", formatar(contagem["mantidos"]))
     logging.info(
         "Conferência (mantidos + descartados = lidos): %s",
         "OK"
         if contagem["mantidos"] + descartados == contagem["lidos"]
         else "DIVERGENTE",
     )
+
+    logging.info("--- Correções aplicadas ---")
     logging.info(
-        "Monitoramento — potência nula ou <= 0: %s",
-        formatar(contagem["potencia_invalida"]),
+        "Código municipal 6 -> 7 dígitos: %s", formatar(contagem["municipio_corrigido"])
     )
     logging.info(
-        "Monitoramento — UF fora do cadastro ..: %s",
-        formatar(contagem["uf_fora_cadastro"]),
+        "UF recuperada pelo município ..: %s", formatar(contagem["uf_recuperada"])
+    )
+    logging.info(
+        "Fonte imputada como solar .....: %s", formatar(contagem["fonte_imputada"])
+    )
+    for uf, quantidade in imputados_uf.most_common(5):
+        logging.info("    %-4s %s", uf, formatar(quantidade))
+
+    logging.info("--- Monitoramento (esperado: zero) ---")
+    logging.info(
+        "UF fora do cadastro .....: %s", formatar(contagem["uf_fora_cadastro"])
+    )
+    logging.info(
+        "Fonte ainda nula ........: %s", formatar(contagem["fonte_nula_restante"])
     )
 
     logging.info("--- Registros mantidos por fonte de geração ---")
@@ -250,12 +321,13 @@ def registrar_resumo(contagem: Counter, fontes: Counter) -> None:
         )
 
 
-def construir_mmgd_silver() -> None:
+def construir_mmgd_silver(municipio_7_digitos: dict[int, int]) -> None:
     logging.info("--- ANEEL: MMGD ---")
     nome_csv = localizar_csv_no_zip(ARQUIVO_ZIP)
 
     contagem: Counter = Counter()
     fontes: Counter = Counter()
+    imputados_uf: Counter = Counter()
     temporario = SAIDA_MMGD.with_suffix(".parquet.parcial")
     writer: pq.ParquetWriter | None = None
 
@@ -275,8 +347,11 @@ def construir_mmgd_silver() -> None:
             writer = pq.ParquetWriter(temporario, SCHEMA_SILVER)
 
             for numero, chunk in enumerate(leitor, start=1):
-                df = tratar_chunk(chunk, contagem)
+                df = tratar_chunk(chunk, contagem, municipio_7_digitos)
                 fontes.update(df["fonte_geracao"].value_counts().to_dict())
+                imputados_uf.update(
+                    df.loc[df["fonte_imputada"], "sigla_uf"].value_counts().to_dict()
+                )
                 writer.write_table(
                     pa.Table.from_pandas(df, schema=SCHEMA_SILVER, preserve_index=False)
                 )
@@ -299,7 +374,7 @@ def construir_mmgd_silver() -> None:
 
     tamanho_mb = SAIDA_MMGD.stat().st_size / (1024 * 1024)
     logging.info("Salvo: %s (%.1f MB)", SAIDA_MMGD, tamanho_mb)
-    registrar_resumo(contagem, fontes)
+    registrar_resumo(contagem, fontes, imputados_uf)
 
 
 # ═══════════════════ Execução ═══════════════════
@@ -315,8 +390,14 @@ def construir_silver() -> None:
 
     # IBGE primeiro: leva segundos e, se houver problema, falha antes
     # dos minutos de leitura da base da ANEEL.
-    construir_populacao_silver()
-    construir_mmgd_silver()
+    municipio = construir_populacao_silver()
+
+    # O código IBGE de 7 dígitos é o de 6 dígitos + dígito verificador.
+    municipio_7_digitos = {
+        int(cod) // 10: int(cod) for cod in municipio["cod_municipio"]
+    }
+
+    construir_mmgd_silver(municipio_7_digitos)
 
     logging.info("Log da sessão: %s", caminho_log)
     logging.info("Concluído.")
