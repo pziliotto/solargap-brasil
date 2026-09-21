@@ -36,17 +36,18 @@ Este relatório documenta as fontes de dados utilizadas no projeto SolarGap Bras
 |---|---|---|
 |`SigUF`|Chave de agregação regional|Sigla da UF|
 |`MdaPotenciaInstaladaKW`|Numerador dos KPIs de potência|Valor em **kW**; conversão para MW na camada Silver|
-|`DscFonteGeracao`|Filtro da fonte solar|A base inclui também hídrica, eólica, térmica e biogás|
+|`DscFonteGeracao`|Filtro da fonte solar|A base inclui também hídrica, eólica, térmica e biogás. Vazio em 73.501 registros (99,8% no MA); **ver seção 3.4**|
 |`CodUFibge`|Chave de junção com o IBGE|Tipo `float64` na origem; requer conversão explícita antes do merge|
 |`CodMunicipioIbge`|Chave de junção municipal|Código IBGE de 7 dígitos|
 |`DscClasseConsumo`|Segmentação por perfil de consumidor|Análise complementar|
 |`DthAtualizaCadastralEmpreend`|Eixo temporal — data de conexão|Validado contra o painel oficial da ANEEL; **ver seção 3.1**|
+|`SigTipoGeracao`|Verificação da fonte de geração|Sigla do tipo de usina (UFV, UTE, EOL, CGH). Correspondência de 100% entre `UFV` e "Radiação solar"; vazio nos mesmos registros em que `DscFonteGeracao` é vazio|
 
 ## 3. Observações sobre Qualidade e Tratamento
 
 - Os dados brutos (ANEEL, IBGE) são armazenados sem alteração em `data/raw/` (camada Bronze) e nunca editados diretamente.
-- A limpeza e padronização (nomes de coluna, tipos, remoção de duplicatas) ocorre em `data/interim/` (camada Silver).
-- O dado final, já agregado e normalizado por população, fica em `data/processed/` (camada Gold) e alimenta a aplicação.
+- A limpeza, tipagem, correção e aplicação dos critérios de exclusão ocorre em `data/interim/` (camada Silver), pelo script `src/preparacao/construir_silver.py`. A base é lida e gravada em blocos de 500 mil registros, sem carregar o arquivo completo em memória.
+- O dado final, agregado e normalizado por população, fica em `data/processed/` (camada Gold), pelo script `src/preparacao/construir_gold.py`, e alimenta a aplicação.
 - A granularidade da ANEEL (registro individual de empreendimento) difere da granularidade do IBGE (população agregada por UF ou município) — a agregação é necessária antes do merge.
 - Em leitura por chunks, as colunas são carregadas como texto (`dtype=str`) para evitar inferência de tipo divergente entre blocos. A tipagem é responsabilidade da camada Silver.
 
@@ -90,12 +91,90 @@ Os seguintes registros são descartados na camada Silver, com o respectivo crit�
 |---|---|---|
 |Ano = 1900|15|Data-sentinela; valor de preenchimento sem significado real|
 |Ano < 2012|68|A REN nº 482/2012 instituiu o marco regulatório da MMGD; registros anteriores são anomalias cadastrais|
+|Potência nula ou ≤ 0|41|Fisicamente inválido para uma usina conectada. Todos os casos no PR, fonte solar, entre 2020 e 2025|
 
 **Tratamento do ano corrente (2026):** os dados cobrem apenas parte do ano (referência 08/2026). Comparações diretas com anos completos são inválidas. Nas visualizações, 2026 é sinalizado como período parcial ou excluído das séries de crescimento anual.
+
+**Balanço:** 4.673.268 registros lidos, 124 descartados, 4.673.144 mantidos na Silver. A conciliação (mantidos + descartados = lidos) é verificada automaticamente a cada execução.
 
 ### 3.3 Nota de atualização da fonte
 
 A ANEEL suspendeu temporariamente a atualização dos dados de conexões de MMGD entre 23/09/2025 e 24/10/2025, em razão da migração do sistema SISGD para o novo sistema MMGD. Conexões desse período podem ter sido inseridas retroativamente.
+
+### 3.4 Correções aplicadas na camada Silver
+
+As correções abaixo foram identificadas pelo script `src/preparacao/diagnostico_silver.py`, que investigou os alertas de monitoramento emitidos na primeira execução da camada Silver.
+
+#### 3.4.1 Fonte de geração ausente — imputação como solar
+
+**Achado.** 73.501 registros chegam sem `DscFonteGeracao` e sem `SigTipoGeracao`. A concentração é quase total em uma unidade da federação: 73.352 (99,8%) no Maranhão. O padrão indica falha de preenchimento de uma distribuidora, e não usinas de outra fonte. Não há outro campo da base que permita recuperar a fonte.
+
+**Evidência para a imputação.**
+
+- Entre os 4.599.684 registros com fonte conhecida, 4.598.903 são "Radiação solar" — **99,98%**.
+- A distribuição de potência do grupo sem fonte é praticamente idêntica à dos solares:
+
+|Potência (kW)|Sem fonte|Radiação solar|
+|---|---|---|
+|Média|11,64|10,97|
+|1º quartil|5,00|4,00|
+|Mediana|6,00|5,85|
+|3º quartil|10,00|8,20|
+
+- 79,9% dos registros sem fonte são da classe residencial, perfil típico da geração solar em telhado.
+- A distribuição temporal (2018 a 2026) acompanha a curva de crescimento da geração solar distribuída.
+
+**Decisão.** Os registros são imputados como "Radiação solar". Se a proporção geral de fontes se repetir nesse grupo, o erro esperado é de aproximadamente 12 registros em 73.501. A alternativa — excluí-los — garantiria um erro de 73.501 registros concentrado em um único estado.
+
+**Rastreabilidade.** A coluna booleana `fonte_imputada` marca cada registro corrigido e segue até a camada Gold. A decisão é reversível e o painel permite ao usuário alternar entre as duas visões (ver seção 3.6).
+
+**Impacto.** A imputação eleva o Maranhão de 91.668 para 165.020 empreendimentos solares (+80%), com efeito direto sobre a posição do estado nos indicadores per capita.
+
+#### 3.4.2 Código municipal incompleto e UF ausente
+
+Um registro chega sem `SigUF` e com código municipal de 6 dígitos (`431780`), quando o padrão do IBGE é de 7. O código de 7 dígitos é o de 6 acrescido de um dígito verificador; a correspondência é recuperada pela tabela municipal do IBGE. A UF é derivada do prefixo do código municipal (43 — Rio Grande do Sul).
+
+Os demais 4.673.143 registros têm código municipal de 7 dígitos, com prefixo coerente com o código da UF em 100% dos casos.
+
+### 3.5 Camada Gold
+
+|Tabela|Grão|Conteúdo|Tamanho|
+|---|---|---|---|
+|`gold_mmgd_agregado.csv`|UF × ano × classe de consumo × fonte imputada|Potência (kW), quantidade de empreendimentos, indicador de ano parcial|81KB|
+|`gold_uf.csv`|UF|Nome, região, população (Censo 2022), potência (MW), watts por habitante, empreendimentos por 100 mil hab., % de registros imputados|2KB|
+
+**Por que uma tabela no menor grão.** O painel filtra por período, classe de consumo e inclusão de registros imputados. Uma tabela já totalizada por UF impediria recalcular esses recortes. A tabela agregada guarda o menor nível que o painel precisa e a aplicação soma depois de filtrar. O mesmo vale para a potência acumulada, calculada na aplicação.
+
+**Métricas per capita.** Watts por habitante é a métrica principal: ordem de grandeza legível e unidade usual no setor. Empreendimentos por 100 mil habitantes a complementa — potência mede volume investido, contagem mede difusão.
+
+**Escopo.** Apenas fonte solar, incluindo os registros imputados, marcados pela coluna `fonte_imputada`.
+
+### 3.6 Validação contra o painel oficial da ANEEL
+
+O resultado da camada Gold foi comparado com o painel oficial de Geração Distribuída da ANEEL (dados até 31/08/2026). O arquivo processado foi gerado pela ANEEL em 19 de Agosto de 2026.
+
+Como o painel não contabiliza os registros sem fonte, a comparação é feita em duas visões:
+
+|Métrica|Painel ANEEL|Projeto — critério ANEEL (sem imputados)|Projeto — com correção de preenchimento|
+|---|---|---|---|
+|Empreendimentos solares (Brasil)|4.655.916|4.598.862|4.672.363|
+|Potência solar (MW)|53.650,9|50.472,3|51.327,9|
+|Empreendimentos solares (MA)|97.458|91.668|165.020|
+
+**Contagem.** No critério ANEEL, a diferença é de 1,2%. O arquivo processado foi gerado em 19/08/2026 e o painel reflete dados até 31/08/2026; no ritmo de conexões de 2025, os 12 dias de defasagem respondem por cerca de metade da diferença. O restante é compatível com as inserções retroativas decorrentes da migração de sistema (seção 3.3). A contagem valida o pipeline de leitura, correção e agregação.
+
+**Maranhão.** O número do painel é próximo ao do projeto **sem** imputados. O painel, portanto, filtra pelo mesmo campo vazio e deixa de fora os registros sem rótulo. Isso não constitui evidência de que esses registros sejam de outra fonte — apenas de que não foram contabilizados. **Conclusão: o painel oficial provavelmente subestima o Maranhão em cerca de 73 mil sistemas solares**, por falha de preenchimento cadastral.
+
+Por esse motivo, o dashboard oferece as duas visões: "Critério ANEEL", que reproduz os números oficiais, e "Com correção de preenchimento", adotada como padrão e acompanhada de nota explicativa.
+
+**Potência — divergência em aberto.** No critério ANEEL, a potência do painel é 6,3% superior à do projeto, desproporcional à diferença de contagem (1,2%) e não explicável pela defasagem de 12 dias entre as extrações. A hipótese de inclusão de outras fontes no indicador do painel foi testada e descartada: as demais fontes somam apenas 301,7 MW. As hipóteses remanescentes são a diferença de data de extração e diferenças de metodologia de cálculo no painel. A divergência permanece registrada como pendência.
+
+### 3.7 Pendências
+
+|Item|Situação|
+|---|---|
+|Classe de consumo `REBR`|39.946 registros em 14 UFs, sem significado documentado. Mantida sem alteração até consulta ao dicionário de dados da ANEEL|
+|Divergência de potência com o painel oficial|Ver seção 3.6|
 
 ## 4. Governança e Privacidade
 
@@ -114,7 +193,8 @@ O mesmo filtro é aplicado na geração da amostra versionada e será mantido em
 |IBGE — UF|~0,01 MB|✅ Sim|Volume irrelevante|
 |IBGE — municípios|~1,9 MB|✅ Sim|Volume aceitável|
 |`data/interim/` (Silver)|—|❌ Não|Sempre reproduzível a partir da camada Bronze|
-|`data/processed/` (Gold)|pequeno|✅ Sim|Alimenta o dashboard; garante reprodutibilidade da aplicação|
+|`gold_mmgd_agregado.csv` (Gold)|81KB|✅ Sim|Alimenta o dashboard; permite todos os filtros sem a base completa|
+|`gold_uf.csv` (Gold)|2KB|✅ Sim|Indicadores por UF; base da visão padrão do painel e da futura API (TP3)|
 
 **Regeneração da base completa:** `python -m src.data_acquisition.aneel` a partir da raiz do projeto.
 
