@@ -1,9 +1,9 @@
 # Data Summary Report — SolarGap Brasil
 
 **Projeto:** SolarGap Brasil — Onde está o próximo mercado solar?
-**Autora:** Pâmela Lima Ziliotto **
-Etapa:** TP1
-**Última atualização:** 20/08/2026
+**Autora:** Pâmela Lima Ziliotto
+**Etapa:** TP2
+**Última atualização:** 20/09/2026
 
 ---
 
