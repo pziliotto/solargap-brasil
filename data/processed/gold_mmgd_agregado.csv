@@ -1,0 +1,1904 @@
+sigla_uf;ano;classe_consumo;fonte_imputada;potencia_kw;qtd_empreendimentos;ano_parcial
+AC;2016;Comercial;False;34.5;2;False
+AC;2016;Residencial;False;2.0;1;False
+AC;2017;Comercial;False;92.72;3;False
+AC;2017;Residencial;False;100.09;12;False
+AC;2018;Comercial;False;213.44;7;False
+AC;2018;Industrial;False;34.32;1;False
+AC;2018;Residencial;False;181.58;22;False
+AC;2019;Comercial;False;1585.49;30;False
+AC;2019;Industrial;False;20.1;1;False
+AC;2019;Residencial;False;837.97;96;False
+AC;2019;Rural;False;39.4;6;False
+AC;2020;Comercial;False;2331.19;75;False
+AC;2020;Industrial;False;143.0;3;False
+AC;2020;Residencial;False;3217.34;407;False
+AC;2020;Rural;False;364.86;18;False
+AC;2020;Serviço Público;False;12.0;1;False
+AC;2021;Comercial;False;6501.28;190;False
+AC;2021;Industrial;False;361.36;5;False
+AC;2021;Poder Público;False;820.5;7;False
+AC;2021;Residencial;False;8584.28;1147;False
+AC;2021;Rural;False;533.61;63;False
+AC;2022;Comercial;False;6844.73;192;False
+AC;2022;Industrial;False;1030.0;7;False
+AC;2022;Poder Público;False;353.35;4;False
+AC;2022;Residencial;False;11362.27;1491;False
+AC;2022;Rural;False;1021.89;96;False
+AC;2023;Comercial;False;8403.8;212;False
+AC;2023;Industrial;False;444.5;7;False
+AC;2023;Poder Público;False;1150.0;3;False
+AC;2023;Residencial;False;11699.63;1356;False
+AC;2023;Rural;False;1479.97;94;False
+AC;2024;Comercial;False;9333.45;360;False
+AC;2024;Industrial;False;266.84;7;False
+AC;2024;Poder Público;False;564.0;6;False
+AC;2024;Residencial;False;35279.77;4086;False
+AC;2024;Rural;False;1752.86;188;False
+AC;2025;Comercial;False;10105.0;417;False
+AC;2025;Industrial;False;577.0;9;False
+AC;2025;Poder Público;False;247.5;5;False
+AC;2025;Residencial;False;42297.29;4848;False
+AC;2025;Rural;False;2465.74;246;False
+AC;2025;Serviço Público;False;30.0;1;False
+AC;2026;Comercial;False;5545.35;232;True
+AC;2026;Industrial;False;505.5;8;True
+AC;2026;Poder Público;False;357.5;7;True
+AC;2026;Residencial;False;26529.2;3131;True
+AC;2026;Rural;False;1779.2;209;True
+AL;2015;Comercial;False;82.36;3;False
+AL;2015;Residencial;False;10.71;1;False
+AL;2016;Comercial;False;19.6;1;False
+AL;2016;Industrial;False;70.0;1;False
+AL;2016;Residencial;False;74.32;12;False
+AL;2017;Comercial;False;193.63;9;False
+AL;2017;Residencial;False;185.64;28;False
+AL;2017;Rural;False;11.56;2;False
+AL;2018;Comercial;False;1184.49;34;False
+AL;2018;Industrial;False;84.0;3;False
+AL;2018;Residencial;False;670.28;125;False
+AL;2018;Rural;False;1.0;1;False
+AL;2019;Comercial;False;3561.72;151;False
+AL;2019;Industrial;False;560.12;10;False
+AL;2019;Poder Público;False;210.68;6;False
+AL;2019;Residencial;False;2853.48;423;False
+AL;2019;Rural;False;494.65;12;False
+AL;2020;Comercial;False;10720.84;333;False
+AL;2020;Industrial;False;839.22;15;False
+AL;2020;Poder Público;False;505.84;26;False
+AL;2020;Residencial;False;8113.58;1159;False
+AL;2020;Rural;False;1833.48;42;False
+AL;2021;Comercial;False;15942.54;621;False
+AL;2021;Industrial;False;1128.35;24;False
+AL;2021;Poder Público;False;379.0;18;False
+AL;2021;Residencial;False;19021.71;2733;False
+AL;2021;Rural;False;1109.86;67;False
+AL;2021;Serviço Público;False;142.0;2;False
+AL;2022;Comercial;False;30000.22;1031;False
+AL;2022;Industrial;False;3181.84;56;False
+AL;2022;Poder Público;False;150.13;14;False
+AL;2022;Residencial;False;50276.9;7061;False
+AL;2022;Rural;False;4036.11;177;False
+AL;2023;Comercial;False;42229.5;1189;False
+AL;2023;Industrial;False;7634.77;84;False
+AL;2023;Poder Público;False;1280.45;18;False
+AL;2023;Residencial;False;63012.41;8441;False
+AL;2023;Rural;False;5278.45;275;False
+AL;2024;Comercial;False;45071.21;1186;False
+AL;2024;Iluminação pública;False;15.0;1;False
+AL;2024;Industrial;False;34497.54;97;False
+AL;2024;Poder Público;False;990.6;19;False
+AL;2024;Residencial;False;103358.91;13583;False
+AL;2024;Rural;False;5528.0;395;False
+AL;2025;Comercial;False;27437.77;870;False
+AL;2025;Industrial;False;17766.86;73;False
+AL;2025;Poder Público;False;1439.79;36;False
+AL;2025;REBR;False;1577.5;284;False
+AL;2025;Residencial;False;77553.47;10503;False
+AL;2025;Rural;False;3706.91;298;False
+AL;2025;Serviço Público;False;111.0;2;False
+AL;2026;Comercial;False;7495.34;371;True
+AL;2026;Industrial;False;532.3;20;True
+AL;2026;Poder Público;False;305.0;6;True
+AL;2026;REBR;False;4265.18;773;True
+AL;2026;Residencial;False;41479.3;5004;True
+AL;2026;Rural;False;1641.9;113;True
+AM;2015;Comercial;False;26.52;2;False
+AM;2016;Industrial;False;2.86;1;False
+AM;2016;Residencial;False;23.98;3;False
+AM;2017;Comercial;False;37.2;1;False
+AM;2017;Residencial;False;184.49;18;False
+AM;2018;Comercial;False;125.62;8;False
+AM;2018;Industrial;False;40.0;1;False
+AM;2018;Poder Público;False;6.0;1;False
+AM;2018;Residencial;False;532.08;67;False
+AM;2018;Rural;False;15.84;2;False
+AM;2019;Comercial;False;1668.97;51;False
+AM;2019;Industrial;False;90.0;2;False
+AM;2019;Poder Público;False;4.16;1;False
+AM;2019;Residencial;False;3301.28;363;False
+AM;2019;Rural;False;18.03;3;False
+AM;2020;Comercial;False;6847.35;126;False
+AM;2020;Industrial;False;472.46;11;False
+AM;2020;Poder Público;False;81.34;4;False
+AM;2020;Residencial;False;6515.06;728;False
+AM;2020;Rural;False;132.2;4;False
+AM;2021;Comercial;False;15613.39;278;False
+AM;2021;Industrial;False;804.87;19;False
+AM;2021;Poder Público;False;422.08;5;False
+AM;2021;Residencial;False;11852.02;1285;False
+AM;2021;Rural;False;254.4;13;False
+AM;2022;Comercial;False;17072.65;464;False
+AM;2022;Industrial;False;2969.07;27;False
+AM;2022;Poder Público;False;1068.18;4;False
+AM;2022;Residencial;False;26355.97;2569;False
+AM;2022;Rural;False;546.37;18;False
+AM;2023;Comercial;False;26605.64;552;False
+AM;2023;Industrial;False;4585.92;34;False
+AM;2023;Poder Público;False;734.37;16;False
+AM;2023;Residencial;False;36098.22;3115;False
+AM;2023;Rural;False;1023.18;40;False
+AM;2023;Serviço Público;False;70.0;1;False
+AM;2024;Comercial;False;29158.76;469;False
+AM;2024;Industrial;False;1094.37;19;False
+AM;2024;Poder Público;False;454.06;9;False
+AM;2024;Residencial;False;30635.5;2586;False
+AM;2024;Rural;False;896.05;35;False
+AM;2025;Comercial;False;33985.56;557;False
+AM;2025;Industrial;False;761.0;15;False
+AM;2025;Poder Público;False;571.9;10;False
+AM;2025;Residencial;False;34066.19;2860;False
+AM;2025;Rural;False;874.55;34;False
+AM;2025;Serviço Público;False;50.0;1;False
+AM;2026;Comercial;False;11474.7;286;True
+AM;2026;Industrial;False;525.0;6;True
+AM;2026;Residencial;False;16174.4;1336;True
+AM;2026;Rural;False;241.0;11;True
+AP;2017;Poder Público;False;555.0;8;False
+AP;2018;Comercial;False;248.76;2;False
+AP;2018;Residencial;False;195.93;34;False
+AP;2019;Comercial;False;683.98;23;False
+AP;2019;Poder Público;False;288.0;2;False
+AP;2019;Residencial;False;576.16;81;False
+AP;2019;Serviço Público;False;60.0;1;False
+AP;2020;Comercial;False;1594.67;28;False
+AP;2020;Poder Público;False;620.0;2;False
+AP;2020;Residencial;False;1014.58;111;False
+AP;2021;Comercial;False;2965.44;71;False
+AP;2021;Industrial;False;301.0;2;False
+AP;2021;Poder Público;False;408.0;3;False
+AP;2021;Residencial;False;3523.11;408;False
+AP;2021;Rural;False;20.0;1;False
+AP;2022;Comercial;False;1810.05;64;False
+AP;2022;Industrial;False;40.0;1;False
+AP;2022;Poder Público;False;84.89;5;False
+AP;2022;Residencial;False;7242.76;831;False
+AP;2022;Rural;False;18.0;2;False
+AP;2023;Comercial;False;6821.54;113;False
+AP;2023;Industrial;False;361.84;3;False
+AP;2023;Poder Público;False;169.0;2;False
+AP;2023;Residencial;False;26589.72;2813;False
+AP;2023;Rural;False;9.99;1;False
+AP;2024;Comercial;False;3802.93;127;False
+AP;2024;Industrial;False;755.0;3;False
+AP;2024;Poder Público;False;476.56;8;False
+AP;2024;Residencial;False;38898.93;3720;False
+AP;2024;Rural;False;39.94;5;False
+AP;2025;Comercial;False;16325.32;552;False
+AP;2025;Industrial;False;1286.27;23;False
+AP;2025;Poder Público;False;104.0;4;False
+AP;2025;REBR;False;5835.56;703;False
+AP;2025;Residencial;False;69667.03;6748;False
+AP;2025;Rural;False;496.12;34;False
+AP;2026;Comercial;False;3675.0;143;True
+AP;2026;Industrial;False;274.0;6;True
+AP;2026;REBR;False;5508.35;676;True
+AP;2026;Residencial;False;21743.92;2080;True
+AP;2026;Rural;False;231.5;11;True
+BA;2012;Industrial;False;403.0;1;False
+BA;2014;Comercial;False;72.0;5;False
+BA;2014;Industrial;False;12.0;1;False
+BA;2014;Residencial;False;118.8;11;False
+BA;2015;Comercial;False;138.94;8;False
+BA;2015;Residencial;False;122.33;27;False
+BA;2015;Rural;False;6.0;1;False
+BA;2016;Comercial;False;392.13;26;False
+BA;2016;Industrial;False;35.1;2;False
+BA;2016;Poder Público;False;46.49;1;False
+BA;2016;Residencial;False;334.97;76;False
+BA;2016;Rural;False;9.4;3;False
+BA;2017;Comercial;False;1596.48;72;False
+BA;2017;Industrial;False;42.5;2;False
+BA;2017;Poder Público;False;92.75;5;False
+BA;2017;Residencial;False;1082.52;186;False
+BA;2017;Rural;False;62.0;2;False
+BA;2018;Comercial;False;3920.23;197;False
+BA;2018;Industrial;False;2481.61;20;False
+BA;2018;Poder Público;False;122.55;5;False
+BA;2018;REBR;False;9.0;1;False
+BA;2018;Residencial;False;3261.42;600;False
+BA;2018;Rural;False;482.35;24;False
+BA;2019;Comercial;False;19529.01;1052;False
+BA;2019;Iluminação pública;False;20.0;1;False
+BA;2019;Industrial;False;1929.84;56;False
+BA;2019;Poder Público;False;258.2;10;False
+BA;2019;REBR;False;44.45;2;False
+BA;2019;Residencial;False;17565.67;2893;False
+BA;2019;Rural;False;2385.71;121;False
+BA;2020;Comercial;False;51430.17;2188;False
+BA;2020;Iluminação pública;False;0.76;1;False
+BA;2020;Industrial;False;3753.09;94;False
+BA;2020;Poder Público;False;651.2;19;False
+BA;2020;REBR;False;131.15;14;False
+BA;2020;Residencial;False;44908.11;6954;False
+BA;2020;Rural;False;7480.42;371;False
+BA;2021;Comercial;False;75202.88;3767;False
+BA;2021;Iluminação pública;False;69.69;2;False
+BA;2021;Industrial;False;6061.41;193;False
+BA;2021;Poder Público;False;1257.41;35;False
+BA;2021;REBR;False;232.56;33;False
+BA;2021;Residencial;False;108240.85;17907;False
+BA;2021;Rural;False;16334.33;1105;False
+BA;2022;Comercial;False;117223.09;6577;False
+BA;2022;Iluminação pública;False;24.0;2;False
+BA;2022;Industrial;False;12742.13;317;False
+BA;2022;Poder Público;False;3615.65;79;False
+BA;2022;REBR;False;363.51;54;False
+BA;2022;Residencial;False;220155.68;35605;False
+BA;2022;Rural;False;37074.97;2201;False
+BA;2023;Comercial;False;155213.48;7816;False
+BA;2023;Iluminação pública;False;94.0;4;False
+BA;2023;Industrial;False;16591.86;369;False
+BA;2023;Poder Público;False;7971.76;164;False
+BA;2023;REBR;False;595.33;74;False
+BA;2023;Residencial;False;273592.73;43158;False
+BA;2023;Residencial;True;3.0;1;False
+BA;2023;Rural;False;56615.5;3180;False
+BA;2023;Serviço Público;False;40.0;1;False
+BA;2024;Comercial;False;161158.29;7251;False
+BA;2024;Iluminação pública;False;53.0;2;False
+BA;2024;Industrial;False;27984.87;413;False
+BA;2024;Poder Público;False;4133.26;100;False
+BA;2024;REBR;False;578.38;84;False
+BA;2024;Residencial;False;424727.37;66479;False
+BA;2024;Rural;False;53405.55;3961;False
+BA;2025;Comercial;False;148143.63;7215;False
+BA;2025;Comercial;True;40.0;1;False
+BA;2025;Iluminação pública;False;426.95;32;False
+BA;2025;Industrial;False;11364.84;290;False
+BA;2025;Poder Público;False;13610.07;190;False
+BA;2025;REBR;False;25799.64;4973;False
+BA;2025;Residencial;False;390347.71;56363;False
+BA;2025;Residencial;True;34.15;3;False
+BA;2025;Rural;False;52614.79;3431;False
+BA;2025;Serviço Público;False;30.02;6;False
+BA;2026;Comercial;False;126394.07;3203;True
+BA;2026;Iluminação pública;False;850.2;53;True
+BA;2026;Industrial;False;2122.41;55;True
+BA;2026;Poder Público;False;6348.83;136;True
+BA;2026;REBR;False;20819.19;4162;True
+BA;2026;Residencial;False;206988.87;30187;True
+BA;2026;Residencial;True;38.34;3;True
+BA;2026;Rural;False;19207.17;1226;True
+BA;2026;Rural;True;42.0;1;True
+BA;2026;Serviço Público;False;721.74;28;True
+CE;2013;Comercial;False;12.7;1;False
+CE;2013;Industrial;False;11.52;1;False
+CE;2014;Comercial;False;34.29;5;False
+CE;2014;Residencial;False;53.66;20;False
+CE;2015;Comercial;False;369.02;13;False
+CE;2015;Industrial;False;22.78;3;False
+CE;2015;Poder Público;False;52.23;1;False
+CE;2015;Residencial;False;239.65;62;False
+CE;2016;Comercial;False;353.4;31;False
+CE;2016;Industrial;False;579.56;3;False
+CE;2016;Poder Público;False;5.0;1;False
+CE;2016;Residencial;False;476.97;120;False
+CE;2016;Rural;False;13.04;3;False
+CE;2017;Comercial;False;2150.48;68;False
+CE;2017;Industrial;False;314.0;6;False
+CE;2017;Poder Público;False;669.72;14;False
+CE;2017;Residencial;False;1336.68;223;False
+CE;2017;Rural;False;97.8;11;False
+CE;2018;Comercial;False;6206.97;184;False
+CE;2018;Industrial;False;820.62;23;False
+CE;2018;Poder Público;False;320.78;8;False
+CE;2018;Residencial;False;4741.89;700;False
+CE;2018;Rural;False;628.13;34;False
+CE;2019;Comercial;False;16534.2;513;False
+CE;2019;Industrial;False;4262.88;55;False
+CE;2019;Poder Público;False;187.5;5;False
+CE;2019;Residencial;False;14376.84;1752;False
+CE;2019;Rural;False;1477.36;104;False
+CE;2019;Serviço Público;False;95.46;3;False
+CE;2020;Comercial;False;43776.42;970;False
+CE;2020;Industrial;False;6493.21;84;False
+CE;2020;Poder Público;False;1972.84;34;False
+CE;2020;Residencial;False;33707.71;4374;False
+CE;2020;Rural;False;6053.6;358;False
+CE;2020;Serviço Público;False;125.0;1;False
+CE;2021;Comercial;False;43083.49;1683;False
+CE;2021;Industrial;False;9493.19;128;False
+CE;2021;Poder Público;False;1211.9;24;False
+CE;2021;Residencial;False;76376.81;11509;False
+CE;2021;Rural;False;11661.53;1181;False
+CE;2021;Serviço Público;False;74.25;1;False
+CE;2022;Comercial;False;57301.09;2397;False
+CE;2022;Industrial;False;23154.63;225;False
+CE;2022;Poder Público;False;3102.56;45;False
+CE;2022;Residencial;False;133202.82;19376;False
+CE;2022;Rural;False;20094.79;2043;False
+CE;2022;Serviço Público;False;640.0;1;False
+CE;2023;Comercial;False;81630.87;2508;False
+CE;2023;Industrial;False;32814.21;242;False
+CE;2023;Poder Público;False;3059.6;75;False
+CE;2023;Residencial;False;151808.18;19311;False
+CE;2023;Rural;False;21530.48;1954;False
+CE;2023;Serviço Público;False;50.0;1;False
+CE;2024;Comercial;False;105154.47;2117;False
+CE;2024;Iluminação pública;False;36.0;1;False
+CE;2024;Industrial;False;29826.74;200;False
+CE;2024;Poder Público;False;8164.23;216;False
+CE;2024;Residencial;False;185511.36;24873;False
+CE;2024;Rural;False;26540.44;2813;False
+CE;2024;Serviço Público;False;1000.0;1;False
+CE;2025;Comercial;False;130995.42;2233;False
+CE;2025;Iluminação pública;False;51.0;2;False
+CE;2025;Industrial;False;34917.63;144;False
+CE;2025;Poder Público;False;9820.44;302;False
+CE;2025;Residencial;False;219602.47;26669;False
+CE;2025;Rural;False;36575.49;3480;False
+CE;2025;Serviço Público;False;1274.04;4;False
+CE;2026;Comercial;False;52854.62;1108;True
+CE;2026;Iluminação pública;False;55.0;3;True
+CE;2026;Industrial;False;15203.15;81;True
+CE;2026;Poder Público;False;6799.68;199;True
+CE;2026;Residencial;False;108642.56;13933;True
+CE;2026;Residencial;True;8.0;1;True
+CE;2026;Rural;False;15408.96;1821;True
+CE;2026;Serviço Público;False;60.0;1;True
+DF;2015;Comercial;False;7.14;1;False
+DF;2015;Residencial;False;105.42;19;False
+DF;2015;Rural;False;10.0;1;False
+DF;2016;Comercial;False;445.75;6;False
+DF;2016;Poder Público;False;100.0;1;False
+DF;2016;Residencial;False;317.77;58;False
+DF;2016;Rural;False;20.28;1;False
+DF;2017;Comercial;False;946.54;16;False
+DF;2017;Poder Público;False;123.48;3;False
+DF;2017;Residencial;False;885.42;164;False
+DF;2017;Rural;False;41.0;4;False
+DF;2018;Comercial;False;2765.03;40;False
+DF;2018;Poder Público;False;574.28;4;False
+DF;2018;Residencial;False;2640.98;364;False
+DF;2018;Rural;False;143.35;9;False
+DF;2019;Comercial;False;9758.59;99;False
+DF;2019;Industrial;False;27.6;1;False
+DF;2019;Poder Público;False;1812.95;11;False
+DF;2019;Residencial;False;5828.2;674;False
+DF;2019;Rural;False;577.74;21;False
+DF;2020;Comercial;False;29632.82;161;False
+DF;2020;Industrial;False;828.5;7;False
+DF;2020;Poder Público;False;1438.12;9;False
+DF;2020;Residencial;False;9589.3;1114;False
+DF;2020;Rural;False;1779.89;26;False
+DF;2020;Serviço Público;False;4.0;1;False
+DF;2021;Comercial;False;28307.86;185;False
+DF;2021;Industrial;False;567.84;9;False
+DF;2021;Poder Público;False;424.61;13;False
+DF;2021;Residencial;False;17154.38;2546;False
+DF;2021;Rural;False;5934.04;62;False
+DF;2022;Comercial;False;52656.55;416;False
+DF;2022;Industrial;False;683.63;11;False
+DF;2022;Poder Público;False;1556.92;14;False
+DF;2022;Residencial;False;46262.52;5920;False
+DF;2022;Rural;False;13777.29;170;False
+DF;2023;Comercial;False;61828.8;630;False
+DF;2023;Industrial;False;423.82;11;False
+DF;2023;Poder Público;False;979.42;10;False
+DF;2023;Residencial;False;48011.51;5168;False
+DF;2023;Rural;False;18778.89;305;False
+DF;2024;Comercial;False;16136.72;452;False
+DF;2024;Industrial;False;284.5;7;False
+DF;2024;Poder Público;False;2867.36;8;False
+DF;2024;Residencial;False;43191.05;5354;False
+DF;2024;Rural;False;5956.86;305;False
+DF;2025;Comercial;False;22188.22;577;False
+DF;2025;Industrial;False;240.5;8;False
+DF;2025;Poder Público;False;267.75;5;False
+DF;2025;Residencial;False;75439.91;7325;False
+DF;2025;Rural;False;9925.73;350;False
+DF;2025;Rural;True;14.0;1;False
+DF;2026;Comercial;False;8134.43;216;True
+DF;2026;Industrial;False;257.25;5;True
+DF;2026;Poder Público;False;108.0;2;True
+DF;2026;Residencial;False;25371.38;2925;True
+DF;2026;Rural;False;2333.1;103;True
+ES;2013;Residencial;False;2.0;1;False
+ES;2014;Comercial;False;4.0;2;False
+ES;2014;REBR;False;1.5;1;False
+ES;2014;Residencial;False;40.06;5;False
+ES;2015;Comercial;False;35.34;3;False
+ES;2015;Residencial;False;59.72;13;False
+ES;2016;Comercial;False;212.92;16;False
+ES;2016;Industrial;False;21.0;3;False
+ES;2016;Residencial;False;676.82;350;False
+ES;2016;Rural;False;30.32;7;False
+ES;2017;Comercial;False;750.89;35;False
+ES;2017;Industrial;False;154.47;7;False
+ES;2017;Poder Público;False;153.3;7;False
+ES;2017;REBR;False;5.28;1;False
+ES;2017;Residencial;False;883.43;179;False
+ES;2017;Rural;False;32.44;8;False
+ES;2018;Comercial;False;2343.57;108;False
+ES;2018;Industrial;False;1029.74;19;False
+ES;2018;Poder Público;False;228.3;2;False
+ES;2018;REBR;False;3.5;2;False
+ES;2018;Residencial;False;2695.52;470;False
+ES;2018;Rural;False;158.16;20;False
+ES;2019;Comercial;False;11365.64;383;False
+ES;2019;Industrial;False;2133.83;68;False
+ES;2019;Poder Público;False;3886.45;12;False
+ES;2019;REBR;False;39.5;5;False
+ES;2019;Residencial;False;8440.96;1336;False
+ES;2019;Rural;False;1375.64;122;False
+ES;2019;Serviço Público;False;14.2;1;False
+ES;2020;Comercial;False;15918.22;534;False
+ES;2020;Industrial;False;6897.5;131;False
+ES;2020;Poder Público;False;1438.34;23;False
+ES;2020;REBR;False;132.77;29;False
+ES;2020;Residencial;False;11603.6;1745;False
+ES;2020;Rural;False;5413.0;291;False
+ES;2021;Comercial;False;19929.02;782;False
+ES;2021;Industrial;False;5513.63;187;False
+ES;2021;Poder Público;False;2425.5;39;False
+ES;2021;REBR;False;383.1;72;False
+ES;2021;Residencial;False;28217.97;4143;False
+ES;2021;Rural;False;16425.55;1015;False
+ES;2022;Comercial;False;51721.37;1759;False
+ES;2022;Industrial;False;9620.69;335;False
+ES;2022;Poder Público;False;1626.61;32;False
+ES;2022;REBR;False;981.44;174;False
+ES;2022;Residencial;False;82160.32;10669;False
+ES;2022;Rural;False;52992.14;3431;False
+ES;2023;Comercial;False;56562.65;1732;False
+ES;2023;Industrial;False;14576.01;331;False
+ES;2023;Poder Público;False;8623.78;151;False
+ES;2023;REBR;False;2094.86;314;False
+ES;2023;Residencial;False;81746.12;10001;False
+ES;2023;Rural;False;70796.35;4359;False
+ES;2023;Serviço Público;False;246.0;5;False
+ES;2024;Comercial;False;94243.51;1667;False
+ES;2024;Iluminação pública;False;30.0;3;False
+ES;2024;Industrial;False;11751.48;287;False
+ES;2024;Poder Público;False;4139.3;76;False
+ES;2024;REBR;False;4661.75;655;False
+ES;2024;Residencial;False;115840.15;13952;False
+ES;2024;Rural;False;101747.28;6685;False
+ES;2024;Serviço Público;False;2736.0;3;False
+ES;2025;Comercial;False;51813.42;1411;False
+ES;2025;Industrial;False;4853.43;207;False
+ES;2025;Poder Público;False;3617.83;73;False
+ES;2025;REBR;False;6544.92;948;False
+ES;2025;Residencial;False;123272.65;14669;False
+ES;2025;Rural;False;114249.81;7548;False
+ES;2025;Serviço Público;False;350.2;2;False
+ES;2026;Comercial;False;19044.85;873;True
+ES;2026;Industrial;False;2680.41;130;True
+ES;2026;Poder Público;False;1116.37;34;True
+ES;2026;REBR;False;3557.26;600;True
+ES;2026;Residencial;False;69337.8;10350;True
+ES;2026;Rural;False;41301.47;3950;True
+GO;2014;Residencial;False;1.44;1;False
+GO;2014;Rural;False;6.0;1;False
+GO;2015;Comercial;False;16.7;3;False
+GO;2015;Residencial;False;61.44;15;False
+GO;2016;Comercial;False;759.62;11;False
+GO;2016;Industrial;False;30.0;1;False
+GO;2016;Poder Público;False;0.25;1;False
+GO;2016;Residencial;False;378.0;538;False
+GO;2016;Rural;False;15.0;2;False
+GO;2017;Comercial;False;3192.89;76;False
+GO;2017;Industrial;False;42.0;1;False
+GO;2017;Poder Público;False;773.66;16;False
+GO;2017;Residencial;False;950.43;365;False
+GO;2017;Rural;False;1637.3;29;False
+GO;2017;Serviço Público;False;61.51;1;False
+GO;2018;Comercial;False;5774.86;194;False
+GO;2018;Industrial;False;528.56;8;False
+GO;2018;Poder Público;False;458.13;9;False
+GO;2018;Residencial;False;5180.05;774;False
+GO;2018;Rural;False;2375.07;73;False
+GO;2019;Comercial;False;27278.73;904;False
+GO;2019;Industrial;False;7186.69;51;False
+GO;2019;Poder Público;False;355.25;9;False
+GO;2019;Residencial;False;24514.77;3310;False
+GO;2019;Rural;False;6713.09;235;False
+GO;2019;Serviço Público;False;60.0;1;False
+GO;2020;Comercial;False;60424.1;1766;False
+GO;2020;Industrial;False;12055.28;103;False
+GO;2020;Poder Público;False;843.15;20;False
+GO;2020;Residencial;False;50938.53;6220;False
+GO;2020;Rural;False;23923.24;653;False
+GO;2021;Comercial;False;59727.62;1868;False
+GO;2021;Industrial;False;6628.26;83;False
+GO;2021;Poder Público;False;1023.63;16;False
+GO;2021;Residencial;False;93118.19;13171;False
+GO;2021;Rural;False;29622.56;1274;False
+GO;2022;Comercial;False;72062.38;3192;False
+GO;2022;Iluminação pública;False;6.0;1;False
+GO;2022;Industrial;False;7926.55;188;False
+GO;2022;Poder Público;False;2307.63;78;False
+GO;2022;Residencial;False;209656.33;29509;False
+GO;2022;Rural;False;62221.2;3535;False
+GO;2022;Serviço Público;False;33.5;2;False
+GO;2023;Comercial;False;79033.1;2639;False
+GO;2023;Iluminação pública;False;40.0;1;False
+GO;2023;Industrial;False;13605.29;255;False
+GO;2023;Poder Público;False;6030.92;270;False
+GO;2023;Residencial;False;187541.87;22534;False
+GO;2023;Rural;False;74466.48;3772;False
+GO;2023;Serviço Público;False;50.0;1;False
+GO;2024;Comercial;False;280194.14;2857;False
+GO;2024;Iluminação pública;False;8.0;1;False
+GO;2024;Industrial;False;8062.47;155;False
+GO;2024;Poder Público;False;4780.15;162;False
+GO;2024;Residencial;False;290783.92;34027;False
+GO;2024;Rural;False;60692.34;3823;False
+GO;2024;Serviço Público;False;494.0;8;False
+GO;2025;Comercial;False;153168.6;1824;False
+GO;2025;Industrial;False;4680.84;115;False
+GO;2025;Poder Público;False;4867.94;104;False
+GO;2025;Residencial;False;288373.2;29767;False
+GO;2025;Rural;False;52251.83;2899;False
+GO;2025;Serviço Público;False;268.0;6;False
+GO;2026;Comercial;False;8713.65;541;True
+GO;2026;Industrial;False;701.96;28;True
+GO;2026;Poder Público;False;53.0;4;True
+GO;2026;Residencial;False;100813.07;11617;True
+GO;2026;Rural;False;13818.35;939;True
+MA;2014;Residencial;False;33.0;1;False
+MA;2015;Comercial;False;37.63;3;False
+MA;2015;Industrial;False;186.7;2;False
+MA;2015;Residencial;False;110.61;17;False
+MA;2016;Comercial;False;748.25;41;False
+MA;2016;Industrial;False;47.3;3;False
+MA;2016;Residencial;False;195.53;33;False
+MA;2017;Comercial;False;620.94;25;False
+MA;2017;Industrial;False;12.19;1;False
+MA;2017;Residencial;False;719.04;94;False
+MA;2018;Comercial;False;2216.8;95;False
+MA;2018;Comercial;True;743.22;30;False
+MA;2018;Industrial;False;127.2;3;False
+MA;2018;Industrial;True;209.7;2;False
+MA;2018;Poder Público;False;33.0;1;False
+MA;2018;REBR;True;37.7;8;False
+MA;2018;Residencial;False;2497.38;312;False
+MA;2018;Residencial;True;4540.39;153;False
+MA;2018;Rural;False;41.9;3;False
+MA;2018;Rural;True;100.0;2;False
+MA;2019;Comercial;False;7967.73;266;False
+MA;2019;Comercial;True;8952.67;139;False
+MA;2019;Consumo Próprio;True;10.0;2;False
+MA;2019;Industrial;False;112.0;4;False
+MA;2019;Industrial;True;340.57;14;False
+MA;2019;Poder Público;False;172.72;9;False
+MA;2019;Poder Público;True;138.0;5;False
+MA;2019;REBR;True;624.96;85;False
+MA;2019;Residencial;False;14511.47;1666;False
+MA;2019;Residencial;True;11601.58;1189;False
+MA;2019;Rural;False;942.25;42;False
+MA;2019;Rural;True;1730.0;35;False
+MA;2020;Comercial;False;20154.06;447;False
+MA;2020;Comercial;True;16388.86;268;False
+MA;2020;Iluminação pública;False;6.0;1;False
+MA;2020;Industrial;False;2057.59;29;False
+MA;2020;Industrial;True;1948.8;27;False
+MA;2020;Poder Público;False;1662.7;33;False
+MA;2020;Poder Público;True;836.9;15;False
+MA;2020;REBR;True;1339.14;214;False
+MA;2020;Residencial;False;27658.53;3550;False
+MA;2020;Residencial;True;25917.07;2847;False
+MA;2020;Rural;False;1869.16;83;False
+MA;2020;Rural;True;1644.4;82;False
+MA;2020;Serviço Público;False;1000.0;1;False
+MA;2021;Comercial;False;22152.7;644;False
+MA;2021;Comercial;True;12784.16;369;False
+MA;2021;Iluminação pública;False;7.0;1;False
+MA;2021;Industrial;False;2523.0;34;False
+MA;2021;Industrial;True;4211.0;37;False
+MA;2021;Poder Público;False;1826.05;33;False
+MA;2021;Poder Público;True;453.5;10;False
+MA;2021;REBR;False;12.0;2;False
+MA;2021;REBR;True;3921.62;605;False
+MA;2021;Residencial;False;82770.87;8008;False
+MA;2021;Residencial;True;48434.79;5847;False
+MA;2021;Rural;False;4671.83;185;False
+MA;2021;Rural;True;2856.98;166;False
+MA;2021;Serviço Público;False;72.0;1;False
+MA;2022;Comercial;False;35719.92;837;False
+MA;2022;Comercial;True;26942.28;628;False
+MA;2022;Consumo Próprio;True;5.0;1;False
+MA;2022;Industrial;False;4599.77;51;False
+MA;2022;Industrial;True;3304.6;45;False
+MA;2022;Poder Público;False;3212.63;75;False
+MA;2022;Poder Público;True;2445.6;34;False
+MA;2022;REBR;False;99.5;10;False
+MA;2022;REBR;True;7624.6;1156;False
+MA;2022;Residencial;False;121131.09;12552;False
+MA;2022;Residencial;True;108629.72;10627;False
+MA;2022;Rural;False;12221.85;337;False
+MA;2022;Rural;True;8340.36;328;False
+MA;2022;Serviço Público;False;85.0;2;False
+MA;2023;Comercial;False;46224.81;849;False
+MA;2023;Comercial;True;38927.15;729;False
+MA;2023;Iluminação pública;False;49.5;1;False
+MA;2023;Industrial;False;2880.14;46;False
+MA;2023;Industrial;True;3226.3;56;False
+MA;2023;Poder Público;False;2990.72;31;False
+MA;2023;Poder Público;True;2532.5;24;False
+MA;2023;REBR;False;74.6;15;False
+MA;2023;REBR;True;10163.12;1426;False
+MA;2023;Residencial;False;105133.88;12779;False
+MA;2023;Residencial;True;97935.72;11041;False
+MA;2023;Rural;False;12949.1;425;False
+MA;2023;Rural;True;11034.55;430;False
+MA;2023;Serviço Público;False;75.0;1;False
+MA;2024;Comercial;False;44955.39;833;False
+MA;2024;Comercial;True;46104.14;749;False
+MA;2024;Industrial;False;2428.92;47;False
+MA;2024;Industrial;True;3132.25;56;False
+MA;2024;Poder Público;False;3136.73;72;False
+MA;2024;Poder Público;True;2628.4;55;False
+MA;2024;REBR;False;241.1;31;False
+MA;2024;REBR;True;21795.95;3178;False
+MA;2024;Residencial;False;158862.26;19709;False
+MA;2024;Residencial;True;137639.33;16155;False
+MA;2024;Rural;False;11651.26;506;False
+MA;2024;Rural;True;10735.28;494;False
+MA;2024;Serviço Público;False;98.7;5;False
+MA;2025;Comercial;False;35851.13;778;False
+MA;2025;Comercial;True;22195.09;507;False
+MA;2025;Iluminação pública;False;30.0;1;False
+MA;2025;Industrial;False;1924.33;53;False
+MA;2025;Industrial;True;2151.3;41;False
+MA;2025;Poder Público;False;3632.38;124;False
+MA;2025;Poder Público;True;2392.23;53;False
+MA;2025;REBR;False;6517.97;990;False
+MA;2025;REBR;True;13324.55;1961;False
+MA;2025;Residencial;False;154291.96;17487;False
+MA;2025;Residencial;True;86732.74;9598;False
+MA;2025;Rural;False;5993.65;519;False
+MA;2025;Rural;True;4173.45;346;False
+MA;2025;Serviço Público;False;70.0;2;False
+MA;2026;Comercial;False;12527.25;187;True
+MA;2026;Comercial;True;4767.2;54;True
+MA;2026;Industrial;False;290.0;14;True
+MA;2026;Industrial;True;72.0;4;True
+MA;2026;Poder Público;False;2261.0;49;True
+MA;2026;Poder Público;True;589.0;10;True
+MA;2026;REBR;False;6061.65;944;True
+MA;2026;REBR;True;1453.76;224;True
+MA;2026;Residencial;False;47859.42;5459;True
+MA;2026;Residencial;True;10147.64;1159;True
+MA;2026;Rural;False;1506.4;174;True
+MA;2026;Rural;True;279.85;32;True
+MG;2012;Comercial;False;6.8;1;False
+MG;2013;Comercial;False;82.53;4;False
+MG;2013;Industrial;False;2.93;1;False
+MG;2013;Residencial;False;37.0;3;False
+MG;2013;Rural;False;27.0;1;False
+MG;2014;Comercial;False;115.32;6;False
+MG;2014;Industrial;False;12.45;3;False
+MG;2014;Residencial;False;124.51;37;False
+MG;2014;Rural;False;6.45;1;False
+MG;2015;Comercial;False;430.14;36;False
+MG;2015;Industrial;False;31.8;3;False
+MG;2015;Poder Público;False;1277.8;4;False
+MG;2015;Residencial;False;868.86;245;False
+MG;2015;Rural;False;67.4;6;False
+MG;2016;Comercial;False;4089.61;219;False
+MG;2016;Iluminação pública;False;2.0;1;False
+MG;2016;Industrial;False;733.75;24;False
+MG;2016;Poder Público;False;179.48;9;False
+MG;2016;Residencial;False;4281.87;1042;False
+MG;2016;Rural;False;259.02;38;False
+MG;2016;Serviço Público;False;166.6;9;False
+MG;2017;Comercial;False;12462.21;460;False
+MG;2017;Industrial;False;1613.52;80;False
+MG;2017;Poder Público;False;1143.22;21;False
+MG;2017;Residencial;False;10407.24;2251;False
+MG;2017;Rural;False;2909.83;198;False
+MG;2017;Serviço Público;False;167.0;6;False
+MG;2018;Comercial;False;40934.05;1351;False
+MG;2018;Industrial;False;13906.44;300;False
+MG;2018;Poder Público;False;225.55;19;False
+MG;2018;REBR;False;2.25;1;False
+MG;2018;Residencial;False;22297.63;4817;False
+MG;2018;Rural;False;9157.13;651;False
+MG;2018;Serviço Público;False;5.0;1;False
+MG;2019;Comercial;False;131885.8;4901;False
+MG;2019;Industrial;False;24009.41;635;False
+MG;2019;Poder Público;False;1095.95;114;False
+MG;2019;Residencial;False;87441.51;16035;False
+MG;2019;Rural;False;55739.43;2483;False
+MG;2019;Serviço Público;False;20.0;1;False
+MG;2020;Comercial;False;263909.73;6322;False
+MG;2020;Iluminação pública;False;240.2;3;False
+MG;2020;Industrial;False;35532.9;733;False
+MG;2020;Poder Público;False;4857.76;106;False
+MG;2020;Residencial;False;142198.62;24523;False
+MG;2020;Rural;False;121464.06;4873;False
+MG;2020;Serviço Público;False;189.8;6;False
+MG;2021;Comercial;False;274841.59;6236;False
+MG;2021;Comercial;True;3732.5;2;False
+MG;2021;Iluminação pública;False;28.4;2;False
+MG;2021;Industrial;False;41057.77;690;False
+MG;2021;Industrial;True;832.5;1;False
+MG;2021;Poder Público;False;3281.62;109;False
+MG;2021;Residencial;False;224215.59;42460;False
+MG;2021;Rural;False;161366.09;8822;False
+MG;2021;Serviço Público;False;138.9;5;False
+MG;2022;Comercial;False;335326.92;8396;False
+MG;2022;Iluminação pública;False;173.6;5;False
+MG;2022;Industrial;False;56685.48;1015;False
+MG;2022;Industrial;True;832.5;1;False
+MG;2022;Poder Público;False;10210.51;237;False
+MG;2022;REBR;False;74.36;13;False
+MG;2022;Residencial;False;404046.94;65770;False
+MG;2022;Rural;False;235989.44;13365;False
+MG;2022;Serviço Público;False;135.0;3;False
+MG;2023;Comercial;False;510587.31;7044;False
+MG;2023;Iluminação pública;False;287.9;6;False
+MG;2023;Industrial;False;39140.72;638;False
+MG;2023;Poder Público;False;12819.78;257;False
+MG;2023;REBR;False;67.1;14;False
+MG;2023;Residencial;False;335896.47;44000;False
+MG;2023;Rural;False;230865.93;11205;False
+MG;2023;Serviço Público;False;334.5;5;False
+MG;2024;Comercial;False;495516.43;4884;False
+MG;2024;Industrial;False;36090.44;374;False
+MG;2024;Poder Público;False;9771.57;252;False
+MG;2024;REBR;False;79.57;18;False
+MG;2024;Residencial;False;288640.57;48543;False
+MG;2024;Rural;False;116776.33;8326;False
+MG;2024;Serviço Público;False;273.78;6;False
+MG;2025;Comercial;False;429051.38;5327;False
+MG;2025;Industrial;False;13671.83;266;False
+MG;2025;Poder Público;False;4744.08;202;False
+MG;2025;REBR;False;4234.95;845;False
+MG;2025;Residencial;False;355429.06;58945;False
+MG;2025;Residencial;True;15.0;1;False
+MG;2025;Rural;False;123211.43;10157;False
+MG;2025;Serviço Público;False;75.72;5;False
+MG;2026;Comercial;False;78463.21;2217;True
+MG;2026;Comercial;True;20.0;2;True
+MG;2026;Industrial;False;5420.61;88;True
+MG;2026;Poder Público;False;1147.44;90;True
+MG;2026;REBR;False;5204.62;1058;True
+MG;2026;Residencial;False;145737.78;21735;True
+MG;2026;Residencial;True;22.5;2;True
+MG;2026;Rural;False;32679.27;2589;True
+MG;2026;Rural;True;45.5;5;True
+MG;2026;Serviço Público;False;80.0;2;True
+MS;2012;Residencial;False;6.0;2;False
+MS;2013;Residencial;False;8.0;1;False
+MS;2014;Comercial;False;88.5;2;False
+MS;2014;Residencial;False;7.0;2;False
+MS;2015;Comercial;False;14.0;2;False
+MS;2015;Residencial;False;84.02;11;False
+MS;2016;Industrial;False;8.2;1;False
+MS;2016;Residencial;False;40.75;9;False
+MS;2017;Comercial;False;190.48;10;False
+MS;2017;Industrial;False;12.48;2;False
+MS;2017;Residencial;False;147.42;23;False
+MS;2017;Rural;False;18.2;2;False
+MS;2018;Comercial;False;2908.41;146;False
+MS;2018;Industrial;False;9756.47;353;False
+MS;2018;Poder Público;False;143.17;4;False
+MS;2018;Residencial;False;3945.29;577;False
+MS;2018;Rural;False;802.97;53;False
+MS;2019;Comercial;False;21339.45;806;False
+MS;2019;Industrial;False;6108.92;84;False
+MS;2019;Poder Público;False;1303.33;10;False
+MS;2019;Residencial;False;17355.84;2827;False
+MS;2019;Rural;False;11400.7;306;False
+MS;2020;Comercial;False;29376.54;1141;False
+MS;2020;Industrial;False;5912.03;146;False
+MS;2020;Poder Público;False;1178.89;24;False
+MS;2020;Residencial;False;37866.23;6304;False
+MS;2020;Rural;False;17811.6;734;False
+MS;2020;Serviço Público;False;20.0;2;False
+MS;2021;Comercial;False;38002.32;1651;False
+MS;2021;Iluminação pública;False;110.0;1;False
+MS;2021;Industrial;False;18452.83;286;False
+MS;2021;Poder Público;False;576.0;8;False
+MS;2021;Residencial;False;84848.26;13818;False
+MS;2021;Rural;False;31914.11;1749;False
+MS;2021;Serviço Público;False;105.8;8;False
+MS;2022;Comercial;False;57398.53;2438;False
+MS;2022;Industrial;False;35567.76;394;False
+MS;2022;Poder Público;False;2831.91;31;False
+MS;2022;Residencial;False;143818.97;22865;False
+MS;2022;Rural;False;55104.87;2849;False
+MS;2022;Serviço Público;False;84.6;3;False
+MS;2023;Comercial;False;80584.75;2188;False
+MS;2023;Iluminação pública;False;60.95;4;False
+MS;2023;Industrial;False;72161.07;409;False
+MS;2023;Poder Público;False;4289.72;86;False
+MS;2023;Residencial;False;141114.16;22060;False
+MS;2023;Rural;False;46050.83;2607;False
+MS;2023;Serviço Público;False;169.0;4;False
+MS;2024;Comercial;False;44253.39;2145;False
+MS;2024;Iluminação pública;False;2579.76;6;False
+MS;2024;Industrial;False;143819.34;526;False
+MS;2024;Poder Público;False;10290.66;164;False
+MS;2024;Residencial;False;232590.37;35730;False
+MS;2024;Rural;False;37872.3;3036;False
+MS;2024;Serviço Público;False;2504.48;2;False
+MS;2025;Comercial;False;39929.91;1641;False
+MS;2025;Iluminação pública;False;30.0;1;False
+MS;2025;Industrial;False;51239.9;255;False
+MS;2025;Poder Público;False;10361.27;98;False
+MS;2025;Residencial;False;191107.21;27561;False
+MS;2025;Rural;False;32655.16;2494;False
+MS;2026;Comercial;False;11642.49;570;True
+MS;2026;Industrial;False;744.4;62;True
+MS;2026;Poder Público;False;1313.0;24;True
+MS;2026;Residencial;False;82035.52;12895;True
+MS;2026;Rural;False;9861.64;878;True
+MT;2015;Comercial;False;54.18;3;False
+MT;2015;Industrial;False;5.1;1;False
+MT;2015;Residencial;False;31.16;7;False
+MT;2016;Comercial;False;463.17;22;False
+MT;2016;Industrial;False;250.52;6;False
+MT;2016;Poder Público;False;28.6;1;False
+MT;2016;Residencial;False;466.33;69;False
+MT;2016;Rural;False;24.4;4;False
+MT;2017;Comercial;False;1798.54;55;False
+MT;2017;Industrial;False;148.63;16;False
+MT;2017;Poder Público;False;18.6;2;False
+MT;2017;Residencial;False;1297.24;185;False
+MT;2017;Rural;False;1250.21;12;False
+MT;2018;Comercial;False;7153.05;276;False
+MT;2018;Industrial;False;1862.74;69;False
+MT;2018;Poder Público;False;650.6;8;False
+MT;2018;Residencial;False;5766.86;765;False
+MT;2018;Rural;False;3664.2;54;False
+MT;2019;Comercial;False;39983.91;1335;False
+MT;2019;Industrial;False;10764.05;367;False
+MT;2019;Poder Público;False;1410.6;21;False
+MT;2019;Residencial;False;33338.54;4296;False
+MT;2019;Rural;False;20240.28;391;False
+MT;2019;Serviço Público;False;25.0;1;False
+MT;2020;Comercial;False;50220.65;1698;False
+MT;2020;Iluminação pública;False;95.0;3;False
+MT;2020;Industrial;False;31910.16;622;False
+MT;2020;Poder Público;False;2758.71;61;False
+MT;2020;Residencial;False;71774.8;9262;False
+MT;2020;Rural;False;50970.44;982;False
+MT;2020;Serviço Público;False;86.0;2;False
+MT;2021;Comercial;False;59113.23;2179;False
+MT;2021;Industrial;False;27465.2;731;False
+MT;2021;Poder Público;False;5202.28;30;False
+MT;2021;Residencial;False;130180.91;17690;False
+MT;2021;Rural;False;58798.91;2046;False
+MT;2021;Serviço Público;False;10.0;1;False
+MT;2022;Comercial;False;76451.34;2229;False
+MT;2022;Iluminação pública;False;291.4;5;False
+MT;2022;Industrial;False;44372.46;756;False
+MT;2022;Poder Público;False;2524.9;34;False
+MT;2022;Residencial;False;160975.88;21002;False
+MT;2022;Rural;False;88209.04;2768;False
+MT;2022;Serviço Público;False;150.0;2;False
+MT;2023;Comercial;False;88218.7;2473;False
+MT;2023;Industrial;False;112836.29;762;False
+MT;2023;Poder Público;False;3693.35;59;False
+MT;2023;Residencial;False;230545.82;29466;False
+MT;2023;Rural;False;106262.11;3687;False
+MT;2023;Serviço Público;False;230.0;5;False
+MT;2024;Comercial;False;116854.83;2727;False
+MT;2024;Industrial;False;113389.47;740;False
+MT;2024;Poder Público;False;5926.84;93;False
+MT;2024;Residencial;False;413899.72;52773;False
+MT;2024;Rural;False;90955.66;5383;False
+MT;2024;Serviço Público;False;362.5;7;False
+MT;2025;Comercial;False;82505.46;2253;False
+MT;2025;Iluminação pública;False;40.0;1;False
+MT;2025;Industrial;False;181115.54;615;False
+MT;2025;Poder Público;False;6449.58;79;False
+MT;2025;Residencial;False;354911.26;45665;False
+MT;2025;Rural;False;62856.18;4836;False
+MT;2025;Serviço Público;False;1227.28;11;False
+MT;2026;Comercial;False;24637.56;634;True
+MT;2026;Industrial;False;28388.08;169;True
+MT;2026;Poder Público;False;1766.05;26;True
+MT;2026;Residencial;False;119479.47;15478;True
+MT;2026;Rural;False;19796.58;1098;True
+PA;2014;Comercial;False;24.0;1;False
+PA;2014;Residencial;False;1.0;1;False
+PA;2015;Comercial;False;2.5;1;False
+PA;2015;Residencial;False;2.5;1;False
+PA;2016;Comercial;False;33.0;3;False
+PA;2016;Residencial;False;119.75;36;False
+PA;2017;Comercial;False;180.89;15;False
+PA;2017;Residencial;False;643.66;119;False
+PA;2017;Rural;False;6.6;1;False
+PA;2018;Comercial;False;1806.01;77;False
+PA;2018;Industrial;False;49.92;1;False
+PA;2018;Poder Público;False;25.5;2;False
+PA;2018;Residencial;False;3247.63;457;False
+PA;2018;Rural;False;180.8;10;False
+PA;2019;Comercial;False;8673.06;350;False
+PA;2019;Iluminação pública;False;52.0;1;False
+PA;2019;Industrial;False;445.5;10;False
+PA;2019;Poder Público;False;243.0;2;False
+PA;2019;Residencial;False;13976.87;1934;False
+PA;2019;Rural;False;1032.22;52;False
+PA;2020;Comercial;False;19835.69;790;False
+PA;2020;Industrial;False;2740.57;28;False
+PA;2020;Poder Público;False;472.47;14;False
+PA;2020;Residencial;False;35711.32;4497;False
+PA;2020;Rural;False;2811.74;140;False
+PA;2021;Comercial;False;37241.88;1160;False
+PA;2021;Industrial;False;2669.11;35;False
+PA;2021;Poder Público;False;1462.5;22;False
+PA;2021;Residencial;False;89151.3;9858;False
+PA;2021;Rural;False;5781.65;279;False
+PA;2022;Comercial;False;46364.11;1483;False
+PA;2022;Industrial;False;4400.62;70;False
+PA;2022;Poder Público;False;2302.25;66;False
+PA;2022;Residencial;False;196989.51;19570;False
+PA;2022;Rural;False;11619.22;483;False
+PA;2023;Comercial;False;68614.98;2051;False
+PA;2023;Iluminação pública;False;8.0;1;False
+PA;2023;Industrial;False;9108.5;115;False
+PA;2023;Poder Público;False;1209.35;45;False
+PA;2023;Residencial;False;219004.31;26014;False
+PA;2023;Rural;False;14551.51;769;False
+PA;2023;Serviço Público;False;10.0;1;False
+PA;2024;Comercial;False;62631.28;2252;False
+PA;2024;Industrial;False;6874.04;73;False
+PA;2024;Poder Público;False;1614.74;83;False
+PA;2024;Residencial;False;332107.88;41068;False
+PA;2024;Rural;False;11398.08;983;False
+PA;2024;Serviço Público;False;119.0;3;False
+PA;2025;Comercial;False;58069.71;2130;False
+PA;2025;Industrial;False;13684.15;80;False
+PA;2025;Poder Público;False;1111.85;72;False
+PA;2025;REBR;False;13840.72;1988;False
+PA;2025;Residencial;False;244513.07;30140;False
+PA;2025;Rural;False;10104.62;883;False
+PA;2025;Serviço Público;False;5.13;1;False
+PA;2026;Comercial;False;12609.78;645;True
+PA;2026;Industrial;False;816.75;22;True
+PA;2026;Poder Público;False;1172.5;25;True
+PA;2026;REBR;False;13427.85;1998;True
+PA;2026;Residencial;False;83981.82;9535;True
+PA;2026;Rural;False;5544.2;277;True
+PB;2014;Comercial;False;2.35;1;False
+PB;2014;Residencial;False;12.44;9;False
+PB;2015;Comercial;False;72.5;2;False
+PB;2015;Residencial;False;5.52;3;False
+PB;2015;Rural;False;7.5;1;False
+PB;2016;Comercial;False;71.19;6;False
+PB;2016;Poder Público;False;150.0;2;False
+PB;2016;Residencial;False;168.26;24;False
+PB;2016;Rural;False;8.32;1;False
+PB;2017;Comercial;False;760.88;27;False
+PB;2017;Industrial;False;94.54;4;False
+PB;2017;Poder Público;False;98.28;2;False
+PB;2017;Residencial;False;631.13;83;False
+PB;2017;Rural;False;64.88;7;False
+PB;2018;Comercial;False;3945.76;145;False
+PB;2018;Industrial;False;2369.09;33;False
+PB;2018;Poder Público;False;33.93;3;False
+PB;2018;Residencial;False;2696.52;354;False
+PB;2018;Rural;False;830.84;30;False
+PB;2019;Comercial;False;19779.92;814;False
+PB;2019;Industrial;False;7107.22;102;False
+PB;2019;Poder Público;False;548.14;25;False
+PB;2019;Residencial;False;16255.43;2351;False
+PB;2019;Rural;False;2504.65;129;False
+PB;2019;Serviço Público;False;5.0;2;False
+PB;2020;Comercial;False;28328.97;829;False
+PB;2020;Industrial;False;6953.52;136;False
+PB;2020;Poder Público;False;1042.15;34;False
+PB;2020;Residencial;False;20226.19;2926;False
+PB;2020;Rural;False;3375.41;161;False
+PB;2021;Comercial;False;24969.68;1062;False
+PB;2021;Industrial;False;6503.38;142;False
+PB;2021;Poder Público;False;835.64;20;False
+PB;2021;Residencial;False;33659.72;5030;False
+PB;2021;Rural;False;5522.19;315;False
+PB;2022;Comercial;False;37268.98;1326;False
+PB;2022;Industrial;False;6410.11;132;False
+PB;2022;Poder Público;False;1185.35;40;False
+PB;2022;Residencial;False;41826.32;5973;False
+PB;2022;Rural;False;7613.35;435;False
+PB;2023;Comercial;False;34532.73;1149;False
+PB;2023;Industrial;False;16737.99;211;False
+PB;2023;Poder Público;False;2028.95;66;False
+PB;2023;Residencial;False;33936.86;4461;False
+PB;2023;Rural;False;7206.04;383;False
+PB;2024;Comercial;False;26845.51;1000;False
+PB;2024;Iluminação pública;False;25.0;1;False
+PB;2024;Industrial;False;4898.99;91;False
+PB;2024;Poder Público;False;2121.69;59;False
+PB;2024;Residencial;False;57036.91;7444;False
+PB;2024;Rural;False;6147.22;501;False
+PB;2024;Serviço Público;False;215.0;2;False
+PB;2025;Comercial;False;28253.65;1147;False
+PB;2025;Industrial;False;3726.56;86;False
+PB;2025;Poder Público;False;7035.5;132;False
+PB;2025;Residencial;False;74963.74;9613;False
+PB;2025;Rural;False;8086.13;755;False
+PB;2025;Serviço Público;False;185.0;2;False
+PB;2026;Comercial;False;17376.51;615;True
+PB;2026;Industrial;False;1337.27;50;True
+PB;2026;Poder Público;False;3866.57;41;True
+PB;2026;Residencial;False;47920.34;6498;True
+PB;2026;Rural;False;4194.22;463;True
+PE;2012;Comercial;False;10.0;1;False
+PE;2013;Residencial;False;3.0;1;False
+PE;2014;Poder Público;False;369.92;2;False
+PE;2014;Residencial;False;11.51;2;False
+PE;2015;Comercial;False;69.8;8;False
+PE;2015;Poder Público;False;528.3;4;False
+PE;2015;Residencial;False;154.13;23;False
+PE;2016;Comercial;False;477.58;21;False
+PE;2016;Industrial;False;74.5;2;False
+PE;2016;Poder Público;False;20.77;3;False
+PE;2016;Residencial;False;337.31;59;False
+PE;2016;Rural;False;7.2;2;False
+PE;2017;Comercial;False;950.07;43;False
+PE;2017;Industrial;False;110.0;6;False
+PE;2017;Poder Público;False;23.0;5;False
+PE;2017;Residencial;False;686.58;110;False
+PE;2017;Rural;False;112.32;2;False
+PE;2018;Comercial;False;3967.7;145;False
+PE;2018;Industrial;False;375.54;9;False
+PE;2018;Poder Público;False;2404.2;2;False
+PE;2018;Residencial;False;2396.71;355;False
+PE;2018;Rural;False;490.62;16;False
+PE;2019;Comercial;False;12689.19;458;False
+PE;2019;Industrial;False;1455.49;16;False
+PE;2019;Poder Público;False;12.88;2;False
+PE;2019;Residencial;False;9223.14;1378;False
+PE;2019;Rural;False;1914.21;78;False
+PE;2020;Comercial;False;31285.63;858;False
+PE;2020;Industrial;False;11503.69;46;False
+PE;2020;Poder Público;False;305.52;7;False
+PE;2020;Residencial;False;23965.62;3418;False
+PE;2020;Rural;False;5309.29;218;False
+PE;2020;Serviço Público;False;12.5;1;False
+PE;2021;Comercial;False;32742.4;1491;False
+PE;2021;Industrial;False;6592.24;109;False
+PE;2021;Poder Público;False;1459.44;20;False
+PE;2021;Residencial;False;72787.85;10945;False
+PE;2021;Rural;False;11813.08;620;False
+PE;2021;Serviço Público;False;360.0;1;False
+PE;2022;Comercial;False;71837.09;2887;False
+PE;2022;Industrial;False;9157.33;118;False
+PE;2022;Poder Público;False;894.0;4;False
+PE;2022;Residencial;False;150438.17;22482;False
+PE;2022;Rural;False;16071.85;1162;False
+PE;2023;Comercial;False;57473.96;2651;False
+PE;2023;Industrial;False;35645.82;283;False
+PE;2023;Residencial;False;137770.74;20015;False
+PE;2023;Rural;False;17389.82;1280;False
+PE;2024;Comercial;False;42549.2;2399;False
+PE;2024;Industrial;False;34754.23;163;False
+PE;2024;Residencial;False;218126.23;32982;False
+PE;2024;Residencial;True;40.0;1;False
+PE;2024;Rural;False;17469.91;1748;False
+PE;2025;Comercial;False;38506.09;2157;False
+PE;2025;Comercial;True;143.3;5;False
+PE;2025;Iluminação pública;False;9.95;1;False
+PE;2025;Industrial;False;23681.8;112;False
+PE;2025;Industrial;True;36.0;1;False
+PE;2025;Poder Público;False;719.93;15;False
+PE;2025;Residencial;False;262757.47;36107;False
+PE;2025;Residencial;True;311.1;29;False
+PE;2025;Rural;False;17229.67;1704;False
+PE;2025;Rural;True;84.0;6;False
+PE;2025;Serviço Público;False;500.0;1;False
+PE;2026;Comercial;False;21489.49;862;True
+PE;2026;Comercial;True;497.5;9;True
+PE;2026;Industrial;False;1702.82;35;True
+PE;2026;Poder Público;False;1285.71;36;True
+PE;2026;Residencial;False;142949.09;21552;True
+PE;2026;Residencial;True;318.75;10;True
+PE;2026;Rural;False;8502.12;815;True
+PE;2026;Rural;True;100.0;3;True
+PE;2026;Serviço Público;False;18.16;3;True
+PI;2012;Residencial;False;3.0;1;False
+PI;2015;Comercial;False;72.0;3;False
+PI;2016;Comercial;False;1782.2;85;False
+PI;2016;Industrial;False;27.6;3;False
+PI;2016;Poder Público;False;150.0;1;False
+PI;2016;Residencial;False;168.0;20;False
+PI;2017;Comercial;False;369.74;12;False
+PI;2017;Industrial;False;32.0;2;False
+PI;2017;Residencial;False;348.59;50;False
+PI;2018;Comercial;False;1949.62;65;False
+PI;2018;Industrial;False;142.6;2;False
+PI;2018;Poder Público;False;111.6;4;False
+PI;2018;Residencial;False;2214.36;289;False
+PI;2018;Rural;False;47.75;3;False
+PI;2019;Comercial;False;11890.12;337;False
+PI;2019;Industrial;False;1338.59;17;False
+PI;2019;Poder Público;False;123.9;8;False
+PI;2019;Residencial;False;9590.1;1343;False
+PI;2019;Rural;False;977.67;42;False
+PI;2020;Comercial;False;18455.52;748;False
+PI;2020;Industrial;False;3769.81;45;False
+PI;2020;Poder Público;False;443.92;31;False
+PI;2020;Residencial;False;28049.85;3794;False
+PI;2020;Rural;False;1769.34;94;False
+PI;2020;Serviço Público;False;27.72;1;False
+PI;2021;Comercial;False;27186.88;991;False
+PI;2021;Iluminação pública;False;160.0;2;False
+PI;2021;Industrial;False;2544.27;46;False
+PI;2021;Poder Público;False;1011.4;20;False
+PI;2021;Residencial;False;58057.24;8067;False
+PI;2021;Rural;False;2283.82;157;False
+PI;2021;Serviço Público;False;593.0;4;False
+PI;2022;Comercial;False;31120.58;1052;False
+PI;2022;Iluminação pública;False;5.0;1;False
+PI;2022;Industrial;False;2665.29;51;False
+PI;2022;Poder Público;False;1009.89;28;False
+PI;2022;Residencial;False;87291.76;11843;False
+PI;2022;Rural;False;4325.01;212;False
+PI;2022;Serviço Público;False;23.6;2;False
+PI;2023;Comercial;False;33859.4;1281;False
+PI;2023;Industrial;False;6324.58;76;False
+PI;2023;Poder Público;False;6446.71;76;False
+PI;2023;Residencial;False;104919.43;14232;False
+PI;2023;Rural;False;6547.28;387;False
+PI;2023;Serviço Público;False;125.0;2;False
+PI;2024;Comercial;False;52303.63;1508;False
+PI;2024;Iluminação pública;False;20.0;1;False
+PI;2024;Industrial;False;2003.31;45;False
+PI;2024;Poder Público;False;2408.66;88;False
+PI;2024;Residencial;False;143012.67;19653;False
+PI;2024;Rural;False;11367.91;883;False
+PI;2024;Serviço Público;False;175.0;4;False
+PI;2025;Comercial;False;22862.64;1085;False
+PI;2025;Iluminação pública;False;85.0;2;False
+PI;2025;Industrial;False;1158.08;37;False
+PI;2025;Poder Público;False;2553.82;91;False
+PI;2025;REBR;False;3470.54;625;False
+PI;2025;Residencial;False;96617.68;13208;False
+PI;2025;Rural;False;7635.76;678;False
+PI;2026;Comercial;False;7102.5;392;True
+PI;2026;Iluminação pública;False;50.0;1;True
+PI;2026;Industrial;False;229.5;9;True
+PI;2026;Poder Público;False;1670.0;52;True
+PI;2026;REBR;False;8369.52;1029;True
+PI;2026;Residencial;False;47056.05;5364;True
+PI;2026;Rural;False;2460.2;281;True
+PI;2026;Serviço Público;False;36.0;1;True
+PR;2012;Comercial;False;201.0;3;False
+PR;2013;Comercial;False;39.8;2;False
+PR;2013;Residencial;False;2.0;1;False
+PR;2014;Comercial;False;51.7;3;False
+PR;2014;Residencial;False;35.96;13;False
+PR;2015;Comercial;False;169.09;19;False
+PR;2015;Industrial;False;64.93;5;False
+PR;2015;Residencial;False;265.41;75;False
+PR;2016;Comercial;False;1429.68;89;False
+PR;2016;Iluminação pública;False;28.2;3;False
+PR;2016;Industrial;False;183.18;26;False
+PR;2016;Poder Público;False;14.5;2;False
+PR;2016;Residencial;False;1513.41;366;False
+PR;2016;Rural;False;54.2;7;False
+PR;2017;Comercial;False;3609.6;163;False
+PR;2017;Industrial;False;944.88;48;False
+PR;2017;Poder Público;False;27.0;1;False
+PR;2017;Residencial;False;2872.42;614;False
+PR;2017;Rural;False;482.83;28;False
+PR;2017;Serviço Público;False;24.6;1;False
+PR;2018;Comercial;False;11078.99;521;False
+PR;2018;Industrial;False;2699.09;131;False
+PR;2018;Poder Público;False;2189.3;6;False
+PR;2018;Residencial;False;8617.4;1826;False
+PR;2018;Rural;False;3102.26;177;False
+PR;2018;Serviço Público;False;22.3;5;False
+PR;2019;Comercial;False;59592.74;2448;False
+PR;2019;Iluminação pública;False;300.0;1;False
+PR;2019;Industrial;False;15330.45;488;False
+PR;2019;Poder Público;False;992.31;9;False
+PR;2019;Residencial;False;101578.99;6979;False
+PR;2019;Rural;False;23972.04;907;False
+PR;2019;Serviço Público;False;250.6;9;False
+PR;2020;Comercial;False;89852.18;3477;False
+PR;2020;Industrial;False;30711.28;998;False
+PR;2020;Poder Público;False;889.2;20;False
+PR;2020;Residencial;False;70663.29;13847;False
+PR;2020;Rural;False;50806.88;2287;False
+PR;2020;Serviço Público;False;147.0;2;False
+PR;2021;Comercial;False;105690.56;4440;False
+PR;2021;Industrial;False;41119.01;1536;False
+PR;2021;Poder Público;False;1516.21;33;False
+PR;2021;Residencial;False;137943.71;25481;False
+PR;2021;Rural;False;114563.81;5355;False
+PR;2021;Serviço Público;False;128.0;2;False
+PR;2022;Comercial;False;178225.42;6872;False
+PR;2022;Iluminação pública;False;375.0;2;False
+PR;2022;Industrial;False;86209.69;2423;False
+PR;2022;Industrial;True;1700.0;1;False
+PR;2022;Poder Público;False;6603.9;72;False
+PR;2022;Residencial;False;276759.81;46283;False
+PR;2022;Rural;False;230268.48;11177;False
+PR;2022;Serviço Público;False;611.67;4;False
+PR;2023;Comercial;False;176367.47;5068;False
+PR;2023;Comercial;True;1150.0;1;False
+PR;2023;Industrial;False;107180.59;1926;False
+PR;2023;Poder Público;False;7355.89;141;False
+PR;2023;REBR;False;5.0;1;False
+PR;2023;Residencial;False;201128.41;30269;False
+PR;2023;Rural;False;208746.48;8950;False
+PR;2023;Serviço Público;False;1115.0;5;False
+PR;2024;Comercial;False;196328.09;5280;False
+PR;2024;Iluminação pública;False;500.0;2;False
+PR;2024;Industrial;False;211282.95;2076;False
+PR;2024;Poder Público;False;17399.23;221;False
+PR;2024;REBR;False;29.0;3;False
+PR;2024;Residencial;False;308049.97;43700;False
+PR;2024;Rural;False;204956.45;9553;False
+PR;2024;Serviço Público;False;1651.0;9;False
+PR;2025;Comercial;False;133349.69;5366;False
+PR;2025;Consumo Próprio;False;1500.0;2;False
+PR;2025;Iluminação pública;False;238.5;17;False
+PR;2025;Industrial;False;133466.76;1658;False
+PR;2025;Poder Público;False;19675.95;431;False
+PR;2025;REBR;False;2600.96;459;False
+PR;2025;Residencial;False;358509.47;45535;False
+PR;2025;Rural;False;174227.06;9385;False
+PR;2025;Serviço Público;False;648.5;4;False
+PR;2026;Comercial;False;28990.3;1352;True
+PR;2026;Consumo Próprio;False;625.0;1;True
+PR;2026;Iluminação pública;False;66.0;1;True
+PR;2026;Industrial;False;20122.11;214;True
+PR;2026;Poder Público;False;4691.88;119;True
+PR;2026;REBR;False;3131.22;568;True
+PR;2026;Residencial;False;119977.29;17234;True
+PR;2026;Rural;False;30831.49;2243;True
+RJ;2013;Residencial;False;31.3;7;False
+RJ;2014;Comercial;False;373.4;4;False
+RJ;2014;Poder Público;False;47.4;4;False
+RJ;2014;Residencial;False;55.38;18;False
+RJ;2015;Comercial;False;302.48;22;False
+RJ;2015;Industrial;False;15.0;1;False
+RJ;2015;Poder Público;False;93.2;2;False
+RJ;2015;Residencial;False;583.4;136;False
+RJ;2015;Rural;False;12.18;2;False
+RJ;2016;Comercial;False;1404.22;82;False
+RJ;2016;Industrial;False;39.52;4;False
+RJ;2016;Poder Público;False;33.0;2;False
+RJ;2016;Residencial;False;1878.37;443;False
+RJ;2016;Rural;False;47.62;6;False
+RJ;2017;Comercial;False;1382.42;73;False
+RJ;2017;Industrial;False;22.6;2;False
+RJ;2017;Poder Público;False;21.5;3;False
+RJ;2017;Residencial;False;3756.78;795;False
+RJ;2017;Rural;False;96.45;9;False
+RJ;2018;Comercial;False;5492.22;179;False
+RJ;2018;Industrial;False;396.1;9;False
+RJ;2018;Poder Público;False;75.0;4;False
+RJ;2018;Residencial;False;9320.9;1756;False
+RJ;2018;Rural;False;233.18;12;False
+RJ;2019;Comercial;False;23533.02;604;False
+RJ;2019;Industrial;False;811.31;27;False
+RJ;2019;Poder Público;False;352.14;16;False
+RJ;2019;Residencial;False;32169.18;5590;False
+RJ;2019;Rural;False;1107.84;82;False
+RJ;2020;Comercial;False;38880.49;974;False
+RJ;2020;Industrial;False;2920.51;60;False
+RJ;2020;Poder Público;False;643.67;30;False
+RJ;2020;Residencial;False;55247.62;8772;False
+RJ;2020;Rural;False;3364.65;218;False
+RJ;2021;Comercial;False;67011.82;1210;False
+RJ;2021;Iluminação pública;False;3.56;1;False
+RJ;2021;Industrial;False;6074.26;115;False
+RJ;2021;Poder Público;False;455.69;28;False
+RJ;2021;Residencial;False;125821.85;21351;False
+RJ;2021;Rural;False;5667.62;463;False
+RJ;2022;Comercial;False;85940.89;2402;False
+RJ;2022;Iluminação pública;False;6.39;1;False
+RJ;2022;Industrial;False;11338.45;196;False
+RJ;2022;Poder Público;False;1705.64;63;False
+RJ;2022;Residencial;False;231693.49;35569;False
+RJ;2022;Rural;False;9191.85;804;False
+RJ;2022;Serviço Público;False;229.58;2;False
+RJ;2023;Comercial;False;132138.16;2396;False
+RJ;2023;Industrial;False;6913.62;126;False
+RJ;2023;Poder Público;False;2703.01;94;False
+RJ;2023;Residencial;False;165792.89;24161;False
+RJ;2023;Rural;False;5730.67;525;False
+RJ;2024;Comercial;False;106251.01;1873;False
+RJ;2024;Iluminação pública;False;38.06;1;False
+RJ;2024;Industrial;False;10849.74;104;False
+RJ;2024;Poder Público;False;1476.32;30;False
+RJ;2024;Residencial;False;224310.55;30820;False
+RJ;2024;Rural;False;7026.67;681;False
+RJ;2024;Serviço Público;False;44.87;3;False
+RJ;2025;Comercial;False;89526.18;2102;False
+RJ;2025;Consumo Próprio;False;2.4;1;False
+RJ;2025;Iluminação pública;False;25.3;1;False
+RJ;2025;Industrial;False;6838.23;80;False
+RJ;2025;Poder Público;False;2009.23;38;False
+RJ;2025;REBR;False;954.01;152;False
+RJ;2025;Residencial;False;263600.67;33771;False
+RJ;2025;Rural;False;9588.16;826;False
+RJ;2025;Serviço Público;False;33.0;1;False
+RJ;2026;Comercial;False;41856.24;786;True
+RJ;2026;Consumo Próprio;False;21.61;3;True
+RJ;2026;Industrial;False;673.77;23;True
+RJ;2026;Poder Público;False;2022.83;40;True
+RJ;2026;REBR;False;676.73;110;True
+RJ;2026;Residencial;False;131574.86;17902;True
+RJ;2026;Rural;False;3481.88;274;True
+RJ;2026;Serviço Público;False;50.0;1;True
+RN;2013;Residencial;False;10.9;1;False
+RN;2014;Residencial;False;22.75;2;False
+RN;2014;Rural;False;30.36;1;False
+RN;2015;Comercial;False;53.62;5;False
+RN;2015;Poder Público;False;3.0;1;False
+RN;2015;Residencial;False;345.75;22;False
+RN;2016;Comercial;False;429.31;15;False
+RN;2016;Industrial;False;37.0;2;False
+RN;2016;Residencial;False;813.73;45;False
+RN;2017;Comercial;False;1372.41;39;False
+RN;2017;Industrial;False;331.08;4;False
+RN;2017;Residencial;False;1835.72;93;False
+RN;2017;Rural;False;194.72;4;False
+RN;2018;Comercial;False;4271.14;129;False
+RN;2018;Industrial;False;910.72;11;False
+RN;2018;Poder Público;False;108.99;5;False
+RN;2018;Residencial;False;2639.47;269;False
+RN;2018;Rural;False;194.94;9;False
+RN;2019;Comercial;False;11340.63;382;False
+RN;2019;Iluminação pública;False;13.14;3;False
+RN;2019;Industrial;False;1072.8;18;False
+RN;2019;Poder Público;False;330.7;8;False
+RN;2019;Residencial;False;8098.77;1006;False
+RN;2019;Rural;False;831.74;27;False
+RN;2020;Comercial;False;20187.42;735;False
+RN;2020;Iluminação pública;False;63.01;6;False
+RN;2020;Industrial;False;4207.95;38;False
+RN;2020;Poder Público;False;1298.44;29;False
+RN;2020;Residencial;False;18769.9;2336;False
+RN;2020;Rural;False;1898.31;92;False
+RN;2021;Comercial;False;33562.69;1486;False
+RN;2021;Industrial;False;4525.43;51;False
+RN;2021;Poder Público;False;1300.93;24;False
+RN;2021;Residencial;False;58223.8;9143;False
+RN;2021;Rural;False;4512.22;315;False
+RN;2022;Comercial;False;48514.56;2354;False
+RN;2022;Iluminação pública;False;3.0;1;False
+RN;2022;Industrial;False;6694.11;74;False
+RN;2022;Poder Público;False;2165.6;35;False
+RN;2022;Residencial;False;95982.05;15062;False
+RN;2022;Rural;False;10083.38;577;False
+RN;2023;Comercial;False;47648.93;2046;False
+RN;2023;Industrial;False;7009.08;71;False
+RN;2023;Poder Público;False;2562.71;53;False
+RN;2023;Residencial;False;91044.05;14485;False
+RN;2023;Rural;False;10026.05;593;False
+RN;2023;Serviço Público;False;160.0;1;False
+RN;2024;Comercial;False;33895.62;2041;False
+RN;2024;Industrial;False;3064.93;38;False
+RN;2024;Poder Público;False;2831.12;71;False
+RN;2024;Residencial;False;162063.58;25741;False
+RN;2024;Rural;False;10393.64;799;False
+RN;2025;Comercial;False;47344.18;2421;False
+RN;2025;Comercial;True;165.0;3;False
+RN;2025;Industrial;False;2932.77;32;False
+RN;2025;Poder Público;False;5823.83;182;False
+RN;2025;Poder Público;True;15.0;1;False
+RN;2025;Residencial;False;192571.23;29821;False
+RN;2025;Residencial;True;90.0;6;False
+RN;2025;Rural;False;15219.07;1127;False
+RN;2025;Rural;True;50.0;1;False
+RN;2025;Serviço Público;False;27.04;2;False
+RN;2026;Comercial;False;16891.82;711;True
+RN;2026;Comercial;True;15.0;1;True
+RN;2026;Industrial;False;675.5;10;True
+RN;2026;Poder Público;False;1721.55;52;True
+RN;2026;Residencial;False;58096.74;8974;True
+RN;2026;Rural;False;4699.06;353;True
+RO;2013;Rural;False;15.0;1;False
+RO;2014;Comercial;False;6.0;1;False
+RO;2015;Residencial;False;5.0;1;False
+RO;2016;Comercial;False;146.28;7;False
+RO;2016;Residencial;False;65.82;7;False
+RO;2017;Comercial;False;227.7;7;False
+RO;2017;Residencial;False;120.96;23;False
+RO;2017;Rural;False;100.0;1;False
+RO;2018;Comercial;False;1030.1;15;False
+RO;2018;Residencial;False;410.98;52;False
+RO;2018;Rural;False;58.0;5;False
+RO;2019;Comercial;False;4380.3;130;False
+RO;2019;Industrial;False;363.0;6;False
+RO;2019;Poder Público;False;250.0;2;False
+RO;2019;Residencial;False;4373.38;560;False
+RO;2019;Rural;False;290.89;35;False
+RO;2020;Comercial;False;12981.68;389;False
+RO;2020;Industrial;False;4682.06;28;False
+RO;2020;Poder Público;False;282.0;7;False
+RO;2020;Residencial;False;15577.65;1796;False
+RO;2020;Rural;False;2440.16;139;False
+RO;2021;Comercial;False;20450.31;424;False
+RO;2021;Iluminação pública;False;10.0;1;False
+RO;2021;Industrial;False;2850.54;26;False
+RO;2021;Poder Público;False;1252.01;60;False
+RO;2021;Residencial;False;34928.28;3970;False
+RO;2021;Rural;False;6091.48;382;False
+RO;2022;Comercial;False;19677.6;599;False
+RO;2022;Industrial;False;3403.13;33;False
+RO;2022;Poder Público;False;2008.91;64;False
+RO;2022;Residencial;False;37834.33;4516;False
+RO;2022;Rural;False;12949.48;1273;False
+RO;2023;Comercial;False;25925.03;728;False
+RO;2023;Industrial;False;4567.1;49;False
+RO;2023;Poder Público;False;6700.44;106;False
+RO;2023;Residencial;False;43721.09;5331;False
+RO;2023;Rural;False;16814.09;1522;False
+RO;2024;Comercial;False;26807.65;1066;False
+RO;2024;Industrial;False;2249.54;47;False
+RO;2024;Poder Público;False;2150.7;40;False
+RO;2024;Residencial;False;114645.09;13477;False
+RO;2024;Rural;False;30499.62;3250;False
+RO;2025;Comercial;False;25515.73;927;False
+RO;2025;Industrial;False;2667.89;49;False
+RO;2025;Poder Público;False;2098.47;37;False
+RO;2025;Residencial;False;171079.61;14333;False
+RO;2025;Rural;False;43411.6;3517;False
+RO;2026;Comercial;False;8714.28;364;True
+RO;2026;Industrial;False;419.71;18;True
+RO;2026;Poder Público;False;388.0;10;True
+RO;2026;Residencial;False;49104.24;5953;True
+RO;2026;Rural;False;11505.92;1375;True
+RR;2016;Residencial;False;2.97;1;False
+RR;2017;Poder Público;False;66.0;1;False
+RR;2017;Residencial;False;17.0;3;False
+RR;2018;Poder Público;False;304.0;2;False
+RR;2018;Residencial;False;129.6;5;False
+RR;2019;Comercial;False;196.4;7;False
+RR;2019;Residencial;False;359.32;46;False
+RR;2019;Rural;False;108.7;3;False
+RR;2020;Comercial;False;618.87;24;False
+RR;2020;Poder Público;False;5906.32;69;False
+RR;2020;Residencial;False;1435.14;166;False
+RR;2020;Rural;False;23.16;3;False
+RR;2021;Comercial;False;2363.84;51;False
+RR;2021;Industrial;False;511.0;5;False
+RR;2021;Poder Público;False;171.12;5;False
+RR;2021;Residencial;False;2374.04;257;False
+RR;2021;Rural;False;104.02;9;False
+RR;2022;Comercial;False;2295.19;63;False
+RR;2022;Industrial;False;125.0;2;False
+RR;2022;Poder Público;False;984.0;13;False
+RR;2022;Residencial;False;4134.45;515;False
+RR;2022;Rural;False;172.0;4;False
+RR;2023;Comercial;False;6555.03;150;False
+RR;2023;Industrial;False;234.0;4;False
+RR;2023;Poder Público;False;1037.24;12;False
+RR;2023;Residencial;False;12885.48;1369;False
+RR;2023;Rural;False;379.61;21;False
+RR;2024;Comercial;False;10262.8;362;False
+RR;2024;Industrial;False;427.5;11;False
+RR;2024;Poder Público;False;614.28;28;False
+RR;2024;Residencial;False;29722.59;2875;False
+RR;2024;Rural;False;750.66;47;False
+RR;2025;Comercial;False;8544.17;269;False
+RR;2025;Industrial;False;1422.5;14;False
+RR;2025;Poder Público;False;151.96;8;False
+RR;2025;Residencial;False;25300.78;2423;False
+RR;2025;Rural;False;604.82;50;False
+RS;2013;Residencial;False;5.29;1;False
+RS;2014;Comercial;False;16.34;4;False
+RS;2014;Poder Público;False;0.98;1;False
+RS;2014;Residencial;False;73.71;20;False
+RS;2014;Rural;False;7.01;3;False
+RS;2015;Comercial;False;366.62;20;False
+RS;2015;Industrial;False;65.0;2;False
+RS;2015;Poder Público;False;10.0;1;False
+RS;2015;Residencial;False;461.85;116;False
+RS;2015;Rural;False;31.36;7;False
+RS;2016;Comercial;False;3622.01;138;False
+RS;2016;Industrial;False;405.17;19;False
+RS;2016;Poder Público;False;21.66;4;False
+RS;2016;Residencial;False;2182.22;448;False
+RS;2016;Rural;False;63.97;13;False
+RS;2017;Comercial;False;9865.69;386;False
+RS;2017;Industrial;False;2475.95;54;False
+RS;2017;Poder Público;False;172.05;6;False
+RS;2017;Residencial;False;5871.52;1064;False
+RS;2017;Rural;False;785.08;107;False
+RS;2017;Serviço Público;False;3.0;1;False
+RS;2018;Comercial;False;29580.57;1083;False
+RS;2018;Consumo Próprio;False;20.67;1;False
+RS;2018;Industrial;False;10014.2;194;False
+RS;2018;Poder Público;False;541.13;25;False
+RS;2018;REBR;False;5.0;1;False
+RS;2018;Residencial;False;18114.18;3312;False
+RS;2018;Rural;False;7581.45;441;False
+RS;2019;Comercial;False;74832.61;3036;False
+RS;2019;Iluminação pública;False;66.0;1;False
+RS;2019;Industrial;False;29286.24;606;False
+RS;2019;Poder Público;False;1174.63;28;False
+RS;2019;REBR;False;12.9;3;False
+RS;2019;Residencial;False;53802.31;10067;False
+RS;2019;Rural;False;26787.49;1518;False
+RS;2020;Comercial;False;103977.57;4170;False
+RS;2020;Iluminação pública;False;150.05;3;False
+RS;2020;Industrial;False;27797.07;744;False
+RS;2020;Poder Público;False;2047.59;55;False
+RS;2020;REBR;False;98.53;13;False
+RS;2020;Residencial;False;125527.69;20820;False
+RS;2020;Rural;False;54493.8;3320;False
+RS;2020;Serviço Público;False;90.0;2;False
+RS;2021;Comercial;False;104938.06;4266;False
+RS;2021;Industrial;False;31507.54;889;False
+RS;2021;Poder Público;False;4559.56;136;False
+RS;2021;REBR;False;251.96;42;False
+RS;2021;Residencial;False;253945.78;46222;False
+RS;2021;Rural;False;95118.79;6964;False
+RS;2021;Serviço Público;False;54.94;1;False
+RS;2022;Comercial;False;174634.83;6857;False
+RS;2022;Industrial;False;56723.81;1166;False
+RS;2022;Poder Público;False;8041.97;245;False
+RS;2022;REBR;False;366.64;79;False
+RS;2022;Residencial;False;497567.91;88891;False
+RS;2022;Rural;False;185239.62;16749;False
+RS;2023;Comercial;False;143977.12;5052;False
+RS;2023;Iluminação pública;False;25.0;1;False
+RS;2023;Industrial;False;31051.29;702;False
+RS;2023;Poder Público;False;9295.72;215;False
+RS;2023;REBR;False;361.39;58;False
+RS;2023;Residencial;False;329413.18;50315;False
+RS;2023;Rural;False;150181.48;12088;False
+RS;2023;Serviço Público;False;642.0;7;False
+RS;2024;Comercial;False;126471.42;3069;False
+RS;2024;Iluminação pública;False;39.96;1;False
+RS;2024;Industrial;False;30322.86;522;False
+RS;2024;Poder Público;False;3912.0;106;False
+RS;2024;REBR;False;463.29;71;False
+RS;2024;Residencial;False;293368.95;37400;False
+RS;2024;Rural;False;93658.43;7547;False
+RS;2024;Serviço Público;False;75.0;1;False
+RS;2025;Comercial;False;75574.96;2754;False
+RS;2025;Consumo Próprio;False;53.4;1;False
+RS;2025;Industrial;False;13637.39;354;False
+RS;2025;Poder Público;False;2658.7;104;False
+RS;2025;REBR;False;2350.92;440;False
+RS;2025;Residencial;False;275860.08;43396;False
+RS;2025;Rural;False;75890.31;8453;False
+RS;2025;Serviço Público;False;31.2;3;False
+RS;2026;Comercial;False;18057.31;1205;True
+RS;2026;Industrial;False;4695.82;149;True
+RS;2026;Poder Público;False;573.03;44;True
+RS;2026;REBR;False;3352.29;670;True
+RS;2026;Residencial;False;136235.53;24902;True
+RS;2026;Residencial;True;73.43;4;True
+RS;2026;Rural;False;27093.25;3747;True
+SC;2013;Poder Público;False;6.61;1;False
+SC;2013;Residencial;False;7.8;2;False
+SC;2014;Comercial;False;294.74;10;False
+SC;2014;Industrial;False;62.3;3;False
+SC;2014;Poder Público;False;1.2;1;False
+SC;2014;Residencial;False;35.49;11;False
+SC;2015;Comercial;False;149.46;11;False
+SC;2015;Industrial;False;40.42;6;False
+SC;2015;Poder Público;False;24.76;2;False
+SC;2015;Residencial;False;281.5;70;False
+SC;2015;Serviço Público;False;4.0;1;False
+SC;2016;Comercial;False;706.46;42;False
+SC;2016;Industrial;False;570.6;14;False
+SC;2016;Poder Público;False;69.3;6;False
+SC;2016;Residencial;False;992.31;206;False
+SC;2016;Rural;False;2.1;1;False
+SC;2016;Serviço Público;False;101.12;3;False
+SC;2017;Comercial;False;2417.3;88;False
+SC;2017;Industrial;False;631.6;25;False
+SC;2017;Poder Público;False;66.9;3;False
+SC;2017;Residencial;False;5579.43;1303;False
+SC;2017;Rural;False;218.26;25;False
+SC;2017;Serviço Público;False;222.25;7;False
+SC;2018;Comercial;False;10171.94;330;False
+SC;2018;Industrial;False;4774.46;92;False
+SC;2018;Poder Público;False;71.8;5;False
+SC;2018;Residencial;False;11488.59;2059;False
+SC;2018;Rural;False;7138.95;480;False
+SC;2018;Serviço Público;False;303.68;3;False
+SC;2019;Comercial;False;34023.29;1128;False
+SC;2019;Industrial;False;13968.86;298;False
+SC;2019;Poder Público;False;45.32;3;False
+SC;2019;Residencial;False;27804.26;4184;False
+SC;2019;Rural;False;22047.77;1283;False
+SC;2019;Serviço Público;False;177.07;6;False
+SC;2020;Comercial;False;37334.13;1392;False
+SC;2020;Iluminação pública;False;25.0;1;False
+SC;2020;Industrial;False;26823.78;901;False
+SC;2020;Poder Público;False;358.71;15;False
+SC;2020;Residencial;False;33822.28;5184;False
+SC;2020;Rural;False;34789.35;1742;False
+SC;2020;Serviço Público;False;684.66;10;False
+SC;2021;Comercial;False;60676.51;2265;False
+SC;2021;Industrial;False;44696.44;1521;False
+SC;2021;Poder Público;False;750.07;24;False
+SC;2021;REBR;False;23.0;5;False
+SC;2021;Residencial;False;103087.64;13909;False
+SC;2021;Rural;False;43556.18;2301;False
+SC;2021;Serviço Público;False;920.99;30;False
+SC;2022;Comercial;False;19604.38;647;False
+SC;2022;Industrial;False;11637.69;247;False
+SC;2022;Poder Público;False;98.25;5;False
+SC;2022;REBR;False;23.0;2;False
+SC;2022;Residencial;False;379362.39;33825;False
+SC;2022;Rural;False;27763.68;1476;False
+SC;2022;Serviço Público;False;70.0;3;False
+SC;2023;Comercial;False;91473.58;2708;False
+SC;2023;Iluminação pública;False;75.0;1;False
+SC;2023;Industrial;False;47125.01;1641;False
+SC;2023;Poder Público;False;2691.43;56;False
+SC;2023;REBR;False;5.0;1;False
+SC;2023;Residencial;False;139499.5;17498;False
+SC;2023;Rural;False;72876.1;4731;False
+SC;2023;Serviço Público;False;55.0;1;False
+SC;2024;Comercial;False;98309.14;2745;False
+SC;2024;Industrial;False;51986.38;2110;False
+SC;2024;Poder Público;False;8595.35;30;False
+SC;2024;REBR;False;718.97;131;False
+SC;2024;Residencial;False;134746.67;23707;False
+SC;2024;Rural;False;51564.61;4853;False
+SC;2024;Serviço Público;False;0.55;1;False
+SC;2025;Comercial;False;105151.12;3104;False
+SC;2025;Comercial;True;75.0;1;False
+SC;2025;Industrial;False;71993.4;2975;False
+SC;2025;Poder Público;False;1070.13;34;False
+SC;2025;REBR;False;1638.97;279;False
+SC;2025;Residencial;False;203952.57;33427;False
+SC;2025;Residencial;True;30.25;2;False
+SC;2025;Rural;False;58171.78;5532;False
+SC;2025;Serviço Público;False;330.0;2;False
+SC;2026;Comercial;False;41120.59;1047;True
+SC;2026;Comercial;True;3095.0;5;True
+SC;2026;Industrial;False;38901.59;1092;True
+SC;2026;Industrial;True;415.0;3;True
+SC;2026;Poder Público;False;359.92;12;True
+SC;2026;Poder Público;True;30.0;1;True
+SC;2026;REBR;False;822.91;139;True
+SC;2026;Residencial;False;85388.68;12501;True
+SC;2026;Residencial;True;120.5;9;True
+SC;2026;Rural;False;19446.03;1776;True
+SC;2026;Rural;True;43.0;4;True
+SE;2016;Comercial;False;32.45;2;False
+SE;2016;Residencial;False;17.6;3;False
+SE;2017;Comercial;False;324.16;12;False
+SE;2017;REBR;False;6.0;1;False
+SE;2017;Residencial;False;306.57;52;False
+SE;2017;Rural;False;21.3;3;False
+SE;2018;Comercial;False;836.19;36;False
+SE;2018;Industrial;False;136.45;4;False
+SE;2018;Poder Público;False;27.0;1;False
+SE;2018;REBR;False;2.16;1;False
+SE;2018;Residencial;False;891.41;156;False
+SE;2018;Rural;False;58.23;4;False
+SE;2019;Comercial;False;4056.68;160;False
+SE;2019;Industrial;False;173.96;8;False
+SE;2019;Poder Público;False;15.0;1;False
+SE;2019;REBR;False;23.68;3;False
+SE;2019;Residencial;False;2850.49;446;False
+SE;2019;Rural;False;218.65;19;False
+SE;2020;Comercial;False;7898.15;305;False
+SE;2020;Industrial;False;1267.81;34;False
+SE;2020;Poder Público;False;262.76;13;False
+SE;2020;REBR;False;44.02;12;False
+SE;2020;Residencial;False;6153.58;792;False
+SE;2020;Rural;False;862.32;44;False
+SE;2021;Comercial;False;13397.95;498;False
+SE;2021;Industrial;False;922.32;18;False
+SE;2021;Poder Público;False;452.0;11;False
+SE;2021;REBR;False;210.81;32;False
+SE;2021;Residencial;False;10346.88;1421;False
+SE;2021;Rural;False;1680.7;84;False
+SE;2022;Comercial;False;22693.57;846;False
+SE;2022;Industrial;False;2612.01;49;False
+SE;2022;Poder Público;False;1235.48;12;False
+SE;2022;REBR;False;253.24;39;False
+SE;2022;Residencial;False;19033.11;2649;False
+SE;2022;Rural;False;2452.18;154;False
+SE;2023;Comercial;False;22219.15;931;False
+SE;2023;Consumo Próprio;False;3.74;1;False
+SE;2023;Industrial;False;4023.13;62;False
+SE;2023;Poder Público;False;1036.0;12;False
+SE;2023;REBR;False;487.33;90;False
+SE;2023;Residencial;False;22236.7;2807;False
+SE;2023;Rural;False;2854.7;198;False
+SE;2023;Serviço Público;False;5295.0;2;False
+SE;2024;Comercial;False;19205.01;806;False
+SE;2024;Industrial;False;951.36;30;False
+SE;2024;Poder Público;False;151.3;5;False
+SE;2024;REBR;False;1395.67;225;False
+SE;2024;Residencial;False;31086.98;4001;False
+SE;2024;Rural;False;3052.71;268;False
+SE;2025;Comercial;False;20877.38;820;False
+SE;2025;Industrial;False;2041.08;31;False
+SE;2025;Poder Público;False;208.1;5;False
+SE;2025;REBR;False;1243.54;214;False
+SE;2025;Residencial;False;40676.06;5100;False
+SE;2025;Rural;False;3461.63;287;False
+SE;2026;Comercial;False;6091.12;291;True
+SE;2026;Iluminação pública;False;141.0;3;True
+SE;2026;Industrial;False;684.12;16;True
+SE;2026;Poder Público;False;1308.0;11;True
+SE;2026;Residencial;False;19533.68;2607;True
+SE;2026;Residencial;True;15.0;1;True
+SE;2026;Rural;False;1096.15;116;True
+SP;2012;Comercial;False;140.0;28;False
+SP;2013;Comercial;False;296.72;36;False
+SP;2013;Industrial;False;250.0;1;False
+SP;2013;Residencial;False;35.74;5;False
+SP;2014;Comercial;False;184.7;14;False
+SP;2014;Industrial;False;25.99;1;False
+SP;2014;Residencial;False;144.62;29;False
+SP;2015;Comercial;False;406.93;33;False
+SP;2015;Industrial;False;102.5;2;False
+SP;2015;Poder Público;False;22.0;2;False
+SP;2015;Residencial;False;529.59;137;False
+SP;2015;Rural;False;10.0;2;False
+SP;2015;Serviço Público;False;88.8;2;False
+SP;2016;Comercial;False;1266.63;147;False
+SP;2016;Industrial;False;316.82;13;False
+SP;2016;Poder Público;False;4.0;1;False
+SP;2016;Residencial;False;4113.9;954;False
+SP;2016;Rural;False;95.09;11;False
+SP;2017;Comercial;False;7371.96;322;False
+SP;2017;Consumo Próprio;False;80.0;2;False
+SP;2017;Industrial;False;654.93;27;False
+SP;2017;Poder Público;False;218.9;12;False
+SP;2017;REBR;False;2.0;1;False
+SP;2017;Residencial;False;9040.63;2148;False
+SP;2017;Rural;False;281.51;30;False
+SP;2017;Serviço Público;False;491.96;3;False
+SP;2018;Comercial;False;15155.24;693;False
+SP;2018;Industrial;False;2413.86;83;False
+SP;2018;Poder Público;False;616.99;30;False
+SP;2018;REBR;False;2.0;1;False
+SP;2018;Residencial;False;21682.68;4709;False
+SP;2018;Rural;False;3598.68;137;False
+SP;2018;Serviço Público;False;80.14;2;False
+SP;2019;Comercial;False;72306.49;2618;False
+SP;2019;Industrial;False;14878.99;411;False
+SP;2019;Poder Público;False;767.74;47;False
+SP;2019;REBR;False;20.64;6;False
+SP;2019;Residencial;False;79903.54;14850;False
+SP;2019;Rural;False;12917.62;489;False
+SP;2019;Serviço Público;False;18.0;3;False
+SP;2020;Comercial;False;139689.77;3971;False
+SP;2020;Iluminação pública;False;18.0;2;False
+SP;2020;Industrial;False;23793.0;632;False
+SP;2020;Poder Público;False;2252.14;90;False
+SP;2020;REBR;False;42.96;15;False
+SP;2020;Residencial;False;150525.9;26834;False
+SP;2020;Rural;False;31059.21;1104;False
+SP;2020;Serviço Público;False;184.52;9;False
+SP;2021;Comercial;False;159934.27;5996;False
+SP;2021;Consumo Próprio;False;38.0;1;False
+SP;2021;Iluminação pública;False;237.0;4;False
+SP;2021;Industrial;False;33841.39;943;False
+SP;2021;Poder Público;False;5439.46;121;False
+SP;2021;REBR;False;126.86;33;False
+SP;2021;Residencial;False;335259.8;62126;False
+SP;2021;Rural;False;54838.04;2473;False
+SP;2021;Serviço Público;False;1421.0;9;False
+SP;2022;Comercial;False;321536.94;11381;False
+SP;2022;Iluminação pública;False;12.0;1;False
+SP;2022;Industrial;False;65742.11;1676;False
+SP;2022;Poder Público;False;9811.27;222;False
+SP;2022;REBR;False;574.64;108;False
+SP;2022;Residencial;False;710511.11;119768;False
+SP;2022;Rural;False;125894.72;5918;False
+SP;2022;Serviço Público;False;621.48;13;False
+SP;2023;Comercial;False;482497.88;15212;False
+SP;2023;Consumo Próprio;False;7.15;1;False
+SP;2023;Iluminação pública;False;120.98;6;False
+SP;2023;Industrial;False;87166.52;1592;False
+SP;2023;Poder Público;False;11966.16;390;False
+SP;2023;REBR;False;733.04;174;False
+SP;2023;Residencial;False;619453.03;92582;False
+SP;2023;Rural;False;125917.73;5560;False
+SP;2023;Serviço Público;False;12839.0;14;False
+SP;2024;Comercial;False;557435.73;16925;False
+SP;2024;Consumo Próprio;False;55.0;3;False
+SP;2024;Iluminação pública;False;2471.0;3;False
+SP;2024;Industrial;False;55221.04;1398;False
+SP;2024;Poder Público;False;18064.02;347;False
+SP;2024;REBR;False;5269.27;568;False
+SP;2024;Residencial;False;1166398.45;134753;False
+SP;2024;Rural;False;112581.93;6518;False
+SP;2024;Serviço Público;False;7709.0;11;False
+SP;2025;Comercial;False;296854.93;16704;False
+SP;2025;Consumo Próprio;False;65.52;4;False
+SP;2025;Industrial;False;41442.91;1094;False
+SP;2025;Poder Público;False;7580.35;323;False
+SP;2025;REBR;False;4390.97;966;False
+SP;2025;Residencial;False;786919.94;125404;False
+SP;2025;Rural;False;89808.02;5386;False
+SP;2025;Serviço Público;False;3090.0;6;False
+SP;2026;Comercial;False;112864.22;4649;True
+SP;2026;Comercial;True;37.33;2;True
+SP;2026;Consumo Próprio;False;28.0;7;True
+SP;2026;Industrial;False;12643.48;512;True
+SP;2026;Poder Público;False;10282.2;227;True
+SP;2026;REBR;False;5392.92;1158;True
+SP;2026;Residencial;False;474148.44;78016;True
+SP;2026;Residencial;True;68.93;10;True
+SP;2026;Rural;False;26645.61;2338;True
+TO;2014;Industrial;False;5.04;1;False
+TO;2014;Residencial;False;15.76;2;False
+TO;2015;Comercial;False;5.0;1;False
+TO;2015;Residencial;False;54.55;11;False
+TO;2016;Residencial;False;126.14;25;False
+TO;2017;Comercial;False;618.1;16;False
+TO;2017;Poder Público;False;114.2;3;False
+TO;2017;Residencial;False;591.45;94;False
+TO;2017;Rural;False;8.2;1;False
+TO;2018;Comercial;False;1489.05;66;False
+TO;2018;Industrial;False;150.0;3;False
+TO;2018;Poder Público;False;77.6;3;False
+TO;2018;Residencial;False;2375.28;344;False
+TO;2018;Residencial;True;12.5;1;False
+TO;2018;Rural;False;122.63;9;False
+TO;2019;Comercial;False;6902.55;233;False
+TO;2019;Industrial;False;633.76;12;False
+TO;2019;Poder Público;False;865.28;16;False
+TO;2019;Residencial;False;8420.1;1135;False
+TO;2019;Rural;False;478.1;18;False
+TO;2020;Comercial;False;13751.26;460;False
+TO;2020;Industrial;False;461.2;20;False
+TO;2020;Poder Público;False;1395.92;22;False
+TO;2020;Residencial;False;19693.64;3151;False
+TO;2020;Rural;False;2562.53;110;False
+TO;2021;Comercial;False;15720.08;654;False
+TO;2021;Industrial;False;790.36;27;False
+TO;2021;Poder Público;False;672.03;9;False
+TO;2021;Residencial;False;38829.33;5690;False
+TO;2021;Rural;False;3450.02;256;False
+TO;2021;Serviço Público;False;3000.0;3;False
+TO;2022;Comercial;False;21048.95;865;False
+TO;2022;Industrial;False;2196.09;49;False
+TO;2022;Poder Público;False;1725.8;39;False
+TO;2022;Residencial;False;60590.84;8189;False
+TO;2022;Rural;False;7722.82;465;False
+TO;2023;Comercial;False;25494.02;949;False
+TO;2023;Iluminação pública;False;39.0;2;False
+TO;2023;Industrial;False;6767.62;55;False
+TO;2023;Poder Público;False;6082.09;128;False
+TO;2023;Residencial;False;72989.7;8616;False
+TO;2023;Rural;False;10927.49;595;False
+TO;2023;Serviço Público;False;10.0;1;False
+TO;2024;Comercial;False;19696.81;744;False
+TO;2024;Iluminação pública;False;122.5;4;False
+TO;2024;Industrial;False;4897.6;30;False
+TO;2024;Poder Público;False;9597.05;178;False
+TO;2024;Residencial;False;89594.17;10755;False
+TO;2024;Rural;False;7068.75;481;False
+TO;2024;Serviço Público;False;18.0;1;False
+TO;2025;Comercial;False;89617.5;799;False
+TO;2025;Iluminação pública;False;75.0;1;False
+TO;2025;Industrial;False;1597.97;45;False
+TO;2025;Poder Público;False;5305.23;105;False
+TO;2025;Residencial;False;105986.42;12907;False
+TO;2025;Rural;False;8025.13;562;False
+TO;2026;Comercial;False;12626.3;339;True
+TO;2026;Iluminação pública;False;100.0;2;True
+TO;2026;Industrial;False;308.8;18;True
+TO;2026;Poder Público;False;1290.84;40;True
+TO;2026;Residencial;False;48382.43;6297;True
+TO;2026;Residencial;True;31.0;3;True
+TO;2026;Rural;False;2963.52;257;True
