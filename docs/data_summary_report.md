@@ -3,7 +3,7 @@
 **Projeto:** SolarGap Brasil — Onde está o próximo mercado solar?
 **Autora:** Pâmela Lima Ziliotto
 **Etapa:** TP2
-**Última atualização:** 20/09/2026
+**Última atualização:** 22/09/2026
 
 ---
 
@@ -15,12 +15,12 @@ Este relatório documenta as fontes de dados utilizadas no projeto SolarGap Bras
 
 |Fonte|Conteúdo|Formato|Método de Obtenção|Objetivo de Uso|Estágio|
 |---|---|---|---|---|---|
-|**ANEEL — Relação de Empreendimentos de Geração Distribuída (MMGD)**|Registro individual de empreendimentos: potência instalada (kW), UF, município, classe de consumo, fonte de geração, modalidade, porte|ZIP (CSV interno)|Download direto do recurso CKAN|Base principal — cálculo de potência instalada agregada por estado|Em uso (TP1)|
-|**ANEEL — Amostra estratificada (derivada)**|Subconjunto de até 40 registros por UF, sem colunas de identificação pessoal|CSV|Derivação local a partir do ZIP (`gerar_amostra.py`)|Versionamento no GitHub e tabela de amostra do app Streamlit|Em uso (TP1)|
-|**IBGE — Censo Demográfico 2022, nível UF**|População residente por Unidade da Federação (27 registros)|JSON|API de Agregados v3 (base SIDRA), tabela 9923|Normalização per capita dos dados de MMGD|Em uso (TP1)|
+|**ANEEL — Relação de Empreendimentos de Geração Distribuída (MMGD)**|Registro individual de empreendimentos: potência instalada (kW), UF, município, classe de consumo, fonte de geração, modalidade, porte|ZIP (CSV interno)|Download direto do recurso CKAN|Base principal — cálculo de potência instalada agregada por estado|Em uso (TP1–TP2)|
+|**ANEEL — Amostra estratificada (derivada)**|Subconjunto de até 40 registros por UF, sem colunas de identificação pessoal|CSV|Derivação local a partir do ZIP (`gerar_amostra.py`)|Referência versionada da estrutura original da base; usada na demo do TP1|Em uso (TP1)|
+|**IBGE — Censo Demográfico 2022, nível UF**|População residente por Unidade da Federação (27 registros)|JSON|API de Agregados v3 (base SIDRA), tabela 9923|Normalização per capita dos dados de MMGD|Em uso (TP1–TP2)|
 |**IBGE — Censo Demográfico 2022, nível município**|População residente por município (5.570 registros)|JSON|API de Agregados v3 (base SIDRA), tabela 9923|Normalização per capita em granularidade municipal (análise complementar)|Em uso (TP1)|
-|Notícias e portais sobre incentivos estaduais à energia solar|Texto|HTML → CSV/TXT|Web scraping (BeautifulSoup)|Contexto qualitativo por estado; insumo para nuvem de palavras|Planejado (TP2)|
-|Portais dinâmicos de secretarias estaduais (ICMS sobre GD)|Texto / tabelas|HTML renderizado via JavaScript|Web scraping dinâmico (Selenium)|Enriquecer a análise de disparidade com dado de política pública|Planejado (TP3)|
+|**Agência Brasil (EBC) — notícias sobre energia solar e geração distribuída**|Texto integral, título, linha fina, data de publicação, URL (114 notícias, 2014–2026)|HTML → CSV|Web scraping estático (BeautifulSoup) de páginas de tag|Nuvem de palavras, estatísticas de texto e contexto qualitativo por UF; corpus para LLM no TP4|Em uso (TP2)|
+|CONFAZ — adesão estadual ao Convênio ICMS 16/2015|Situação e data de adesão por UF|HTML → CSV|Web scraping (BeautifulSoup; Selenium se a página exigir)|Variável de política pública para a análise de disparidade|Planejado (TP3)|
 
 ### 2.1 Parâmetros das consultas ao IBGE
 
@@ -35,13 +35,53 @@ Este relatório documenta as fontes de dados utilizadas no projeto SolarGap Bras
 |Coluna|Papel no projeto|Observação|
 |---|---|---|
 |`SigUF`|Chave de agregação regional|Sigla da UF|
-|`MdaPotenciaInstaladaKW`|Numerador dos KPIs de potência|Valor em **kW**; conversão para MW na camada Silver|
+|`MdaPotenciaInstaladaKW`|Numerador dos KPIs de potência|Valor em **kW**; conversão para MW na camada Gold|
 |`DscFonteGeracao`|Filtro da fonte solar|A base inclui também hídrica, eólica, térmica e biogás. Vazio em 73.501 registros (99,8% no MA); **ver seção 3.4**|
 |`CodUFibge`|Chave de junção com o IBGE|Tipo `float64` na origem; requer conversão explícita antes do merge|
 |`CodMunicipioIbge`|Chave de junção municipal|Código IBGE de 7 dígitos|
 |`DscClasseConsumo`|Segmentação por perfil de consumidor|Análise complementar|
 |`DthAtualizaCadastralEmpreend`|Eixo temporal — data de conexão|Validado contra o painel oficial da ANEEL; **ver seção 3.1**|
 |`SigTipoGeracao`|Verificação da fonte de geração|Sigla do tipo de usina (UFV, UTE, EOL, CGH). Correspondência de 100% entre `UFV` e "Radiação solar"; vazio nos mesmos registros em que `DscFonteGeracao` é vazio|
+
+### 2.3 Corpus de notícias (web scraping)
+
+**Script:** `src/data_acquisition/noticias.py` · **Saída:** `data/processed/corpus_noticias.csv`
+
+**Fonte e método.** Páginas de tag da Agência Brasil (`energia-solar-1`, `energia-solar`, `geracao-distribuida`, `energia-renovavel`, `energias-renovaveis`), em HTML estático com paginação `?page=N`. O script percorre as páginas de cada tag até não encontrar links novos e, em seguida, baixa cada notícia.
+
+**Extração independente do layout.** O script não depende de classes CSS do site, que mudam com frequência:
+
+- links de notícia identificados pelo padrão de URL `/<editoria>/noticia/AAAA-MM/<slug>`;
+- data extraída do texto "Publicado em DD/MM/AAAA - HH:MM";
+- título e linha fina lidos das meta tags `og:title` e `og:description`;
+- corpo definido como o elemento cujos parágrafos `<p>` somam o maior volume de texto, após a remoção de menus, cabeçalho e rodapé.
+
+**Boas práticas de coleta.** Consulta ao `robots.txt` antes de cada requisição, `User-Agent` identificado como projeto acadêmico, pausa de 1,5 segundo entre requisições e *retry* com espera exponencial (reaproveitando `calcular_espera_backoff` do `coletor_base.py`). O HTML bruto é salvo em `data/raw/html/agenciabrasil/` (camada Bronze, não versionada): uma notícia já baixada nunca é requisitada de novo.
+
+**Resultado da coleta (21/09/2026).**
+
+|Etapa|Notícias|
+|---|---|
+|Links distintos encontrados nas tags|126|
+|Falhas de download / bloqueio por `robots.txt`|0|
+|Descartadas por irrelevância (sem menção a solar, fotovoltaica ou geração distribuída)|12|
+|**Notícias no corpus**|**114**|
+
+Período coberto: 27/06/2014 a 08/07/2026. Tamanho médio: 3.019 caracteres. Todas as notícias com data identificada. UFs mais mencionadas: SP (20), RJ (16), MG (12), BA (11) e PR (10).
+
+**Esquema do corpus.**
+
+|Coluna|Conteúdo|
+|---|---|
+|`id`|Hash da URL (12 caracteres)|
+|`fonte`, `url`, `tag_origem`|Origem e rastreabilidade de cada registro|
+|`data_publicacao`, `coletado_em`|Data da notícia e data da coleta|
+|`titulo`, `linha_fina`, `texto`|Conteúdo textual integral|
+|`ufs_mencionadas`|Siglas das UFs cujo nome aparece no texto, detectadas por expressão regular com fronteira de palavra ("Mato Grosso" não é confundido com "Mato Grosso do Sul")|
+|`nivel_texto`|`integral` — reservado para fontes futuras que admitam apenas metadados|
+|`resumo`, `sentimento`|Vazias no TP2; serão preenchidas pelo modelo de linguagem local no TP4, sem alteração de esquema|
+
+**Observação analítica.** A cobertura da imprensa se concentra nos estados do Sudeste, o que não coincide necessariamente com o ranking de adoção per capita. O dashboard exibe as duas informações lado a lado para permitir a comparação.
 
 ## 3. Observações sobre Qualidade e Tratamento
 
@@ -93,7 +133,7 @@ Os seguintes registros são descartados na camada Silver, com o respectivo crit�
 |Ano < 2012|68|A REN nº 482/2012 instituiu o marco regulatório da MMGD; registros anteriores são anomalias cadastrais|
 |Potência nula ou ≤ 0|41|Fisicamente inválido para uma usina conectada. Todos os casos no PR, fonte solar, entre 2020 e 2025|
 
-**Tratamento do ano corrente (2026):** os dados cobrem apenas parte do ano (referência 08/2026). Comparações diretas com anos completos são inválidas. Nas visualizações, 2026 é sinalizado como período parcial ou excluído das séries de crescimento anual.
+**Tratamento do ano corrente (2026):** os dados cobrem apenas parte do ano (referência 08/2026). Comparações diretas com anos completos são inválidas. No dashboard, 2026 é sinalizado como período parcial: faixa sombreada no gráfico de evolução e aviso na barra lateral sempre que o ano está dentro do filtro. A coluna `ano_parcial` da camada Gold carrega essa marcação como dado.
 
 **Balanço:** 4.673.268 registros lidos, 124 descartados, 4.673.144 mantidos na Silver. A conciliação (mantidos + descartados = lidos) é verificada automaticamente a cada execução.
 
@@ -176,25 +216,48 @@ Por esse motivo, o dashboard oferece as duas visões: "Critério ANEEL", que rep
 |Classe de consumo `REBR`|39.946 registros em 14 UFs, sem significado documentado. Mantida sem alteração até consulta ao dicionário de dados da ANEEL|
 |Divergência de potência com o painel oficial|Ver seção 3.6|
 
+### 3.8 Uso dos dados na aplicação
+
+O dashboard (`src/app/demo_app.py`) lê exclusivamente a camada Gold, o que permite executá-lo sem a base completa da ANEEL.
+
+|Aba|Dados utilizados|O que o usuário faz|
+|---|---|---|
+|Panorama|`gold_mmgd_agregado.csv`, `gold_uf.csv`|Ranking das 27 UFs na métrica escolhida, média nacional como referência, destaque e posição de uma UF|
+|Evolução|`gold_mmgd_agregado.csv`|Série anual ou acumulada por UF, em potência ou número de empreendimentos|
+|Notícias|`corpus_noticias.csv`|Nuvem de palavras, termos mais frequentes, notícias por ano, UFs mais mencionadas e tabela com links, filtráveis por UF|
+|Dados|Todas as anteriores + arquivo do usuário|Download dos recortes filtrados; upload de um indicador próprio por UF para comparação com a adoção|
+
+**Filtros globais.** Visão dos dados ("Com correção de preenchimento" ou "Critério ANEEL", seção 3.6), métrica, período de conexão e classe de consumo. Os indicadores per capita são recalculados após os filtros, a partir do grão da Gold.
+
+**Cache.** As funções de leitura, as agregações filtradas, a contagem de termos e a geração da nuvem de palavras usam `st.cache_data` (`src/app/carregamento.py`): cada combinação de parâmetros é calculada uma única vez por sessão do servidor.
+
+**Estado de sessão.** Os filtros e a UF em destaque persistem entre abas e interações. O arquivo enviado pelo usuário é validado uma única vez e mantido em `st.session_state` até ser removido.
+
+**Upload.** O usuário baixa um CSV-modelo com as 27 UFs, preenche uma coluna de valor e envia o arquivo. A validação (`src/app/validacao_upload.py`) verifica a coluna `sigla_uf`, siglas válidas, duplicidades e valores numéricos (aceitando decimal com vírgula ou ponto), com mensagens de erro específicas.
+
 ## 4. Governança e Privacidade
 
 A base original da ANEEL contém duas colunas com dado pessoal identificável: `NumCPFCNPJ` e `NomTitularEmpreendimento`.
 
 Como o repositório do projeto é público e nenhum indicador do SolarGap Brasil depende da identificação do titular, essas colunas são **excluídas na leitura** (parâmetro `usecols` do pandas), e não removidas após o carregamento. A distinção é relevante: o dado sensível nunca é carregado em memória nem gravado em disco pelos artefatos do projeto, em conformidade com o princípio de minimização de dados.
 
-O mesmo filtro é aplicado na geração da amostra versionada e será mantido em todos os tratamentos das camadas Silver e Gold.
+O mesmo filtro é aplicado na geração da amostra versionada e em todos os tratamentos das camadas Silver e Gold.
+
+**Arquivos enviados pelo usuário.** O conteúdo enviado pelo serviço de upload permanece apenas na sessão do navegador (`st.session_state`) e não é gravado em disco nem versionado.
 
 ## 5. Versionamento e Reprodutibilidade
 
 |Artefato|Tamanho|Versionado no Git|Justificativa|
 |---|---|---|---|
 |ANEEL — ZIP completo|~105 MiB (CSV interno ~1,4 GB)|❌ Não|Excede o limite de 100 MB por arquivo do GitHub|
-|ANEEL — amostra estratificada|< 1 MB|✅ Sim|Permite executar o app demo sem download da base completa|
+|ANEEL — amostra estratificada|< 1 MB|✅ Sim|Referência da estrutura original da base, sem dados pessoais|
 |IBGE — UF|~0,01 MB|✅ Sim|Volume irrelevante|
 |IBGE — municípios|~1,9 MB|✅ Sim|Volume aceitável|
 |`data/interim/` (Silver)|—|❌ Não|Sempre reproduzível a partir da camada Bronze|
 |`gold_mmgd_agregado.csv` (Gold)|81KB|✅ Sim|Alimenta o dashboard; permite todos os filtros sem a base completa|
 |`gold_uf.csv` (Gold)|2KB|✅ Sim|Indicadores por UF; base da visão padrão do painel e da futura API (TP3)|
+|`corpus_noticias.csv`|< 1 MB|✅ Sim|Alimenta a aba Notícias; corpus para o modelo de linguagem no TP4|
+|`data/raw/html/` (cache do scraping)|—|❌ Não|Reproduzível executando `python -m src.data_acquisition.noticias`|
 
 **Regeneração da base completa:** `python -m src.data_acquisition.aneel` a partir da raiz do projeto.
 
@@ -212,11 +275,13 @@ A licença ODbL exige atribuição da fonte e possui cláusula _share-alike_: ba
 
 **IBGE — Censo Demográfico 2022:** dados públicos disponibilizados pelo Instituto Brasileiro de Geografia e Estatística para uso livre, incluindo fins acadêmicos e de pesquisa, mediante citação da fonte.
 
-**Dados obtidos via scraping (TP2/TP3):** provenientes de páginas públicas de órgãos governamentais, respeitando os termos de uso e o `robots.txt` de cada portal.
+**Agência Brasil (EBC) — notícias:** conforme os Termos de Uso do portal da EBC, a reprodução é autorizada mediante indicação da fonte, para uso sem finalidade comercial. O projeto é acadêmico e não comercial; cada registro do corpus guarda a URL de origem, e o dashboard exibe a atribuição à Agência Brasil na aba Notícias. A coleta respeita o `robots.txt` do portal.
+
+**Dados a obter via scraping no TP3:** provenientes de páginas públicas de órgãos governamentais, respeitando os termos de uso e o `robots.txt` de cada portal.
 
 ## 7. Próximos Passos
 
-- **TP2:** incorporar fontes textuais via scraping estático (BeautifulSoup); consolidar a camada Silver e publicar a camada Gold
-- **TP3:** incorporar fontes dinâmicas via Selenium; expor os dados processados por meio de API própria (FastAPI)
-- **TP4:** processar o corpus textual coletado com modelo de linguagem local (HuggingFace/Transformers)
+- **TP2 (concluído):** camadas Silver e Gold implementadas e validadas; corpus de notícias coletado via BeautifulSoup; dashboard interativo com cache, estado de sessão e upload/download
+- **TP3:** coletar a adesão estadual ao Convênio ICMS 16/2015 (CONFAZ) e juntá-la à camada Gold; calcular a taxa de crescimento anual; converter as abas em aplicação multipáginas; expor os dados por meio de API própria (FastAPI); investigar as pendências da seção 3.7
+- **TP4:** processar o corpus de notícias com modelo de linguagem local (HuggingFace/Transformers), preenchendo as colunas `resumo` e `sentimento`
 - **TP5:** integrar agente inteligente de recomendação ao dashboard final
