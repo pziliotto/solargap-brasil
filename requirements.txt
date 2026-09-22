@@ -14,6 +14,8 @@ pyarrow==24.0.0
 
 # Visualização
 matplotlib-inline==0.2.2
+plotly==7.1.0
+wordcloud==1.9.6
 
 # Jupyter / JupyterLab
 ipykernel==7.3.0
