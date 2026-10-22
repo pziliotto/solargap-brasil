@@ -45,6 +45,16 @@ data/interim/*
 # ── Camada Gold (processed) ──
 # VERSIONADA — é o que alimenta o dashboard. Nada a ignorar aqui.
 
+# ── Dados externos (external) ──
+# VERSIONADA: referências de terceiros curadas manualmente, com fonte
+# documentada (ex.: texto oficial do Convênio ICMS 16/15).
+# Exceção: notícias recebidas pela API são estado de execução, não dado do projeto.
+data/external/noticias_enviadas.csv
+
+# ═══════════════════ Testes e lint ═══════════════════
+.pytest_cache/
+.ruff_cache/
+
 # ═══════════════════ LOGS ═══════════════════
 logs/
 *.log

@@ -4,7 +4,8 @@ Energia Solar Brasil
 
 Autora: Pâmela Lima Ziliotto
 Data: 17/08/2026
-Atualizado:
+Atualizado: 21/10/2026 — TP3: pastas da API, serviços, páginas, testes e data/external;
+            .gitignore e requirements sincronizados com os arquivos da raiz
 OBS: Com o andamento do projeto serão criadas outras funções, "env", "sample_config" e "requirements". Assim como qualquer outra função que o projeto precise para que ao final, esse arquivo permita o setup completo em qualquer máquina.
 """
 
@@ -20,11 +21,17 @@ def create_directory_structure():
         "data/raw",  # CSVs originais da ANEEL/IBGE
         "data/interim",  # Etapa Silver, dados em processamento
         "data/processed",  # Dados Gold, prontos para o APP
+        "data/external",  # Referências de terceiros curadas (TP3)
         # Documentos
         "docs",
         # Código Fonte
         "src/data_acquisition/",  # scripts de API/scrapping
-        "src/app",  # script streamlit
+        "src/data_acquisition/noticias",  # scrapers de notícias (TP3)
+        "src/preparacao",  # camadas Silver e Gold
+        "src/servicos",  # regra de negócio compartilhada (TP3)
+        "src/api/rotas",  # API FastAPI (TP3)
+        "src/app/paginas",  # páginas do app multipáginas (TP3)
+        "tests/fixtures",  # testes automatizados (TP3)
         # Notebooks
         "notebooks",  # exploração inicial
         # Outputs
@@ -70,6 +77,7 @@ ENV/
 # ═══════════════════ Dados ═══════════════════
 # Camada Bronze (raw)
 # Ignora tudo por padrão; libera apenas o que é pequeno.
+# HTML de noticias fica em data/raw/html/ -> cache descartável
 data/raw/*
 !data/raw/.gitkeep
 
@@ -90,6 +98,16 @@ data/interim/*
 
 # ── Camada Gold (processed) ──
 # VERSIONADA — é o que alimenta o dashboard. Nada a ignorar aqui.
+
+# ── Dados externos (external) ──
+# VERSIONADA: referências de terceiros curadas manualmente, com fonte
+# documentada (ex.: texto oficial do Convênio ICMS 16/15).
+# Exceção: notícias recebidas pela API são estado de execução, não dado do projeto.
+data/external/noticias_enviadas.csv
+
+# ═══════════════════ Testes e lint ═══════════════════
+.pytest_cache/
+.ruff_cache/
 
 # ═══════════════════ LOGS ═══════════════════
 logs/
@@ -131,6 +149,8 @@ pyarrow==24.0.0
 
 # Visualização
 matplotlib-inline==0.2.2
+plotly==7.1.0
+wordcloud==1.9.6
 
 # Jupyter / JupyterLab
 ipykernel==7.3.0
@@ -262,6 +282,21 @@ terminado==0.18.1
 
 # Protocolos / Serialização
 protobuf==7.35.1
+
+# API (TP3)
+fastapi==0.159.1
+pydantic==2.14.1
+pydantic_core==2.50.1
+annotated-types==0.8.0
+annotated-doc==0.0.5
+typing-inspection==0.4.4
+opentelemetry-api==1.45.1
+
+# Testes e qualidade de código (TP3)
+pytest==9.1.1
+iniconfig==2.3.1
+pluggy==1.7.0
+ruff==0.17.1
 """
 
     with open("requirements.txt", "w", encoding="utf-8") as f:
@@ -273,7 +308,17 @@ protobuf==7.35.1
 def create_init_files():
     """Cria arquivos __init__.py para tornar diretórios em pacotes Python."""
 
-    init_dirs = ["src", "src/data_acquisition", "src/app"]
+    init_dirs = [
+        "src",
+        "src/data_acquisition",
+        "src/data_acquisition/noticias",
+        "src/preparacao",
+        "src/servicos",
+        "src/api",
+        "src/api/rotas",
+        "src/app",
+        "tests",
+    ]
 
     for directory in init_dirs:
         init_file = Path(directory) / "__init__.py"

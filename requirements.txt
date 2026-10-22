@@ -147,3 +147,18 @@ terminado==0.18.1
 
 # Protocolos / Serialização
 protobuf==7.35.1
+
+# API (TP3)
+fastapi==0.159.1
+pydantic==2.14.1
+pydantic_core==2.50.1
+annotated-types==0.8.0
+annotated-doc==0.0.5
+typing-inspection==0.4.4
+opentelemetry-api==1.45.1
+
+# Testes e qualidade de código (TP3)
+pytest==9.1.1
+iniconfig==2.3.1
+pluggy==1.7.0
+ruff==0.17.1
