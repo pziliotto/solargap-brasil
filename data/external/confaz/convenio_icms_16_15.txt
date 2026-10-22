@@ -1,0 +1,69 @@
+# ════════════════════════════════════════════════════════════════════════════
+# CÓPIA DE REFERÊNCIA — CONVÊNIO ICMS 16/15 (CONFAZ)
+# ════════════════════════════════════════════════════════════════════════════
+# Projeto SolarGap Brasil · usada por src/data_acquisition/icms_confaz.py
+#
+# O QUE É: trechos do texto consolidado do Convênio ICMS 16/15, com as notas
+# de adesão e as redações da cláusula primeira, conforme publicado pelo CONFAZ
+# (https://www.confaz.fazenda.gov.br/legislacao/convenios/2015/CV016_15) e
+# reproduzido pela Sefaz-MT em 25/06/2021.
+#
+# POR QUE EXISTE: o coletor tenta primeiro a página oficial do CONFAZ, mas só
+# se o robots.txt permitir o acesso automatizado. Na avaliação do TP3 o acesso
+# foi bloqueado; nesse caso o coletor usa esta cópia e registra a origem
+# ("referencia_local") em cada linha da tabela gerada.
+#
+# DIREITO AUTORAL: convênios do CONFAZ são atos oficiais. Pela Lei 9.610/98,
+# art. 8º, IV, textos de atos oficiais não são objeto de proteção autoral.
+#
+# COMPLEMENTO: a alteração do § 3º pelo Convênio ICMS 114/23 é posterior à
+# reprodução de 2021 e foi acrescentada ao final, no mesmo padrão de anotação
+# do CONFAZ (DOU de 08.08.23; ratificação pelo Ato Declaratório 31/23).
+#
+# Linhas iniciadas por "#" são comentários e são ignoradas pelo coletor.
+# ════════════════════════════════════════════════════════════════════════════
+
+CONVÊNIO ICMS 16, DE 22 DE ABRIL DE 2015
+
+Publicado no DOU de 27.04.15, pelo Despacho 79/15.
+Ratificação nacional no DOU de 14.05.15, pelo Ato Declaratório 10/15.
+Vide Ajuste SINIEF 2/15, que dispõe sobre os procedimentos fiscais.
+Adesão do RN, a partir de 23.06.15, pelo Conv. ICMS 44/15.
+Adesão de CE e TO, a partir de 21.07.15, pelo Conv. ICMS 52/15.
+Adesão da BA, MA, MT e DF, a partir de 26.11.15, pelo Conv. ICMS 130/15.
+Alterado pelos Convs. ICMS 130/15, 59/16, 75/16, 18/18.
+Adesão de AC, AL, MG, RJ e RS, a partir de 30.12.15, pelo Conv. ICMS 157/15.
+Adesão de RR, a partir de 24.05.16, pelo Conv. ICMS 39/16.
+Adesão de PA, a partir de 13.09.16, pelo Conv. ICMS 81/16.
+Adesão de MS, a partir de 10.11.16, pelo Conv. ICMS 113/16.
+Adesão do AP, a partir de 03.05.17, pelo Conv. ICMS 39/17.
+Adesão do ES, a partir de 05.01.18, pelo Conv. ICMS 215/17.
+Adesão do AM, PR e SC, a partir de 01.07.18, pelo Conv. ICMS 42/18.
+
+Autoriza a conceder isenção nas operações internas relativas à circulação de energia elétrica, sujeitas a faturamento sob o Sistema de Compensação de Energia Elétrica de que trata a Resolução Normativa nº 482, de 2012, da Agência Nacional de Energia Elétrica - ANEEL.
+
+Nova redação dada ao caput da cláusula primeira pelo Conv. ICMS 42/18, efeitos a partir de 01.07.18.
+Cláusula primeira Ficam os Estados do Acre, Alagoas, Amapá, Amazonas, Bahia, Ceará, Espírito Santo, Goiás, Maranhão, Mato Grosso, Mato Grosso do Sul, Minas Gerais, Pará, Paraíba, Paraná, Pernambuco, Piauí, Rio de Janeiro, Rio Grande do Norte, Rio Grande do Sul, Rondônia, Roraima, Santa Catarina, São Paulo, Sergipe, Tocantins e o Distrito Federal autorizados a conceder isenção do ICMS incidente sobre a energia elétrica fornecida pela distribuidora à unidade consumidora, na quantidade correspondente à soma da energia elétrica injetada na rede de distribuição pela mesma unidade consumidora com os créditos de energia ativa originados na própria unidade consumidora no mesmo mês, em meses anteriores ou em outra unidade consumidora do mesmo titular, nos termos do Sistema de Compensação de Energia Elétrica, estabelecido pela Resolução Normativa nº 482, de 17 de abril de 2012.
+
+Redação anterior dada ao caput da cláusula primeira pelo Conv. ICMS 75/16, efeitos de 01.09.16 a 30.06.18.
+Cláusula primeira Ficam os Estados do Acre, Alagoas, Bahia, Ceará, Goiás, Maranhão, Mato Grosso, Minas Gerais, Paraíba, Pernambuco, Piauí, Rio de Janeiro, Rio Grande do Norte, Rio Grande do Sul, Rondônia, Roraima, São Paulo, Sergipe, Tocantins e o Distrito Federal autorizados a conceder isenção do ICMS incidente sobre a energia elétrica fornecida pela distribuidora à unidade consumidora, na quantidade correspondente à soma da energia elétrica injetada na rede de distribuição pela mesma unidade consumidora com os créditos de energia ativa originados na própria unidade consumidora no mesmo mês, em meses anteriores ou em outra unidade consumidora do mesmo titular, nos termos do Sistema de Compensação de Energia Elétrica, estabelecido pela Resolução Normativa nº 482, de 17 de abril de 2012.
+
+Redação anterior dada ao caput da cláusula primeira pelo Conv. ICMS 59/16, sem efeitos.
+Cláusula Primeira Ficam os Estados do Acre, Alagoas, Bahia, Ceará, Goiás, Maranhão, Mato Grosso, Minas Gerais, Paraíba, Pernambuco, Piauí, Rio de Janeiro, Rio Grande do Norte, Rio Grande do Sul, Rondônia, Roraima, São Paulo, Tocantins e o Distrito Federal autorizados a conceder isenção do ICMS incidente sobre a energia elétrica fornecida pela distribuidora à unidade consumidora, na quantidade correspondente à soma da energia elétrica injetada na rede de distribuição pela mesma unidade consumidora com os créditos de energia ativa originados na própria unidade consumidora no mesmo mês, em meses anteriores ou em outra unidade consumidora do mesmo titular, nos termos do Sistema de Compensação de Energia Elétrica, estabelecido pela Resolução Normativa nº 482, de 17 de abril de 2012.
+
+Redação original, efeitos até 31.08.16.
+Cláusula primeira Ficam os Estados de Goiás, Pernambuco e São Paulo autorizados a conceder isenção do ICMS incidente sobre a energia elétrica fornecida pela distribuidora à unidade consumidora, na quantidade correspondente à soma da energia elétrica injetada na rede de distribuição pela mesma unidade consumidora com os créditos de energia ativa originados na própria unidade consumidora no mesmo mês, em meses anteriores ou em outra unidade consumidora do mesmo titular, nos termos do Sistema de Compensação de Energia Elétrica, estabelecido pela Resolução Normativa nº 482, de 17 de abril de 2012.
+
+§ 1º O benefício previsto no caput:
+Nova redação dada ao inciso I do § 1º da cláusula primeira pelo Conv. ICMS 18/18, efeitos a partir de 01.06.18.
+I - aplica-se somente à compensação de energia elétrica produzida por microgeração e minigeração definidas na referida resolução, cuja potência instalada seja, respectivamente, menor ou igual a 75 kW e superior a 75 kW e menor ou igual a 1 MW;
+II - não se aplica ao custo de disponibilidade, à energia reativa, à demanda de potência, aos encargos de conexão ou uso do sistema de distribuição, e a quaisquer outros valores cobrados pela distribuidora.
+
+Acrescido § 3º à cláusula primeira pelo Conv. ICMS 42/18, efeitos a partir de 01.07.18.
+§3º Para os Estados do Paraná e de Santa Catarina, o benefício previsto no caput será concedido pelo prazo máximo de 48 (quarenta e oito) meses, na forma da legislação estadual.
+
+Cláusula terceira Este convênio entrará em vigor na data da publicação de sua ratificação nacional no Diário Oficial da União, produzindo efeitos para os fatos geradores ocorridos a partir de 1º de setembro de 2015.
+
+# ─── COMPLEMENTO: Convênio ICMS 114/23 (DOU de 08.08.23; Ato Declaratório 31/23, de 24.08.23) ───
+Nova redação dada ao § 3º da cláusula primeira pelo Conv. ICMS 114/23.
+§ 3º Para o Estado do Paraná, o benefício previsto no caput será concedido pelo prazo máximo de 48 (quarenta e oito) meses, na forma da legislação estadual.
