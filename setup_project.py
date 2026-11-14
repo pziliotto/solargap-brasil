@@ -4,7 +4,8 @@ Energia Solar Brasil
 
 Autora: Pâmela Lima Ziliotto
 Data: 17/08/2026
-Atualizado: 21/10/2026 — TP3: pastas da API, serviços, páginas, testes e data/external;
+Atualizado: 13/11/2026 — TP4: pastas src/ia e docs/benchmark
+            21/10/2026 — TP3: pastas da API, serviços, páginas, testes e data/external;
             .gitignore e requirements sincronizados com os arquivos da raiz
 OBS: Com o andamento do projeto serão criadas outras funções, "env", "sample_config" e "requirements". Assim como qualquer outra função que o projeto precise para que ao final, esse arquivo permita o setup completo em qualquer máquina.
 """
@@ -31,6 +32,8 @@ def create_directory_structure():
         "src/servicos",  # regra de negócio compartilhada (TP3)
         "src/api/rotas",  # API FastAPI (TP3)
         "src/app/paginas",  # páginas do app multipáginas (TP3)
+        "src/ia",  # modelos de linguagem locais (TP4)
+        "docs/benchmark",  # rótulos e resultados do benchmark de modelos (TP4)
         "tests/fixtures",  # testes automatizados (TP3)
         # Notebooks
         "notebooks",  # exploração inicial
@@ -220,7 +223,7 @@ fqdn==1.5.0
 isoduration==20.11.0
 rfc3339-validator==0.1.4
 rfc3986-validator==0.1.1
-rfc3987-syntax==1.0.0
+rfc3987-syntax==1.1.0
 uri-template==1.3.0
 tzdata==2026.3
 python-dateutil==2.9.0.post0
@@ -281,7 +284,7 @@ prometheus_client==0.26.0
 terminado==0.18.1
 
 # Protocolos / Serialização
-protobuf==7.35.1
+protobuf==7.36.2
 
 # API (TP3)
 fastapi==0.159.1
@@ -297,6 +300,26 @@ pytest==9.1.1
 iniconfig==2.3.1
 pluggy==1.7.0
 ruff==0.17.1
+
+# IA local (TP4) — modelos de linguagem com Transformers/PyTorch
+# ATENÇÃO (Windows + GPU NVIDIA): instale o torch ANTES deste arquivo, pelo
+# índice do PyTorch, senão o pip baixa a versão só-CPU do PyPI:
+#   pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cu132
+# Sem GPU, o pip install -r requirements.txt instala a versão CPU normalmente.
+torch==2.15.0
+transformers==5.23.0
+tokenizers==0.23.3
+sentencepiece==0.2.3
+safetensors==0.8.0
+huggingface_hub==2.4.0
+hf-xet==1.8.0
+regex==2026.11.9
+tqdm==4.70.1
+filelock==4.2.10
+fsspec==2026.9.0
+sympy==1.14.0
+mpmath==1.3.0
+networkx==3.7
 """
 
     with open("requirements.txt", "w", encoding="utf-8") as f:
@@ -314,6 +337,7 @@ def create_init_files():
         "src/data_acquisition/noticias",
         "src/preparacao",
         "src/servicos",
+        "src/ia",
         "src/api",
         "src/api/rotas",
         "src/app",
