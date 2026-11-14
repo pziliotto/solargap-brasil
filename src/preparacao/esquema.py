@@ -3,7 +3,8 @@ PROJETO: SolarGap Brasil
 ARQUIVO: esquema.py
 AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 21/09/2026
-ATUALIZAÇÃO:
+ATUALIZAÇÃO: 21/10/2026 — TP3: contrato do corpus de notícias (colunas, níveis
+             de texto e regra de identificação), remoção de import duplicado
 
 DESCRIÇÃO:
     Constantes compartilhadas entre as camadas Silver e Gold e, a partir da etapa 2,
@@ -14,11 +15,22 @@ DESCRIÇÃO:
 OBS.:
     Se a ANEEL renomear uma coluna ou o cadastro de UFs precisar de ajuste a correção
     acontece só aqui.
+
+OBS. TP3:
+    O import de COLUNAS_SENSIVEIS vindo do aneel.py foi removido: a constante era
+    importada e redefinida logo abaixo (o Ruff acusa F811). Além de redundante, o
+    import fazia o esquema — e tudo que depende dele, como a API — carregar o
+    coletor da ANEEL sem necessidade.
+
+    A única função do módulo, id_noticia(), é exceção consciente à regra de "sem
+    lógica": a identificação de uma notícia precisa ser idêntica em quem coleta
+    (scrapers) e em quem recebe (API, POST /noticias). Duas cópias da regra
+    divergiriam com o tempo e gerariam duplicatas no corpus.
 """
 
 from __future__ import annotations
 
-from src.data_acquisition.aneel import COLUNAS_SENSIVEIS
+import hashlib
 
 # ═══════════════════ Colunas da base ANEEL ═══════════════════
 
@@ -50,7 +62,8 @@ RENOMEAR_ANEEL = {
     "SigTipoGeracao": "tipo_geracao",
 }
 
-# Mantido aqui para consulta; os scripts antigos têm cópia própria.
+# Fonte única da lista de colunas com dado pessoal (LGPD). Os scripts do TP1
+# (aneel.py, gerar_amostra.py) mantêm cópia própria por serem anteriores a este módulo.
 COLUNAS_SENSIVEIS = ["NumCPFCNPJ", "NomTitularEmpreendimento"]
 
 # ═══════════════════ Filtros e cortes ═══════════════════
@@ -107,3 +120,43 @@ REGIOES = {
 REGIAO_POR_UF = {sigla: REGIOES[cod // 10] for sigla, (cod, _) in UFS.items()}
 
 TOTAL_UFS = 27
+
+
+# ═══════════════════ Corpus de notícias ═══════════════════
+
+# Ordem e nomes das colunas do corpus (data/processed/corpus_noticias.csv).
+# Contrato compartilhado por: scrapers (escrevem), API (lê e recebe POST),
+# dashboard (lê) e, no TP4, o modelo de linguagem (preenche resumo/sentimento).
+COLUNAS_CORPUS = [
+    "id",
+    "fonte",
+    "url",
+    "data_publicacao",
+    "titulo",
+    "linha_fina",
+    "texto",
+    "ufs_mencionadas",
+    "nivel_texto",
+    "tag_origem",
+    "coletado_em",
+    "resumo",
+    "sentimento",
+]
+
+# integral  -> texto completo armazenado (fontes com licença que autoriza reprodução)
+# metadados -> só título, linha fina, data e link (fontes sem autorização de cópia)
+NIVEL_INTEGRAL = "integral"
+NIVEL_METADADOS = "metadados"
+NIVEIS_TEXTO = (NIVEL_INTEGRAL, NIVEL_METADADOS)
+
+# Colunas que o modelo de linguagem preencherá no TP4. Uma nova coleta NUNCA
+# pode apagar o que já foi preenchido nelas (ver mesclar_corpus no coletor).
+COLUNAS_MODELO = ["resumo", "sentimento"]
+
+
+def id_noticia(url: str) -> str:
+    """Identificador estável de uma notícia: 12 primeiros caracteres do MD5 da URL.
+
+    Mesma regra usada no TP2 — os ids do corpus já versionado continuam válidos.
+    """
+    return hashlib.md5(url.strip().encode("utf-8")).hexdigest()[:12]

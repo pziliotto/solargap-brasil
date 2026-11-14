@@ -3,7 +3,7 @@ PROJETO: SolarGap Brasil
 ARQUIVO: construir_gold.py
 AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 21/09/2026
-ATUALIZAÇÃO:
+ATUALIZAÇÃO: 21/10/2026 — TP3: junção opcional do ICMS removida (dimensão própria)
 
 DESCRIÇÃO:
     Constrói a camada Gold (data/processed) a partir da Silver (data/interim).
@@ -30,8 +30,10 @@ DECISÕES:
       grandeza legível (centenas) e unidade usual no setor.
     - Empreendimentos por 100 mil hab. complementa a potência: potência mede
       volume investido, contagem mede difusão.
-    - A coluna de ICMS (Convênio 16/2015) é opcional: se o CSV da etapa de
-      scraping existir, é juntada; se não existir, a Gold é gerada sem ela.
+    - TP3: a adesão ao Convênio ICMS 16/15 NÃO é juntada aqui. Virou uma tabela
+      Gold própria (gold_icms_uf.csv, gerada por icms_confaz.py), unida por
+      sigla_uf sob demanda no painel e na API. Assim, atualizar a política não
+      exige reprocessar 4,6 milhões de registros — nem ter a base da ANEEL.
 
 OBS. DE USO:
     Rodar como módulo a partir da raiz, depois do construir_silver:
@@ -55,7 +57,6 @@ PASTA_LOGS = PROJECT_ROOT / "logs"
 
 SILVER_MMGD = PASTA_INTERIM / "mmgd_silver.parquet"
 SILVER_POP_UF = PASTA_INTERIM / "populacao_uf_silver.csv"
-SILVER_ICMS = PASTA_INTERIM / "icms_confaz_silver.csv"  # gerado na etapa 2
 
 SAIDA_AGREGADO = PASTA_PROCESSED / "gold_mmgd_agregado.csv"
 SAIDA_UF = PASTA_PROCESSED / "gold_uf.csv"
@@ -183,27 +184,11 @@ def construir_uf(agregado: pd.DataFrame) -> pd.DataFrame:
     )
 
     uf = uf.drop(columns=["potencia_kw", "qtd_imputados"])
-    uf = juntar_icms(uf)
 
     if len(uf) != esquema.TOTAL_UFS:
         abortar(f"Tabela por UF com {len(uf)} linhas; esperado {esquema.TOTAL_UFS}.")
 
     return uf.sort_values("watts_por_habitante", ascending=False).reset_index(drop=True)
-
-
-def juntar_icms(uf: pd.DataFrame) -> pd.DataFrame:
-    """Junta a adesão ao Convênio ICMS 16/2015, se o CSV já existir."""
-    if not SILVER_ICMS.exists():
-        logging.warning(
-            "ICMS ainda não disponível (%s) — Gold gerada sem essa coluna.",
-            SILVER_ICMS.name,
-        )
-        return uf
-
-    icms = pd.read_csv(SILVER_ICMS, sep=SEPARADOR)
-    uf = uf.merge(icms, on="sigla_uf", how="left", validate="one_to_one")
-    logging.info("ICMS juntado: %s", [c for c in icms.columns if c != "sigla_uf"])
-    return uf
 
 
 # ═══════════════════ Resumo ═══════════════════

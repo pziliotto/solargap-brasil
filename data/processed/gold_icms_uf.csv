@@ -1,0 +1,28 @@
+sigla_uf;nome_uf;regiao;convenio_adesao;data_adesao;inicio_efeitos;ano_inicio_efeitos;meses_desde_inicio;forma_inclusao;observacao;origem_texto
+CE;Ceará;Nordeste;52/15;2015-07-21;2015-09-01;2015;131;convênio de adesão;;confaz_online
+GO;Goiás;Centro-Oeste;16/15;2015-05-14;2015-09-01;2015;131;texto original;;confaz_online
+PE;Pernambuco;Nordeste;16/15;2015-05-14;2015-09-01;2015;131;texto original;;confaz_online
+RN;Rio Grande do Norte;Nordeste;44/15;2015-06-23;2015-09-01;2015;131;convênio de adesão;;confaz_online
+SP;São Paulo;Sudeste;16/15;2015-05-14;2015-09-01;2015;131;texto original;;confaz_online
+TO;Tocantins;Norte;52/15;2015-07-21;2015-09-01;2015;131;convênio de adesão;;confaz_online
+BA;Bahia;Nordeste;130/15;2015-11-26;2015-11-26;2015;129;convênio de adesão;;confaz_online
+DF;Distrito Federal;Centro-Oeste;130/15;2015-11-26;2015-11-26;2015;129;convênio de adesão;;confaz_online
+MA;Maranhão;Nordeste;130/15;2015-11-26;2015-11-26;2015;129;convênio de adesão;;confaz_online
+MT;Mato Grosso;Centro-Oeste;130/15;2015-11-26;2015-11-26;2015;129;convênio de adesão;;confaz_online
+AC;Acre;Norte;157/15;2015-12-30;2015-12-30;2015;128;convênio de adesão;;confaz_online
+AL;Alagoas;Nordeste;157/15;2015-12-30;2015-12-30;2015;128;convênio de adesão;;confaz_online
+MG;Minas Gerais;Sudeste;157/15;2015-12-30;2015-12-30;2015;128;convênio de adesão;;confaz_online
+RJ;Rio de Janeiro;Sudeste;157/15;2015-12-30;2015-12-30;2015;128;convênio de adesão;;confaz_online
+RS;Rio Grande do Sul;Sul;157/15;2015-12-30;2015-12-30;2015;128;convênio de adesão;;confaz_online
+RR;Roraima;Norte;39/16;2016-05-24;2016-05-24;2016;123;convênio de adesão;;confaz_online
+PB;Paraíba;Nordeste;75/16;2016-09-01;2016-09-01;2016;119;nova redação da cláusula primeira;Inclusão inferida da redação dada pelo Conv. ICMS 75/16: o texto consolidado não traz nota de adesão própria.;confaz_online
+PI;Piauí;Nordeste;75/16;2016-09-01;2016-09-01;2016;119;nova redação da cláusula primeira;Inclusão inferida da redação dada pelo Conv. ICMS 75/16: o texto consolidado não traz nota de adesão própria.;confaz_online
+RO;Rondônia;Norte;75/16;2016-09-01;2016-09-01;2016;119;nova redação da cláusula primeira;Inclusão inferida da redação dada pelo Conv. ICMS 75/16: o texto consolidado não traz nota de adesão própria.;confaz_online
+SE;Sergipe;Nordeste;75/16;2016-09-01;2016-09-01;2016;119;nova redação da cláusula primeira;Inclusão inferida da redação dada pelo Conv. ICMS 75/16: o texto consolidado não traz nota de adesão própria.;confaz_online
+PA;Pará;Norte;81/16;2016-09-13;2016-09-13;2016;119;convênio de adesão;;confaz_online
+MS;Mato Grosso do Sul;Centro-Oeste;113/16;2016-11-10;2016-11-10;2016;117;convênio de adesão;;confaz_online
+AP;Amapá;Norte;39/17;2017-05-03;2017-05-03;2017;111;convênio de adesão;;confaz_online
+ES;Espírito Santo;Sudeste;215/17;2018-01-05;2018-01-05;2018;103;convênio de adesão;;confaz_online
+AM;Amazonas;Norte;42/18;2018-07-01;2018-07-01;2018;97;convênio de adesão;;confaz_online
+PR;Paraná;Sul;42/18;2018-07-01;2018-07-01;2018;97;convênio de adesão;;confaz_online
+SC;Santa Catarina;Sul;42/18;2018-07-01;2018-07-01;2018;97;convênio de adesão;;confaz_online
