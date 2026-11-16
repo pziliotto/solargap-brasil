@@ -2,8 +2,8 @@
 
 **Projeto:** SolarGap Brasil — Onde está o próximo mercado solar?
 **Autora:** Pâmela Lima Ziliotto
-**Etapa:** TP3
-**Última atualização:** 21/10/2026
+**Etapa:** TP4
+**Última atualização:** 16/11/2026
 
 ---
 
@@ -376,13 +376,14 @@ Arquivo de entrada: `src/app/app.py`, com `st.navigation`, menu agrupado em seç
 
 ### 4.3 API (FastAPI)
 
-São 13 rotas em `src/api/`, documentadas em `docs/api.md` e em `/docs` (Swagger). Todas as respostas usam modelos Pydantic (`response_model`). Os erros seguem um formato único (`{"detail": ...}`):
+São 16 rotas em `src/api/` (13 do TP3 e 3 de IA do TP4, seção 5), documentadas em `docs/api.md` e em `/docs` (Swagger). Todas as respostas usam modelos Pydantic (`response_model`). Os erros seguem um formato único (`{"detail": ...}`):
 
 - **400** filtros incoerentes;
 - **404** recurso inexistente;
 - **409** notícia duplicada;
 - **422** validação dos dados enviados;
-- **503** dados indisponíveis;
+- **503** dados indisponíveis ou modelo de linguagem não pronto;
+- **504** inferência acima do tempo limite;
 - **500** erro inesperado, registrado no log, sem rastro de pilha para o cliente.
 
 As duas rotas de envio são:
@@ -392,7 +393,7 @@ As duas rotas de envio são:
 
 ### 4.4 Testes
 
-São 67 testes automatizados (`python -m pytest`):
+São 104 testes automatizados (`python -m pytest`):
 
 - **Serviços:** reprodução exata do `gold_uf.csv`, filtros, monotonia do parque, CAGR e quadrantes.
 - **API:** todas as rotas e todos os códigos de erro.
@@ -401,27 +402,55 @@ São 67 testes automatizados (`python -m pytest`):
 - **Gold:** execução com Silver sintética.
 - **Upload.**
 - **Dashboard:** todas as páginas via `AppTest` e persistência dos filtros.
+- **IA (TP4):** métricas, catálogo, estados do gerenciador de modelos, rotas de IA com todos os erros, processamento em lote incremental e inferência real com modelos minúsculos criados na hora (mesma arquitetura T5 e DeBERTa, sem download).
 
 Também foi executado um teste de integração real, com a API no uvicorn e a página API do dashboard enviando uma notícia por HTTP: a resposta foi 201 e o reenvio, 409.
 
-## 5. Preparação para o Modelo de Linguagem (TP4)
+## 5. Modelos de Linguagem Locais (TP4)
 
-|Tarefa de LLM (enunciado)|Dados disponíveis|Aplicação no SolarGap|
-|---|---|---|
-|Classificação de sentimentos|Corpus multifonte; títulos e linhas finas também no nível "metadados"|Tom das notícias sobre GD por UF (positivo, neutro, negativo), comparado à adoção: a imprensa acompanha o mercado?|
-|Análise de texto (resumo)|Textos integrais (média de ~3 mil caracteres)|Resumo de cada notícia na página Notícias|
-|Perguntas e respostas|Gold + corpus + ICMS, expostos pela API|Base do agente do TP5: perguntas como "por que o RJ é lacuna persistente?" respondidas com as rotas da API|
-|Geração de texto|Ficha da UF (`/ufs/{sigla}`)|Relatório descritivo automático por estado|
+### 5.1 Tarefas e modelos
 
-**O que já está pronto.**
+O corpus de notícias é processado por modelos executados localmente (HuggingFace Transformers e PyTorch), escolhidos por benchmark. A justificativa completa, com os resultados de cada candidato, está em `docs/escolha_modelo.md`.
 
-1. As colunas `resumo` e `sentimento` existem no esquema (nulas).
-2. A mescla do coletor nunca apaga o que o modelo preencher.
-3. `texto_para_modelo` (em `servicos/texto.py`) monta a entrada do modelo respeitando a licença: uma notícia de nível "metadados" nunca envia texto integral. O limite de 4.000 caracteres (~1.000 tokens) cabe em modelos locais pequenos.
-4. A API já devolve `texto_para_modelo` em `GET /noticias/{id}`.
-5. A rota `POST /processar_texto` do TP4 seguirá o padrão já implementado: modelo Pydantic de entrada e de resposta, e erro 503 se o modelo não carregar.
+|Tarefa|Modelo|Resultado no benchmark|Uso|
+|---|---|---|---|
+|Resumo|`recogna-nlp/ptt5-base-summ` (MIT)|ROUGE-1 0,344, contra 0,309 do início do texto|Gravado no corpus; página Notícias e API|
+|Relevância|`MoritzLaurer/mDeBERTa-v3-base-xnli-multilingual-nli-2mil7` (MIT), zero-shot|F1 macro 0,71, contra 0,43 de "sempre relevante"|Gravada no corpus; filtro na página Notícias e em `GET /noticias`|
+|Tom|mesmo mDeBERTa|Acurácia 0,43, contra 0,83 de "sempre favorável"|**Reprovado**: só na API, como experimental|
 
-**Ponto de atenção de licença para o TP4.** Resumos gerados por LLM são obras derivadas. Agência Brasil e Agência Gov autorizam reprodução com citação. Cada resumo manterá a URL de origem.
+### 5.2 Dados do benchmark
+
+|Conjunto|Origem|Tamanho|Uso|
+|---|---|---|---|
+|`docs/benchmark/rotulos_benchmark.csv`|Amostra estratificada por fonte e período (`src/ia/rotulagem.py`), rotulada manualmente pela autora seguindo `docs/benchmark/README.md`|30 notícias: 23 relevantes, 7 fora do tema; entre as relevantes, 19 favoráveis, 2 desfavoráveis e 2 neutras|Gabarito de relevância e tom|
+|Linhas finas próprias|Corpus: notícias cuja linha fina não repete o primeiro parágrafo|56 notícias|Referência de resumo (o modelo recebe a notícia **sem** a linha fina, para não haver vazamento)|
+
+Achado de qualidade do corpus: em 56 das 119 notícias, a "linha fina" coletada é o primeiro parágrafo da matéria (o portal repete o lide na meta descrição). A entrada do modelo (`texto_para_modelo`) passou a omitir a linha fina nesses casos, para não gastar a janela de 512 tokens com texto duplicado.
+
+### 5.3 Processamento em lote e armazenamento
+
+`python -m src.ia.processar_corpus` resume e avalia a relevância de cada notícia e grava `data/processed/corpus_ia.csv`:
+
+|Coluna|Conteúdo|
+|---|---|
+|`id`|Chave de ligação com `corpus_noticias.csv`|
+|`resumo`, `resumo_truncado`|Resumo gerado e se a notícia passou do limite de 512 tokens|
+|`relevante`, `relevancia_prob`|Julgamento do modelo e probabilidade (limiar 0,5)|
+|`modelo_resumo`, `modelo_relevancia`|Identificador de cada modelo no HuggingFace Hub (rastreabilidade)|
+|`processado_em`|Data e hora do processamento|
+
+**Por que um arquivo separado.** O corpus é escrito pelos coletores e o enriquecimento por outro processo. Separados, uma nova coleta não apaga o que já foi processado e um novo processamento não regrava o corpus. A carga (`servicos/dados.py`) junta os dois pelo `id`; notícias ainda não processadas ficam com relevância nula ("não avaliada"), nunca "irrelevante".
+
+**Incremental.** O lote só processa notícias sem resultado do par de modelos atual. Trocar de modelo reprocessa tudo, e as colunas `modelo_*` registram qual modelo gerou cada linha.
+
+**Versionado no Git.** O painel e a API mostram resumo e relevância em qualquer máquina, sem GPU e sem baixar os modelos (~2 GB).
+
+### 5.4 Limitações dos dados gerados
+
+- **Truncamento:** 64% das notícias passam do limite no resumo e 80% na classificação. O modelo lê o início, onde o texto jornalístico concentra o essencial.
+- **Resumo não é fonte:** resumos automáticos podem omitir ou distorcer detalhes. O painel sempre mostra o link da matéria original ao lado, e o resumo nunca alimenta um indicador numérico.
+- **Relevância mais estrita que a rotulagem:** quatro dos cinco falsos negativos do benchmark são notícias sobre renováveis em geral. O filtro tende a excluir esse tipo de notícia. No lote completo, 28 das 119 notícias foram julgadas fora do tema; entre elas há notícias de geração distribuída que não mencionam "solar", por isso o filtro do painel vem desligado por padrão.
+- **Licença:** resumos são obras derivadas. Agência Brasil e Agência Gov autorizam reprodução com citação; cada resumo mantém a ligação com a URL de origem.
 
 ## 6. Governança e Privacidade
 
@@ -445,7 +474,10 @@ Como o repositório é público e nenhum indicador depende da identificação do
 |`data/interim/` (Silver)|—|❌ Não|Sempre reproduzível a partir da Bronze|
 |`gold_mmgd_agregado.csv`, `gold_uf.csv`|81 KB, 2 KB|✅ Sim|Alimentam o dashboard e a API sem a base completa|
 |`gold_icms_uf.csv`|~3,5 KB|✅ Sim|Dimensão de política pública (TP3)|
-|`corpus_noticias.csv`|< 1 MB|✅ Sim|Corpus para o dashboard, a API e o LLM do TP4|
+|`corpus_noticias.csv`|< 1 MB|✅ Sim|Corpus para o dashboard, a API e os modelos de linguagem|
+|`corpus_ia.csv`|< 100 KB|✅ Sim|Resumo e relevância gerados em lote (TP4); dispensa GPU e download dos modelos para avaliar|
+|`docs/benchmark/`|< 200 KB|✅ Sim|Rótulos manuais, saídas e métricas do benchmark: evidência da escolha dos modelos|
+|Pesos dos modelos (cache do HuggingFace)|~2 GB|❌ Não|Baixados automaticamente na primeira carga|
 |`data/external/confaz/`|~8 KB|✅ Sim|Cópia de referência do texto oficial do Convênio ICMS 16/15|
 |`data/external/noticias_enviadas.csv`|—|❌ Não|Estado de execução da API, não dado do projeto|
 |`data/raw/html/` (cache dos scrapers)|—|❌ Não|Reproduzível executando os coletores|
@@ -479,10 +511,16 @@ A ODbL exige atribuição e tem cláusula _share-alike_: bases derivadas distrib
   - Agência Gov e CONFAZ como novas fontes;
   - KPI de crescimento e matriz de oportunidade;
   - 67 testes automatizados.
-- **TP4:**
-  - escolher e documentar um modelo local da HuggingFace (ex.: BERTimbau para sentimento; PTT5 ou mT5 para resumo), avaliando desempenho, custo computacional local e acessibilidade;
-  - implementar `POST /processar_texto` com modelos de resposta e erro 503 se o modelo não carregar;
-  - preencher `resumo` e `sentimento` no corpus.
+- **TP4 (concluído):**
+  - benchmark de cinco modelos no próprio corpus, com rotulagem manual (`docs/escolha_modelo.md`);
+  - resumo (PTT5) e relevância (mDeBERTa) do corpus em lote, versionados em `corpus_ia.csv`;
+  - rotas `POST /processar_texto`, `POST /noticias/{id}/processar` e `GET /ia/status`, com modelos de resposta e erros 422, 503 e 504;
+  - página Laboratório de IA e resumo/relevância na página Notícias;
+  - tom reprovado no benchmark e mantido só como experimental.
+- **Pendências herdadas para o TP5:**
+  - atualizar a base da ANEEL para a referência 10/2026, já baixada. O diagnóstico mostrou que a ANEEL removeu os ~73 mil registros sem fonte do Maranhão, o que confirma o critério do painel oficial e torna a imputação da seção 3.4.1 desnecessária;
+  - ampliar o corpus (Agência Senado, Agência Câmara e agências estaduais), com verificação de termos de uso fonte a fonte.
 - **TP5:**
-  - agente inteligente de recomendação que use as rotas da API como ferramentas;
+  - agente inteligente de recomendação que use as rotas da API como ferramentas, lendo só as notícias relevantes e já resumidas;
+  - reavaliar o tom com o LLM online permitido no TP5, contra os mesmos 30 rótulos;
   - dashboard final consolidado.

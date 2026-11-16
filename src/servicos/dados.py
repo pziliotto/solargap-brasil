@@ -123,20 +123,61 @@ def carregar_noticias_enviadas(pasta: Path = PASTA_EXTERNAL) -> pd.DataFrame:
     return _preparar_corpus(pd.read_csv(caminho, sep=SEPARADOR))
 
 
+def carregar_corpus_ia(pasta: Path = PASTA_PROCESSED) -> pd.DataFrame | None:
+    """Resumo e relevância gerados pelos modelos locais (TP4). Opcional."""
+    caminho = pasta / esquema.ARQUIVO_CORPUS_IA
+    if not caminho.exists():
+        return None
+    ia = pd.read_csv(caminho, sep=SEPARADOR, dtype={"id": str})
+    for coluna in esquema.COLUNAS_CORPUS_IA:
+        if coluna not in ia.columns:
+            ia[coluna] = pd.NA
+    return ia[esquema.COLUNAS_CORPUS_IA].drop_duplicates(subset="id", keep="last")
+
+
+def anexar_ia(corpus: pd.DataFrame, ia: pd.DataFrame | None) -> pd.DataFrame:
+    """Junta o enriquecimento por IA ao corpus pelo id.
+
+    O resumo do arquivo de IA preenche a coluna resumo do corpus (prevalece um
+    resumo já existente no corpus, se houver). Notícias ainda não processadas
+    ficam com relevante/relevancia_prob nulos — "não avaliada", não "irrelevante".
+    """
+    extras = ["relevante", "relevancia_prob", "resumo_truncado"]
+    if ia is None or ia.empty:
+        return corpus.assign(**{coluna: pd.NA for coluna in extras})
+    unido = corpus.merge(
+        ia[["id", "resumo", *extras]].rename(columns={"resumo": "resumo_ia"}),
+        on="id",
+        how="left",
+    )
+    # A coluna resumo do corpus costuma estar toda vazia (lida como float):
+    # converte para objeto antes de receber texto (pandas 3 não aceita upcast).
+    resumo = unido["resumo"].astype("object")
+    vazio = resumo.isna() | (resumo.astype(str).str.strip() == "")
+    unido["resumo"] = resumo.where(~vazio, unido["resumo_ia"].astype("object"))
+    unido["relevante"] = unido["relevante"].map(
+        lambda v: v if pd.isna(v) else str(v).strip().lower() in {"true", "1", "sim"}
+    )
+    return unido.drop(columns="resumo_ia")
+
+
 def carregar_corpus_completo(
     pasta_processed: Path = PASTA_PROCESSED, pasta_external: Path = PASTA_EXTERNAL
 ) -> pd.DataFrame:
-    """Corpus coletado + notícias enviadas pela API, sem ids repetidos.
+    """Corpus coletado + notícias enviadas pela API, sem ids repetidos, com o
+    enriquecimento por IA (resumo e relevância) quando disponível.
 
     Em caso de id repetido, prevalece o registro coletado (fonte primária).
     """
     coletado = carregar_corpus(pasta_processed)
     enviadas = carregar_noticias_enviadas(pasta_external)
+    ia = carregar_corpus_ia(pasta_processed)
     if enviadas.empty:
-        return coletado
+        return anexar_ia(coletado, ia)
 
     completo = pd.concat([coletado, enviadas], ignore_index=True)
     completo = completo.drop_duplicates(subset="id", keep="first")
-    return completo.sort_values(
+    completo = completo.sort_values(
         "data_publicacao", ascending=False, na_position="last"
     ).reset_index(drop=True)
+    return anexar_ia(completo, ia)

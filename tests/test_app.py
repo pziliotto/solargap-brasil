@@ -16,6 +16,7 @@ PAGINAS = [
     "noticias",
     "dados",
     "api",
+    "laboratorio_ia",
 ]
 
 
@@ -50,3 +51,21 @@ def test_pagina_api_sem_servidor_mostra_instrucao(app, monkeypatch):
     monkeypatch.setenv("SOLARGAP_API_URL", "http://127.0.0.1:1")
     app.switch_page("paginas/api.py").run()
     assert any("uvicorn" in e.value for e in app.error) or app.code
+
+
+def test_laboratorio_sem_servidor_mostra_instrucao(app, monkeypatch):
+    monkeypatch.setenv("SOLARGAP_API_URL", "http://127.0.0.1:1")
+    app.switch_page("paginas/laboratorio_ia.py").run()
+    assert any("fora do ar" in e.value for e in app.error)
+    assert any("uvicorn" in c.value for c in app.code)
+
+
+def test_noticias_mostra_resumo_e_filtro_de_relevancia(app):
+    app.switch_page("paginas/noticias.py").run()
+    filtro = app.toggle(key="so_relevantes")
+    if filtro.disabled:  # corpus_ia.csv ainda não gerado
+        pytest.skip("corpus sem processamento por IA")
+    total = int(app.metric[0].value)
+    filtro.set_value(True).run()
+    assert not app.exception
+    assert int(app.metric[0].value) <= total

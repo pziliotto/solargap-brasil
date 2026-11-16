@@ -10,11 +10,16 @@ leitura. Tudo o que GRAVA (notícias enviadas, Gold sintética) vai para pastas
 temporárias (tmp_path), sem tocar nos arquivos do projeto.
 """
 
+import os
 import shutil
 import sys
 from pathlib import Path
 
 import pytest
+
+# A API carrega os modelos de linguagem no startup. Nos testes, nunca: eles
+# baixariam ~2 GB. As rotas de IA são testadas com um gerenciador falso.
+os.environ["SOLARGAP_CARREGAR_MODELOS"] = "0"
 
 RAIZ = Path(__file__).resolve().parents[1]
 if str(RAIZ) not in sys.path:

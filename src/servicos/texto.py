@@ -3,7 +3,8 @@ PROJETO: SolarGap Brasil
 ARQUIVO: texto.py
 AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 21/10/2026
-ATUALIZAÇÃO:
+ATUALIZAÇÃO: 13/11/2026 — TP4: texto_para_modelo não repete a linha fina quando
+             ela é o próprio primeiro parágrafo do texto
 
 DESCRIÇÃO:
     Processamento de texto do corpus de notícias, sem dependência de interface:
@@ -267,6 +268,18 @@ def _limpo(valor) -> str:
     return "" if texto.lower() in {"nan", "none", "<na>"} else texto
 
 
+def _espacos(valor: str) -> str:
+    return " ".join(valor.split())
+
+
+def _abre_o_texto(linha_fina: str, texto: str) -> bool:
+    """Se a linha fina já aparece no início do texto (mesmo com espaços diferentes)."""
+    if not linha_fina or not texto:
+        return False
+    inicio = _espacos(linha_fina)[:80]
+    return inicio in _espacos(texto)[: len(linha_fina) + 200]
+
+
 def texto_para_modelo(
     titulo: str,
     linha_fina: str | None,
@@ -279,9 +292,16 @@ def texto_para_modelo(
     Notícias de nível "metadados" nunca usam o campo texto, mesmo que ele venha
     preenchido por engano: o nível é o que a licença da fonte permite usar.
     """
-    partes = [_limpo(titulo), _limpo(linha_fina)]
-    if nivel_texto == esquema.NIVEL_INTEGRAL:
-        partes.append(_limpo(texto))
+    titulo, linha_fina, texto = _limpo(titulo), _limpo(linha_fina), _limpo(texto)
+    integral = nivel_texto == esquema.NIVEL_INTEGRAL
+
+    # Em cerca de metade do corpus a "linha fina" coletada é o primeiro parágrafo
+    # da matéria (o portal repete o lide na meta descrição). Repeti-la desperdiça
+    # a janela de 512 tokens dos modelos locais com texto duplicado.
+    if integral and _abre_o_texto(linha_fina, texto):
+        linha_fina = ""
+
+    partes = [titulo, linha_fina, texto if integral else ""]
 
     entrada = "\n\n".join(p for p in partes if p)
     if len(entrada) <= limite:

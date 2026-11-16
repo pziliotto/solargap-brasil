@@ -59,8 +59,14 @@ def filtrar_noticias(
     desde: date | None = None,
     ate: date | None = None,
     nivel_texto: str | None = None,
+    relevante: bool | None = None,
 ) -> pd.DataFrame:
-    """Aplica os filtros informados (os ausentes são ignorados)."""
+    """Aplica os filtros informados (os ausentes são ignorados).
+
+    relevante=True mantém só as notícias que o modelo julgou sobre energia
+    solar; False, só as julgadas fora do tema. Não avaliadas ficam de fora
+    nos dois casos.
+    """
     filtro = pd.Series(True, index=corpus.index)
 
     if fonte:
@@ -77,6 +83,10 @@ def filtrar_noticias(
         filtro &= corpus["data_publicacao"] < pd.Timestamp(ate) + pd.Timedelta(days=1)
     if nivel_texto:
         filtro &= corpus["nivel_texto"] == nivel_texto
+    if relevante is not None and "relevante" in corpus.columns:
+        filtro &= corpus["relevante"].map(
+            lambda v: not pd.isna(v) and bool(v) == relevante
+        )
 
     return corpus[filtro]
 

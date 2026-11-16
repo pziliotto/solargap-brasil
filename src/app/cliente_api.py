@@ -3,7 +3,7 @@ PROJETO: SolarGap Brasil
 ARQUIVO: cliente_api.py
 AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 21/10/2026
-ATUALIZAÇÃO:
+ATUALIZAÇÃO: 16/11/2026 — TP4: status dos modelos e processamento de texto
 
 DESCRIÇÃO:
     Cliente HTTP do dashboard para a API do projeto (src/api). Usado pela página
@@ -35,6 +35,10 @@ import requests
 
 URL_PADRAO = "http://127.0.0.1:8000"
 TIMEOUT = (3, 10)
+# A inferência leva segundos na GPU e mais na CPU. A espera do cliente fica
+# acima do limite da própria API (60 s), para que o 504 dela chegue ao painel
+# com a mensagem explicativa, em vez de um timeout genérico do cliente.
+TIMEOUT_IA = (3, 90)
 
 
 def url_base() -> str:
@@ -65,10 +69,10 @@ def _detalhe_erro(resposta: requests.Response) -> str:
     return str(detalhe)
 
 
-def _requisitar(metodo: str, caminho: str, **kwargs) -> RespostaAPI:
+def _requisitar(metodo: str, caminho: str, timeout=TIMEOUT, **kwargs) -> RespostaAPI:
     url = f"{url_base()}{caminho}"
     try:
-        resposta = requests.request(metodo, url, timeout=TIMEOUT, **kwargs)
+        resposta = requests.request(metodo, url, timeout=timeout, **kwargs)
     except requests.exceptions.ConnectionError:
         return RespostaAPI(
             ok=False,
@@ -97,3 +101,25 @@ def consultar(caminho: str, parametros: dict | None = None) -> RespostaAPI:
 
 def enviar_noticia(payload: dict) -> RespostaAPI:
     return _requisitar("POST", "/noticias", json=payload)
+
+
+def status_ia() -> RespostaAPI:
+    return _requisitar("GET", "/ia/status")
+
+
+def processar_texto(texto: str, tarefas: list[str]) -> RespostaAPI:
+    return _requisitar(
+        "POST",
+        "/processar_texto",
+        timeout=TIMEOUT_IA,
+        json={"texto": texto, "tarefas": tarefas},
+    )
+
+
+def processar_noticia(id_noticia: str, tarefas: list[str]) -> RespostaAPI:
+    return _requisitar(
+        "POST",
+        f"/noticias/{id_noticia}/processar",
+        timeout=TIMEOUT_IA,
+        params={"tarefas": tarefas},
+    )

@@ -1,0 +1,9 @@
+﻿tarefa;modelo;dispositivo;n_itens;rouge1;rougeL;palavras_media;acuracia;f1_macro;truncados_pct;parametros_m;carga_s;tempo_medio_s;tempo_p95_s;ram_processo_mb;vram_pico_mb;licenca;hf_id;erro
+resumo;baseline_lide;;56;0.3093;0.2623;28.0;;;;;;;;;;;;
+resumo;ptt5-summ;cuda;56;0.3441;0.2814;37.2;;;64.3;222.9;6.3;1.938;2.833;850.0;1058.0;conferir no cartão do modelo;recogna-nlp/ptt5-base-summ;
+resumo;ptt5-summ-xlsum;cuda;56;0.2398;0.175;24.8;;;64.3;222.9;2.2;1.407;1.987;1461.0;1028.0;CC BY-NC-SA 4.0;recogna-nlp/ptt5-base-summ-xlsum;
+resumo;qwen2.5-1.5b;cuda;56;0.2839;0.1966;63.1;;;0.0;1543.7;87.5;10.943;15.201;4503.0;3060.0;Apache-2.0;Qwen/Qwen2.5-1.5B-Instruct;
+relevancia;mdeberta-nli;cuda;30;;;;0.767;0.713;80.0;278.8;4.6;0.841;0.889;4736.0;682.0;MIT;MoritzLaurer/mDeBERTa-v3-base-xnli-multilingual-nli-2mil7;
+tom;mdeberta-nli;cuda;23;;;;0.435;0.276;80.0;278.8;4.6;0.841;0.889;4736.0;682.0;MIT;MoritzLaurer/mDeBERTa-v3-base-xnli-multilingual-nli-2mil7;
+relevancia;minilm-nli;cuda;30;;;;0.6;0.375;63.3;107.0;3.6;0.04;0.048;4881.0;433.0;conferir no cartão do modelo;MoritzLaurer/multilingual-MiniLMv2-L6-mnli-xnli;
+tom;minilm-nli;cuda;23;;;;0.696;0.366;63.3;107.0;3.6;0.04;0.048;4881.0;433.0;conferir no cartão do modelo;MoritzLaurer/multilingual-MiniLMv2-L6-mnli-xnli;

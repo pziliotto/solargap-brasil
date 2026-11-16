@@ -19,6 +19,7 @@ Documentação completa:
 - 📄 [Project Charter](docs/project_charter_solargap.docx) — escopo, objetivos, KPIs, stakeholders e cronograma
 - 📊 [Data Summary Report](docs/data_summary_report.md) — fontes, qualidade, tratamento e licenciamento dos dados
 - 🔌 [Documentação da API](docs/api.md) — rotas, parâmetros, exemplos e códigos de erro
+- 🧠 [Escolha dos modelos de linguagem](docs/escolha_modelo.md) — benchmark de cinco modelos locais (TP4)
 
 ### Indicadores
 
@@ -65,7 +66,9 @@ solargap-brasil/
 ├── docs/
 │   ├── project_charter_solargap.docx
 │   ├── data_summary_report.md
-│   └── api.md
+│   ├── api.md
+│   ├── escolha_modelo.md         # justificativa dos modelos de linguagem (TP4)
+│   └── benchmark/                # rótulos manuais, saídas e métricas do benchmark (TP4)
 ├── src/
 │   ├── data_acquisition/
 │   │   ├── coletor_base.py       # infraestrutura compartilhada (retry, logging, paths)
@@ -82,14 +85,20 @@ solargap-brasil/
 │   │   ├── construir_gold.py     # camada Gold
 │   │   └── ...                   # amostra e diagnósticos
 │   ├── servicos/                 # regra de negócio usada pelo app E pela API (TP3)
+│   ├── ia/                       # modelos de linguagem locais (TP4)
+│   │   ├── catalogo.py           #   candidatos, modelo de cada tarefa, hipóteses zero-shot
+│   │   ├── modelos_hf.py         #   carga e inferência (único módulo que importa torch)
+│   │   ├── motor.py              #   carga única, estados, fila de inferência
+│   │   ├── benchmark.py          #   comparação dos candidatos (qualidade, tempo, memória)
+│   │   └── processar_corpus.py   #   resumo e relevância do corpus em lote
 │   ├── api/                      # API FastAPI (TP3)
 │   │   ├── main.py               #   aplicação e tratamento de erros
 │   │   ├── modelos.py            #   modelos Pydantic de entrada e resposta
-│   │   └── rotas/                #   sistema, indicadores, notícias, políticas, comparações
+│   │   └── rotas/                #   sistema, indicadores, notícias, políticas, comparações, ia
 │   └── app/                      # dashboard Streamlit multipáginas (TP3)
 │       ├── app.py                #   entrada: menu de navegação e filtros globais
-│       └── paginas/              #   Início, Panorama, Evolução, Oportunidades, Notícias, Dados, API
-├── tests/                        # 67 testes automatizados (pytest)
+│       └── paginas/              #   Início, Panorama, Evolução, Oportunidades, Notícias, Laboratório de IA, Dados, API
+├── tests/                        # 104 testes automatizados (pytest)
 ├── requirements.txt
 ├── setup_project.py
 └── README.md
@@ -132,8 +141,12 @@ python -m venv .venv
 source .venv/bin/activate
 
 # 3. Instalar as dependências
+#    Com GPU NVIDIA: instale o PyTorch com CUDA ANTES, senão o pip baixa a versão só-CPU
+pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cu132
 pip install -r requirements.txt
 ```
+
+O PyTorch 2.15 com CUDA 13.2 exige driver NVIDIA recente (`nvidia-smi` deve mostrar "CUDA Version" 13.2 ou maior). Sem GPU, basta o `pip install -r requirements.txt`: os modelos rodam em CPU, mais devagar.
 
 **Dashboard** (a partir da raiz):
 
@@ -148,7 +161,14 @@ uvicorn src.api.main:app --reload
 # Documentação interativa: http://127.0.0.1:8000/docs
 ```
 
-O dashboard funciona sem a API; a página **API** do dashboard mostra o status, consulta as rotas e envia notícias quando a API está no ar.
+O dashboard funciona sem a API; as páginas **API** e **Laboratório de IA** usam a API quando ela está no ar. Na primeira execução, a API baixa os modelos de linguagem (~2 GB) para o cache do HuggingFace; enquanto carregam, as rotas de IA respondem 503 e o resto funciona normalmente. Para subir a API sem os modelos: `SOLARGAP_CARREGAR_MODELOS=0`.
+
+**Modelos de linguagem (opcional — os resultados já estão versionados):**
+
+```bash
+python -m src.ia.processar_corpus      # resumo e relevância das notícias pendentes
+python -m src.ia.benchmark             # repete a comparação dos modelos
+```
 
 **Testes:**
 
@@ -184,6 +204,8 @@ python -m src.preparacao.construir_gold         # camada Gold
 
 **Dados pessoais excluídos na origem.** `NumCPFCNPJ` e `NomTitularEmpreendimento` não são carregados em memória nem gravados em nenhum artefato (parâmetro `usecols`).
 
+**Modelos de linguagem.** Leem no máximo 512 tokens (~350 palavras): notícias longas são resumidas e classificadas pelo início, e a API informa `truncado: true`. O tom das notícias ficou abaixo da linha de base no benchmark e não é usado como indicador. Detalhes em `docs/escolha_modelo.md`.
+
 **Ano corrente parcial.** Os dados de 2026 cobrem até agosto e ficam fora do cálculo de crescimento.
 
 ---
@@ -193,7 +215,7 @@ python -m src.preparacao.construir_gold         # camada Gold
 - [x] **TP1** — Proposta, organização do projeto, coleta via API e demo Streamlit
 - [x] **TP2** — Camadas Silver/Gold, web scraping (BeautifulSoup), interface com cache, estado de sessão e upload
 - [x] **TP3** — App multipáginas, API própria (FastAPI), novas fontes (Agência Gov, CONFAZ), KPI de crescimento, testes
-- [ ] **TP4** — Modelo de linguagem local (HuggingFace/Transformers): resumo e sentimento do corpus via `POST /processar_texto`
+- [x] **TP4** — Modelos de linguagem locais (HuggingFace/Transformers): benchmark, resumo e relevância do corpus, `POST /processar_texto` com erros 503/504, Laboratório de IA
 - [ ] **TP5** — Agente inteligente de recomendação usando a API como ferramenta e dashboard final
 
 ---
