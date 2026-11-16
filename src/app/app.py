@@ -3,7 +3,7 @@ PROJETO: SolarGap Brasil
 ARQUIVO: app.py
 AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 21/10/2026 (substitui demo_app.py, de 20/08/2026)
-ATUALIZAÇÃO:
+ATUALIZAÇÃO: 16/11/2026 — TP4: página Laboratório de IA
 
 DESCRIÇÃO:
     Arquivo de entrada do dashboard multipáginas (TP3). Configura a página,
@@ -26,12 +26,13 @@ ESTRUTURA DO MENU:
     Visão geral  — Início
     Análises     — Panorama · Evolução e crescimento · Oportunidades
     Contexto     — Notícias
-    Ferramentas  — Dados · API
+    Ferramentas  — Laboratório de IA · Dados · API
 
 OBS. DE USO:
     Rodar a partir da raiz:
         python -m streamlit run src/app/app.py
-    Para a página API, a API precisa estar rodando em outro terminal:
+    Para as páginas API e Laboratório de IA, a API precisa estar rodando em
+    outro terminal:
         uvicorn src.api.main:app --reload
 """
 
@@ -65,6 +66,7 @@ PAGINAS = {
         st.Page("paginas/noticias.py", title="Notícias", icon="📰"),
     ],
     "Ferramentas": [
+        st.Page("paginas/laboratorio_ia.py", title="Laboratório de IA", icon="🧠"),
         st.Page("paginas/dados.py", title="Dados", icon="📁"),
         st.Page("paginas/api.py", title="API", icon="🔌"),
     ],

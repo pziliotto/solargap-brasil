@@ -3,12 +3,18 @@ PROJETO: SolarGap Brasil
 ARQUIVO: paginas/noticias.py
 AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 21/10/2026 (origem: aba Notícias do demo_app.py, TP2)
-ATUALIZAÇÃO:
+ATUALIZAÇÃO: 16/11/2026 — TP4: resumo e relevância gerados pelos modelos locais
 
 DESCRIÇÃO:
     Estatísticas do corpus de notícias, agora com várias fontes (TP3):
     filtro por fonte e por UF, nuvem de palavras, termos frequentes, volume
     por ano e por fonte, UFs mais mencionadas e tabela com links.
+
+IA (TP4):
+    Resumo (PTT5) e relevância (mDeBERTa zero-shot) vêm de
+    data/processed/corpus_ia.csv, gerado em lote por src/ia/processar_corpus.py.
+    O filtro "Só notícias sobre energia solar" usa a relevância; o card de
+    destaque mostra o resumo gerado ao lado do link para a matéria original.
 
 NÍVEIS DE TEXTO:
     Notícias de nível "integral" contribuem com o texto completo para a nuvem;
@@ -53,7 +59,18 @@ termos_frequentes = sorted(
     frequencias_gerais, key=frequencias_gerais.get, reverse=True
 )[:40]
 
-c1, c2, c3 = st.columns(3)
+avaliadas = corpus["relevante"].notna()
+c0, c1, c2, c3 = st.columns([1.2, 1, 1, 1.4])
+so_relevantes = c0.toggle(
+    "Só notícias sobre energia solar",
+    value=False,
+    key="so_relevantes",
+    disabled=not avaliadas.any(),
+    help=(
+        "Relevância estimada por modelo de linguagem local (mDeBERTa, zero-shot). "
+        "No benchmark, acertou 77% das notícias rotuladas à mão; veja docs/escolha_modelo.md."
+    ),
+)
 fontes_escolhidas = c1.multiselect(
     "Fontes", fontes, default=fontes, key="fontes_noticias"
 )
@@ -69,6 +86,8 @@ ocultar = c3.multiselect(
 )
 
 selecao = corpus[corpus["fonte"].isin(fontes_escolhidas)]
+if so_relevantes:
+    selecao = filtrar_noticias(selecao, relevante=True)
 if uf_noticia != "Todas as UFs":
     selecao = filtrar_noticias(selecao, uf=uf_noticia)
 
@@ -78,7 +97,15 @@ if selecao.empty:
 
 k1, k2, k3, k4 = st.columns(4)
 k1.metric("Notícias", len(selecao))
-k2.metric("Fontes", selecao["fonte"].nunique())
+if avaliadas.any():
+    fora = int((corpus.loc[avaliadas, "relevante"] == False).sum())  # noqa: E712
+    k2.metric(
+        "Fora do tema (IA)",
+        f"{fora} de {int(avaliadas.sum())}",
+        help="Notícias do corpus que o modelo julgou não tratar de energia solar.",
+    )
+else:
+    k2.metric("Fontes", selecao["fonte"].nunique())
 datas = selecao["data_publicacao"].dropna()
 k3.metric("Período", f"{datas.min():%Y} – {datas.max():%Y}" if not datas.empty else "—")
 k4.metric(
@@ -152,21 +179,74 @@ with col_uf:
         )
 
 st.subheader("Notícias")
+tabela = selecao.assign(
+    relevancia_pct=pd.to_numeric(selecao["relevancia_prob"], errors="coerce") * 100
+)
 st.dataframe(
-    selecao[
-        ["data_publicacao", "fonte", "titulo", "ufs_mencionadas", "nivel_texto", "url"]
+    tabela[
+        [
+            "data_publicacao",
+            "fonte",
+            "titulo",
+            "resumo",
+            "relevancia_pct",
+            "ufs_mencionadas",
+            "url",
+        ]
     ],
     column_config={
         "data_publicacao": st.column_config.DateColumn("Data", format="DD/MM/YYYY"),
         "fonte": "Fonte",
-        "titulo": st.column_config.TextColumn("Título", width="large"),
-        "ufs_mencionadas": "UFs mencionadas",
-        "nivel_texto": "Nível",
+        "titulo": st.column_config.TextColumn("Título", width="medium"),
+        "resumo": st.column_config.TextColumn(
+            "Resumo (IA)",
+            width="large",
+            help="Gerado pelo PTT5 a partir do início da notícia.",
+        ),
+        "relevancia_pct": st.column_config.ProgressColumn(
+            "Sobre energia solar",
+            min_value=0,
+            max_value=100,
+            format="%.0f%%",
+            help="Probabilidade estimada pelo mDeBERTa (zero-shot). Acima de 50% conta como relevante.",
+        ),
+        "ufs_mencionadas": "UFs",
         "url": st.column_config.LinkColumn("Link", display_text="abrir"),
     },
     hide_index=True,
     width="stretch",
 )
+
+com_resumo = selecao[
+    selecao["resumo"].notna() & (selecao["resumo"].astype(str).str.strip() != "")
+]
+if not com_resumo.empty:
+    st.subheader("Ler o resumo de uma notícia")
+    escolha = st.selectbox(
+        "Notícia",
+        com_resumo["id"],
+        format_func=lambda i: com_resumo.set_index("id").loc[i, "titulo"],
+        key="noticia_resumo",
+    )
+    noticia = com_resumo.set_index("id").loc[escolha]
+    with st.container(border=True):
+        st.markdown(f"**{noticia['titulo']}**")
+        st.write(noticia["resumo"])
+        truncado = str(noticia.get("resumo_truncado")).lower() == "true"
+        st.caption(
+            f"{noticia['fonte']} · {noticia['data_publicacao']:%d/%m/%Y} · "
+            "Resumo gerado por modelo local (recogna-nlp/ptt5-base-summ)"
+            + (
+                " a partir do início da notícia (texto longo, truncado)"
+                if truncado
+                else ""
+            )
+            + f". [Ler a matéria original]({noticia['url']})"
+        )
+    st.caption(
+        "Resumos automáticos podem omitir ou distorcer detalhes. Confira números na matéria "
+        "original. Para processar um texto novo, use a página Laboratório de IA."
+    )
 
 enviadas = int((corpus["tag_origem"] == TAG_ENVIO_API).sum())
 st.caption(
