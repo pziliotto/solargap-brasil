@@ -160,3 +160,23 @@ def id_noticia(url: str) -> str:
     Mesma regra usada no TP2 — os ids do corpus já versionado continuam válidos.
     """
     return hashlib.md5(url.strip().encode("utf-8")).hexdigest()[:12]
+
+
+# ═══════════════════ Enriquecimento por IA (TP4) ═══════════════════
+
+# Resultado dos modelos locais sobre o corpus, em arquivo separado
+# (data/processed/corpus_ia.csv), ligado ao corpus pelo id. Separado porque o
+# corpus é escrito pelos coletores e o enriquecimento por outro processo, com
+# ritmo próprio: uma nova coleta não apaga o que já foi processado, e um novo
+# processamento não regrava o corpus. A carga junta os dois (servicos/dados.py).
+ARQUIVO_CORPUS_IA = "corpus_ia.csv"
+COLUNAS_CORPUS_IA = [
+    "id",
+    "resumo",
+    "resumo_truncado",
+    "relevante",
+    "relevancia_prob",
+    "modelo_resumo",
+    "modelo_relevancia",
+    "processado_em",
+]

@@ -185,6 +185,10 @@ class GerenciadorModelos:
     def todas_prontas(self) -> bool:
         return all(s.estado == EstadoModelo.pronto for s in self._situacoes.values())
 
+    def verificar(self, tarefa: Tarefa) -> None:
+        """Levanta ModeloIndisponivel se a tarefa não puder ser executada agora."""
+        self._instancia(tarefa)
+
     def _instancia(self, tarefa: Tarefa):
         situacao = self.situacao(tarefa)
         if situacao.estado != EstadoModelo.pronto:

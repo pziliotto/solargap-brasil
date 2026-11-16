@@ -72,6 +72,12 @@ def listar_noticias(
         date | None, Query(description="Publicadas até (AAAA-MM-DD), inclusive.")
     ] = None,
     nivel_texto: Annotated[str | None, Query(pattern="^(integral|metadados)$")] = None,
+    relevante: Annotated[
+        bool | None,
+        Query(
+            description="Só notícias julgadas sobre energia solar (true) ou fora do tema (false)."
+        ),
+    ] = None,
     limite: Annotated[int, Query(ge=1, le=100)] = 20,
     deslocamento: Annotated[
         int, Query(ge=0, description="Quantas notícias pular (paginação).")
@@ -82,7 +88,7 @@ def listar_noticias(
             status_code=400, detail="'desde' não pode ser posterior a 'ate'."
         )
     filtrado = servico.filtrar_noticias(
-        repositorio.corpus, fonte, uf, termo, desde, ate, nivel_texto
+        repositorio.corpus, fonte, uf, termo, desde, ate, nivel_texto, relevante
     )
     filtrado = filtrado.sort_values(
         "data_publicacao", ascending=False, na_position="last"

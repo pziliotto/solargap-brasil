@@ -15,7 +15,7 @@ from src.api.dependencias import RepositorioDep
 from src.api.modelos import Erro, ResumoDados, Saude
 from src.servicos import indicadores
 
-VERSAO_API = "1.0.0"
+VERSAO_API = "1.1.0"  # 1.1: rotas de IA (TP4)
 roteador = APIRouter(tags=["Sistema"])
 
 
@@ -39,6 +39,9 @@ def raiz() -> dict:
             "GET /politicas/icms",
             "GET /politicas/icms/{sigla}",
             "POST /comparacoes",
+            "GET /ia/status",
+            "POST /processar_texto",
+            "POST /noticias/{id}/processar",
         ],
     }
 

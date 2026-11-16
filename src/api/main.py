@@ -3,7 +3,8 @@ PROJETO: SolarGap Brasil
 ARQUIVO: main.py
 AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 21/10/2026
-ATUALIZAÇÃO:
+ATUALIZAÇÃO: 16/11/2026 — TP4: rotas de IA, carga dos modelos em segundo plano,
+             503 com Retry-After para modelo indisponível
 
 DESCRIÇÃO:
     Aplicação FastAPI: metadados da documentação, registro das rotas, carga
@@ -15,11 +16,17 @@ TRATAMENTO DE ERROS (todas as respostas de erro têm o formato {"detail": ...}):
     409  HTTPException       — notícia com URL já existente
     422  validação Pydantic  — campos inválidos, com a lista campo a campo
     503  DadosIndisponiveis  — arquivo obrigatório da Gold ausente
+    503  ModeloIndisponivel  — modelo de linguagem carregando (Retry-After) ou
+                               com falha de carga (TP4)
+    504  HTTPException       — inferência acima do tempo limite (TP4)
     500  qualquer outro erro — registrado no log; o cliente recebe mensagem
                                genérica, sem rastro de pilha (não expõe código)
 
-    O TP4 pede exatamente esse padrão para a rota do modelo de linguagem
-    (ex.: 503 quando o modelo não carregar). A estrutura já está pronta.
+MODELOS DE LINGUAGEM (TP4):
+    No startup, os modelos começam a carregar em uma thread. A API sobe na
+    hora: enquanto carregam, as rotas de IA respondem 503 com Retry-After, e o
+    resto da API funciona normalmente. SOLARGAP_CARREGAR_MODELOS=0 desliga a
+    carga (testes, máquinas sem PyTorch).
 
 EXECUÇÃO (a partir da raiz):
     uvicorn src.api.main:app --reload
@@ -27,6 +34,7 @@ EXECUÇÃO (a partir da raiz):
 """
 
 import logging
+import os
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -39,7 +47,15 @@ from fastapi import FastAPI, Request  # noqa: E402
 from fastapi.responses import JSONResponse  # noqa: E402
 
 from src.api.dependencias import Repositorio  # noqa: E402
-from src.api.rotas import comparacoes, indicadores, noticias, politicas, sistema  # noqa: E402
+from src.api.rotas import (  # noqa: E402
+    comparacoes,
+    ia,
+    indicadores,
+    noticias,
+    politicas,
+    sistema,
+)
+from src.ia.motor import GerenciadorModelos, ModeloIndisponivel  # noqa: E402
 from src.servicos.dados import DadosIndisponiveis  # noqa: E402
 from src.servicos.indicadores import FiltroInvalido  # noqa: E402
 
@@ -57,6 +73,8 @@ adesão estadual ao Convênio ICMS 16/15. Os cálculos são os mesmos do dashboa
 * **Notícias** — consulta paginada e envio de novas notícias (POST).
 * **Políticas públicas** — adesão ao Convênio ICMS 16/15.
 * **Comparações** — cruzamento de um indicador próprio com a adoção solar (POST).
+* **IA** — resumo e relevância de textos com modelos de linguagem locais (HuggingFace),
+  sem serviço externo. Tom em caráter experimental.
 
 Fontes: ANEEL (ODbL), IBGE — Censo 2022, Agência Brasil e Agência Gov (EBC), CONFAZ.
 """
@@ -76,6 +94,10 @@ TAGS = [
         "name": "Comparações",
         "description": "Cruzamento de indicadores do usuário com a adoção.",
     },
+    {
+        "name": "IA",
+        "description": "Modelos de linguagem locais (PTT5 e mDeBERTa) — TP4.",
+    },
 ]
 
 
@@ -88,6 +110,15 @@ async def ciclo_de_vida(app: FastAPI):
     except DadosIndisponiveis as erro:
         logger.error("API iniciada sem dados: %s", erro)
         app.state.repositorio = None
+
+    try:
+        app.state.ia = GerenciadorModelos()
+    except ValueError as erro:  # modelo inválido na variável de ambiente
+        logger.error("Configuração de modelos inválida: %s", erro)
+        app.state.ia = None
+    if app.state.ia and os.getenv("SOLARGAP_CARREGAR_MODELOS", "1") != "0":
+        app.state.ia.carregar(em_segundo_plano=True)
+        logger.info("Carga dos modelos de linguagem iniciada em segundo plano.")
     yield
 
 
@@ -104,7 +135,7 @@ app = FastAPI(
     },
 )
 
-for modulo in (sistema, indicadores, noticias, politicas, comparacoes):
+for modulo in (sistema, indicadores, noticias, politicas, comparacoes, ia):
     app.include_router(modulo.roteador)
 
 
@@ -118,6 +149,16 @@ async def tratar_dados_indisponiveis(
     _: Request, erro: DadosIndisponiveis
 ) -> JSONResponse:
     return JSONResponse(status_code=503, content={"detail": str(erro)})
+
+
+@app.exception_handler(ModeloIndisponivel)
+async def tratar_modelo_indisponivel(
+    _: Request, erro: ModeloIndisponivel
+) -> JSONResponse:
+    cabecalhos = {"Retry-After": str(erro.retry_after)} if erro.retry_after else None
+    return JSONResponse(
+        status_code=503, content={"detail": str(erro)}, headers=cabecalhos
+    )
 
 
 @app.exception_handler(Exception)

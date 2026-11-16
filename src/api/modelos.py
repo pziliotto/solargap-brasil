@@ -204,9 +204,22 @@ class Noticia(BaseModel):
     ufs_mencionadas: list[str]
     nivel_texto: str = Field(description="integral ou metadados.")
     tag_origem: str | None = None
-    resumo: str | None = Field(default=None, description="Preenchido pelo LLM no TP4.")
+    resumo: str | None = Field(
+        default=None, description="Resumo gerado pelo modelo local (PTT5)."
+    )
     sentimento: str | None = Field(
-        default=None, description="Preenchido pelo LLM no TP4."
+        default=None,
+        description="Reservado. O tom não é gravado: ficou abaixo da linha de base no benchmark.",
+    )
+    relevante: bool | None = Field(
+        default=None,
+        description="Se o modelo julgou que a notícia trata de energia solar (null = não avaliada).",
+    )
+    relevancia_prob: float | None = Field(
+        default=None,
+        ge=0,
+        le=1,
+        description="Probabilidade de tratar de energia solar.",
     )
 
 
@@ -332,3 +345,122 @@ class RespostaComparacao(BaseModel):
     correlacao_spearman: float | None
     interpretacao: str
     itens: list[ItemComparacao]
+
+
+# ═══════════════════ IA — modelos de linguagem locais (TP4) ═══════════════════
+
+
+class TarefaIA(StrEnum):
+    resumo = "resumo"
+    relevancia = "relevancia"
+    tom = "tom"
+
+
+class PedidoProcessamento(BaseModel):
+    """Texto livre a ser processado pelos modelos locais."""
+
+    model_config = ConfigDict(
+        str_strip_whitespace=True,
+        json_schema_extra={
+            "examples": [
+                {
+                    "texto": (
+                        "A potência instalada de micro e minigeração distribuída solar no "
+                        "Brasil ultrapassou 40 GW, segundo a ANEEL. Minas Gerais, São Paulo "
+                        "e Rio Grande do Sul lideram o número de sistemas conectados."
+                    ),
+                    "tarefas": ["resumo", "relevancia"],
+                }
+            ]
+        },
+    )
+
+    texto: str = Field(
+        min_length=40,
+        max_length=20_000,
+        description="Texto em português. Acima de ~350 palavras, o modelo lê só o início (truncado=true).",
+    )
+    tarefas: list[TarefaIA] = Field(
+        default=[TarefaIA.resumo, TarefaIA.relevancia],
+        min_length=1,
+        description="Tarefas a executar. 'tom' é experimental.",
+    )
+
+    @field_validator("tarefas")
+    @classmethod
+    def sem_repeticao(cls, valor: list[TarefaIA]) -> list[TarefaIA]:
+        return list(dict.fromkeys(valor))
+
+    @field_validator("texto")
+    @classmethod
+    def texto_com_palavras(cls, valor: str) -> str:
+        if len(valor.split()) < 8:
+            raise ValueError("envie um texto com pelo menos 8 palavras")
+        return valor
+
+
+class ResultadoResumoIA(BaseModel):
+    resumo: str
+    tokens_entrada: int = Field(description="Tamanho do texto em tokens do modelo.")
+    truncado: bool = Field(
+        description="Se o texto passou do limite e só o início foi lido."
+    )
+
+
+class ResultadoRelevanciaIA(BaseModel):
+    relevante: bool
+    probabilidade: float = Field(ge=0, le=1)
+    limiar: float = Field(description="Probabilidade mínima para considerar relevante.")
+    tokens_entrada: int
+    truncado: bool
+
+
+class ResultadoTomIA(BaseModel):
+    rotulo: Literal["favoravel", "desfavoravel", "neutro"]
+    confianca: float = Field(ge=0, le=1)
+    distribuicao: dict[str, float]
+    tokens_entrada: int
+    truncado: bool
+    experimental: bool = True
+    aviso: str
+
+
+class ResultadosIA(BaseModel):
+    resumo: ResultadoResumoIA | None = None
+    relevancia: ResultadoRelevanciaIA | None = None
+    tom: ResultadoTomIA | None = None
+
+
+class ModeloUsado(BaseModel):
+    tarefa: TarefaIA
+    modelo: str = Field(description="Identificador no HuggingFace Hub.")
+    licenca: str
+
+
+class RespostaProcessamento(BaseModel):
+    origem: str = Field(
+        description="'texto' (enviado na requisição) ou 'noticia:<id>'."
+    )
+    tarefas: list[TarefaIA]
+    caracteres_entrada: int
+    resultados: ResultadosIA
+    modelos: list[ModeloUsado]
+    dispositivo: str = Field(description="cuda (GPU) ou cpu.")
+    duracao_ms: int = Field(description="Tempo total de inferência.")
+
+
+class EstadoTarefaIA(BaseModel):
+    tarefa: TarefaIA
+    modelo: str
+    estado: Literal["nao_carregado", "carregando", "pronto", "falhou"]
+    experimental: bool
+    segundos_carga: float | None = None
+    carregado_em: datetime | None = None
+    erro: str | None = None
+
+
+class StatusIA(BaseModel):
+    pronto: bool = Field(description="Se todas as tarefas podem ser executadas.")
+    dispositivo: str | None = Field(description="Definido quando a carga começa.")
+    timeout_inferencia_s: float
+    tarefas: list[EstadoTarefaIA]

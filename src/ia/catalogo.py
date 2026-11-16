@@ -72,7 +72,7 @@ CANDIDATOS: dict[str, ModeloConfig] = {
         tokenizer_id="unicamp-dl/ptt5-base-portuguese-vocab",
         arquitetura=Arquitetura.seq2seq,
         tarefas=(Tarefa.resumo,),
-        licenca="conferir no cartão do modelo",
+        licenca="MIT",
         max_tokens_entrada=512,
         descricao="PTT5 base ajustado no RecognaSumm, corpus de notícias brasileiras.",
     ),
@@ -176,3 +176,17 @@ HIPOTESES_TOM = {
     "neutro": "Esta notícia apenas informa, sem apresentar a energia solar como positiva ou negativa.",
 }
 ROTULOS_TOM = tuple(HIPOTESES_TOM)
+
+# ═══════════════════ Tarefas experimentais ═══════════════════
+#
+# Resultado do benchmark (docs/escolha_modelo.md): o tom zero-shot acertou 43%
+# das 23 notícias relevantes, abaixo dos 83% de prever sempre "favoravel". Ele
+# continua disponível na API para demonstração, sempre marcado como
+# experimental, mas não é gravado no corpus nem exibido como indicador.
+
+TAREFAS_EXPERIMENTAIS = frozenset({Tarefa.tom})
+AVISO_TOM = (
+    "Tarefa experimental: no benchmark do projeto, o tom acertou 43% das notícias "
+    "rotuladas, abaixo da linha de base de 83% (responder sempre 'favoravel'). "
+    "Não use o resultado como indicador."
+)
