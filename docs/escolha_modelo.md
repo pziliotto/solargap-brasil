@@ -103,7 +103,7 @@ Quatro dos cinco falsos negativos são notícias sobre renováveis em geral, que
 | Memória de GPU | 1,1 GB + 0,7 GB | — |
 | Memória do processo | ~4,7 GB (os dois modelos e o PyTorch) | ~4,7 GB |
 
-**Nota sobre CPU.** Medido com `python -m src.ia.benchmark --dispositivo cpu`, o resumo fica em 4,9 s por notícia e a relevância + tom em 49,2 s, então a aplicação funciona sem GPU, mas o mDeBERTa em CPU só é viável em lote, não em uso interativo.
+**Nota sobre CPU.** Medido com `python -m src.ia.benchmark --dispositivo cpu`, o resumo fica em 4,9 s por notícia e a relevância + tom em 49,2 s, então a aplicação funciona sem GPU, mas o mDeBERTa em CPU só é viável em lote, não em uso interativo. Em CPU, pedir relevância e tom na mesma chamada da API pode passar do limite de 60 s e receber 504; aumente SOLARGAP_TIMEOUT_INFERENCIA ou peça só a relevância (cerca de um quarto desse tempo).
 
 **Consequência para o projeto.** O processamento do corpus inteiro (119 notícias) leva cerca de 5 minutos na GPU. Por isso ele roda **em lote** (`python -m src.ia.processar_corpus`) e o resultado vai para o Git (`data/processed/corpus_ia.csv`). Quem avalia o projeto vê resumos e relevância sem GPU e sem baixar 2 GB de modelos.
 
@@ -119,7 +119,7 @@ Quatro dos cinco falsos negativos são notícias sobre renováveis em geral, que
 - **Amostras pequenas:** 30 notícias rotuladas e 56 referências de resumo. O benchmark descarta candidatos claramente piores e mede custo; não crava o melhor modelo por décimos.
 - **Um único rotulador.** Sem uma segunda rotulagem não há medida de concordância entre pessoas, que seria o teto realista para os modelos.
 - **ROUGE mede sobreposição de palavras, não fidelidade.** Os resumos de `docs/benchmark/saidas_resumo_cuda.csv` foram lidos; o PTT5 às vezes inverte sujeito e verbo ("Redata sanciona Regime..."), por isso o painel sempre mostra o link da matéria original ao lado do resumo.
-- **A hipótese de relevância fala só em "energia solar".** Testar uma hipótese que inclua "geração distribuída" exigiria um novo conjunto rotulado, para não ajustar o modelo ao gabarito atual.
+- **A hipótese de relevância fala só em "energia solar".** No lote do corpus, o modelo julgou fora do tema notícias de geração distribuída que não usam a palavra "solar" (multa à Coelba, revisão das regras para quem gera a própria energia, impacto da geração própria nas distribuidoras). Por isso o filtro do painel vem desligado por padrão. Testar uma hipótese que inclua "geração distribuída" exige um novo conjunto rotulado, para não ajustar o modelo ao gabarito atual; fica para o TP5.
 
 ## 8. Ligação com o TP5
 

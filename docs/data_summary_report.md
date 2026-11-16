@@ -449,7 +449,7 @@ Achado de qualidade do corpus: em 56 das 119 notícias, a "linha fina" coletada 
 
 - **Truncamento:** 64% das notícias passam do limite no resumo e 80% na classificação. O modelo lê o início, onde o texto jornalístico concentra o essencial.
 - **Resumo não é fonte:** resumos automáticos podem omitir ou distorcer detalhes. O painel sempre mostra o link da matéria original ao lado, e o resumo nunca alimenta um indicador numérico.
-- **Relevância mais estrita que a rotulagem:** quatro dos cinco falsos negativos do benchmark são notícias sobre renováveis em geral. O filtro tende a excluir esse tipo de notícia.
+- **Relevância mais estrita que a rotulagem:** quatro dos cinco falsos negativos do benchmark são notícias sobre renováveis em geral. O filtro tende a excluir esse tipo de notícia. No lote completo, 28 das 119 notícias foram julgadas fora do tema; entre elas há notícias de geração distribuída que não mencionam "solar", por isso o filtro do painel vem desligado por padrão.
 - **Licença:** resumos são obras derivadas. Agência Brasil e Agência Gov autorizam reprodução com citação; cada resumo mantém a ligação com a URL de origem.
 
 ## 6. Governança e Privacidade
