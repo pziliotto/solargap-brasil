@@ -31,6 +31,13 @@ data/raw/*
 !data/raw/demografico_uf_2022.json
 !data/raw/demografico_municipio_2022.json
 
+# IBGE — domicílios particulares permanentes ocupados por município (TP4.5,
+# SIDRA 4712, ~1.9 MB). Fica em subpasta: libera a pasta, ignora o conteúdo
+# e reinclui só o JSON de domicílios.
+!data/raw/ibge/
+data/raw/ibge/*
+!data/raw/ibge/domicilios_municipio_2022.json
+
 # ANEEL — base completa tem ~103 MB e estoura o limite de 100 MB do
 # GitHub. Só a amostra usada pelo app demo é versionada.
 # Para obter a base completa: python -m src.data_acquisition.aneel
