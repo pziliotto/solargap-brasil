@@ -35,7 +35,12 @@ def test_gold_com_silver_sintetica(tmp_path, monkeypatch):
             },  # fora do escopo solar
         ]
     silver = tmp_path / "mmgd_silver.parquet"
-    pd.DataFrame(linhas).to_parquet(silver)
+    tabela = pd.DataFrame(linhas)
+    # Sem potência suspeita: as três potências coincidem.
+    tabela["potencia_corrigida_kw"] = tabela["potencia_kw"]
+    tabela["potencia_conservadora_kw"] = tabela["potencia_kw"]
+    tabela["flag_potencia_suspeita"] = False
+    tabela.to_parquet(silver)
     populacao = tmp_path / "populacao_uf_silver.csv"
     pd.DataFrame(
         [{"cod_uf": cod, "populacao": 1_000} for cod, _ in esquema.UFS.values()]

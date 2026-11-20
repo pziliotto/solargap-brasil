@@ -2,8 +2,8 @@
 
 **Projeto:** SolarGap Brasil — Onde está o próximo mercado solar?
 **Autora:** Pâmela Lima Ziliotto
-**Etapa:** TP4
-**Última atualização:** 16/11/2026
+**Etapa:** TP4 (base ANEEL atualizada para a referência 10/2026 em 20/11/2026)
+**Última atualização:** 20/11/2026
 
 ---
 
@@ -47,12 +47,14 @@ Este relatório documenta as fontes de dados utilizadas no projeto SolarGap Bras
 |---|---|---|
 |`SigUF`|Chave de agregação regional|Sigla da UF|
 |`MdaPotenciaInstaladaKW`|Numerador dos KPIs de potência|Valor em **kW**; conversão para MW na camada Gold|
-|`DscFonteGeracao`|Filtro da fonte solar|A base inclui também hídrica, eólica, térmica e biogás. Vazio em 73.501 registros (99,8% no MA); **ver seção 3.4**|
+|`DscFonteGeracao`|Filtro da fonte solar|A base inclui também hídrica, eólica, térmica e biogás. Vazio em 156 registros na base 10/2026 (73.501 na base 08/2026, 99,8% no MA); **ver seção 3.4**|
 |`CodUFibge`|Chave de junção com o IBGE|Tipo `float64` na origem; requer conversão explícita antes do merge|
 |`CodMunicipioIbge`|Chave de junção municipal|Código IBGE de 7 dígitos|
 |`DscClasseConsumo`|Segmentação por perfil de consumidor|Análise complementar|
 |`DthAtualizaCadastralEmpreend`|Eixo temporal — data de conexão|Validado contra o painel oficial da ANEEL; **ver seção 3.1**|
 |`SigTipoGeracao`|Verificação da fonte de geração|Sigla do tipo de usina (UFV, UTE, EOL, CGH). Correspondência de 100% entre `UFV` e "Radiação solar"; vazio nos mesmos registros em que `DscFonteGeracao` é vazio|
+|`SigAgente`|Distribuidora (`distribuidora` na Silver)|Diagnóstico da potência suspeita por distribuidora; **ver seção 3.4.3** (TP4.5)|
+|`DscModalidadeHabilitado`|Modalidade (`modalidade` na Silver)|Geração na própria UC, autoconsumo remoto, compartilhada, condomínio; usada no potencial municipal (TP4.5)|
 
 ### 2.3 Corpus de notícias (web scraping multifonte)
 
@@ -173,7 +175,7 @@ Como a cláusula terceira fixa efeitos a partir de 01/09/2015, adesões anterior
 
 **Validações automáticas:** 27 UFs, cada uma uma única vez; a redação vigente da cláusula primeira lista as 27.
 
-**Achado analítico.** A correlação de Spearman entre o tempo de isenção e a adoção per capita é de **−0,06**, ou seja, nenhuma relação. Entre as 15 UFs com isenção desde 2015, oito estão abaixo da média nacional de adoção (AL, AC, BA, CE, PE, SP, RJ e DF). Entre as que aderiram a partir de 2017, quatro estão acima (AP, ES, PR e SC). A isenção de ICMS é condição favorável, mas não explica sozinha a disparidade. Correlação não é causalidade, e a amostra tem 27 UFs.
+**Achado analítico.** A correlação de Spearman entre o tempo de isenção e a adoção per capita é de **−0,02** na visão corrigida (−0,06 no critério ANEEL), ou seja, nenhuma relação. Entre as 15 UFs com isenção desde 2015, oito estão abaixo da média nacional de adoção (AL, BA, CE, DF, MA, PE, RJ e SP; no critério ANEEL, também o AC). Entre as que aderiram a partir de 2017, três estão acima (ES, PR e SC). A isenção de ICMS é condição favorável, mas não explica sozinha a disparidade. Correlação não é causalidade, e a amostra tem 27 UFs.
 
 **Modelagem.** A tabela é uma dimensão própria da Gold, unida por `sigla_uf` sob demanda no dashboard e na API. No TP2 o plano era juntá-la ao `gold_uf.csv` dentro do `construir_gold.py`; essa junção foi removida para que atualizar a política não exija reprocessar 4,6 milhões de registros, nem ter a base da ANEEL.
 
@@ -187,7 +189,7 @@ Como a cláusula terceira fixa efeitos a partir de 01/09/2015, adesões anterior
 
 ### 3.1 Natureza temporal da base e validação do campo de data
 
-O campo `AnmPeriodoReferencia` apresenta **um único valor (08/2026)** em todos os registros, indicando que o arquivo é um **retrato da situação corrente** — a relação dos empreendimentos ativos no momento da geração do conjunto de dados — e não uma série histórica de snapshots mensais acumulados.
+O campo `AnmPeriodoReferencia` apresenta **um único valor (10/2026)** em todos os registros (arquivo gerado pela ANEEL em 10/10/2026; a versão anterior do projeto usava a referência 08/2026), indicando que o arquivo é um **retrato da situação corrente** — a relação dos empreendimentos ativos no momento da geração do conjunto de dados — e não uma série histórica de snapshots mensais acumulados.
 
 Em consequência, o único campo temporal disponível para a análise de série histórica é `DthAtualizaCadastralEmpreend`. A nomenclatura do campo sugere tratar-se de data de atualização cadastral, o que levantou a hipótese de que o campo não seria adequado como proxy de adoção — registros atualizados em lote (como na migração do sistema SISGD para o sistema MMGD) poderiam concentrar artificialmente contagens em períodos específicos.
 
@@ -195,25 +197,25 @@ Em consequência, o único campo temporal disponível para a análise de série 
 
 > https://app.powerbi.com/view?r=eyJrIjoiY2VmMmUwN2QtYWFiOS00ZDE3LWI3NDMtZDk0NGI4MGU2NTkxIiwidCI6IjQwZDZmOWI4LWVjYTctNDZhMi05MmQ0LWVhNGU5YzAxNzBlMSIsImMiOjR9
 
-Constatou-se que a própria ANEEL utiliza esse campo como **"Ano de conexão"** no painel, e que a distribuição anual de registros obtida localmente **reproduz exatamente** os valores publicados no painel oficial.
+Constatou-se que a própria ANEEL utiliza esse campo como **"Ano de conexão"** no painel, e que a distribuição anual de registros obtida localmente **reproduz exatamente** os valores publicados no painel oficial. A verificação foi repetida na base 10/2026 para o Paraná, ano a ano, com diferença de 0,05% na potência (`docs/potencial/atualizacao_base_10_2026.md`, seção 6.2).
 
 **Conclusão.** O campo é adotado como referência temporal de conexão, seguindo a interpretação da própria fonte. A nomenclatura da coluna é enganosa em relação ao seu conteúdo semântico; a evidência do painel oficial prevalece. O cruzamento valida simultaneamente a interpretação do campo e a correção do pipeline de leitura, parsing e agregação implementado no projeto.
 
-**Distribuição anual observada** (`DthAtualizaCadastralEmpreend`, 4.673.268 registros, nenhuma data inválida):
+**Distribuição anual observada** (`DthAtualizaCadastralEmpreend`, base 10/2026, 4.666.785 registros de todas as fontes, nenhuma data inválida):
 
 |Ano|Registros|Ano|Registros|
 |---|---|---|---|
-|1900|15|2019|124.714|
-|2009|23|2020|228.017|
-|2010|5|2021|460.173|
-|2011|40|2022|816.548|
-|2012|37|2023|705.437|
-|2013|78|2024|931.223|
-|2014|273|2025|925.632|
-|2015|1.296|2026|424.428|
-|2016|6.269|||
-|2017|13.280|||
-|2018|35.780|||
+|1900|56|2017|13.098|
+|2004|1|2018|35.074|
+|2005|1|2019|120.228|
+|2009|22|2020|221.726|
+|2010|5|2021|449.599|
+|2011|39|2022|811.420|
+|2012|34|2023|697.096|
+|2013|79|2024|915.771|
+|2014|270|2025|907.245|
+|2015|1.266|2026|487.544|
+|2016|6.211|||
 
 A retração observada em 2023 frente a 2022 é consistente com o contexto regulatório descrito no Project Charter: a antecipação de conexões até janeiro de 2023, motivada pela isenção dos custos do Fio B, seguida de arrefecimento e posterior retomada.
 
@@ -223,13 +225,13 @@ Os seguintes registros são descartados na camada Silver, com o respectivo crit�
 
 |Critério|Registros|Justificativa|
 |---|---|---|
-|Ano = 1900|15|Data-sentinela; valor de preenchimento sem significado real|
+|Ano = 1900|56|Data-sentinela; valor de preenchimento sem significado real|
 |Ano < 2012|68|A REN nº 482/2012 instituiu o marco regulatório da MMGD; registros anteriores são anomalias cadastrais|
-|Potência nula ou ≤ 0|41|Fisicamente inválido para uma usina conectada. Todos os casos no PR, fonte solar, entre 2020 e 2025|
+|Potência nula ou ≤ 0|6|Fisicamente inválido para uma usina conectada. Todos os casos no PR, fonte solar, em 2024 e 2025|
 
-**Tratamento do ano corrente (2026):** os dados cobrem apenas parte do ano (referência 08/2026). Comparações diretas com anos completos são inválidas. No dashboard, 2026 é sinalizado como período parcial: faixa sombreada no gráfico de evolução e aviso na barra lateral sempre que o ano está dentro do filtro. A coluna `ano_parcial` da camada Gold carrega essa marcação como dado.
+**Tratamento do ano corrente (2026):** os dados cobrem apenas parte do ano (referência 10/2026, conexões até o início de outubro). Comparações diretas com anos completos são inválidas. No dashboard, 2026 é sinalizado como período parcial: faixa sombreada no gráfico de evolução e aviso na barra lateral sempre que o ano está dentro do filtro. A coluna `ano_parcial` da camada Gold carrega essa marcação como dado.
 
-**Balanço:** 4.673.268 registros lidos, 124 descartados, 4.673.144 mantidos na Silver. A conciliação (mantidos + descartados = lidos) é verificada automaticamente a cada execução.
+**Balanço (base 10/2026):** 4.666.785 registros lidos, 130 descartados, 4.666.655 mantidos na Silver. A conciliação (mantidos + descartados = lidos) é verificada automaticamente a cada execução.
 
 ### 3.3 Nota de atualização da fonte
 
@@ -241,7 +243,9 @@ As correções abaixo foram identificadas pelo script `src/preparacao/diagnostic
 
 #### 3.4.1 Fonte de geração ausente — imputação como solar
 
-**Achado.** 73.501 registros chegam sem `DscFonteGeracao` e sem `SigTipoGeracao`. A concentração é quase total em uma unidade da federação: 73.352 (99,8%) no Maranhão. O padrão indica falha de preenchimento de uma distribuidora, e não usinas de outra fonte. Não há outro campo da base que permita recuperar a fonte.
+> **Atualização (base 10/2026).** A ANEEL retirou da base os registros do Maranhão sem fonte de geração: o MA passou de 165.020 para 97.458 empreendimentos solares, exatamente o número que o painel oficial já mostrava em agosto (seção 3.6). Restam **156** registros sem fonte, espalhados (PE 64, SC 25, MG 21, RN 12, SP 12, outros 22), de 2021 a 2026, imputados pela mesma regra. Entre os registros com fonte conhecida, 99,98% continuam sendo solares. O texto abaixo documenta a decisão tomada com a base 08/2026.
+
+**Achado (base 08/2026).** 73.501 registros chegavam sem `DscFonteGeracao` e sem `SigTipoGeracao`. A concentração é quase total em uma unidade da federação: 73.352 (99,8%) no Maranhão. O padrão indica falha de preenchimento de uma distribuidora, e não usinas de outra fonte. Não há outro campo da base que permita recuperar a fonte.
 
 **Evidência para a imputação.**
 
@@ -266,26 +270,38 @@ As correções abaixo foram identificadas pelo script `src/preparacao/diagnostic
 
 #### 3.4.2 Código municipal incompleto e UF ausente
 
-Um registro chega sem `SigUF` e com código municipal de 6 dígitos (`431780`), quando o padrão do IBGE é de 7. O código de 7 dígitos é o de 6 acrescido de um dígito verificador; a correspondência é recuperada pela tabela municipal do IBGE. A UF é derivada do prefixo do código municipal (43 — Rio Grande do Sul).
+Na base 08/2026, um registro chegava sem `SigUF` e com código municipal de 6 dígitos (`431780`), quando o padrão do IBGE é de 7. Na base 10/2026 não há ocorrências; a correção permanece no pipeline. O código de 7 dígitos é o de 6 acrescido de um dígito verificador; a correspondência é recuperada pela tabela municipal do IBGE. A UF é derivada do prefixo do código municipal (43 — Rio Grande do Sul).
 
-Os demais 4.673.143 registros têm código municipal de 7 dígitos, com prefixo coerente com o código da UF em 100% dos casos.
+Na base 10/2026, todos os 4.666.655 registros mantidos têm código municipal de 7 dígitos, com prefixo coerente com o código da UF em 100% dos casos.
+
+#### 3.4.3 Potência suspeita de 75 kW — tratamento aplicado (TP4.5)
+
+**Achado.** Na base 10/2026, 47.190 registros da COPEL-DIS têm potência de exatamente 75 kW, o teto da microgeração, inclusive 28.179 residências, cuja mediana é de 5 kW. A base reproduz o painel oficial da ANEEL (validação ano a ano em 20/11/2026), então a inconsistência está na fonte. Evidências em `docs/potencial/atualizacao_base_10_2026.md`, seção 6.
+
+**Diagnóstico** (`src/preparacao/potencia_suspeita.py`, sem UF ou distribuidora fixada no código). Para cada distribuidora, a fração de residências com exatamente 75 kW. É sinalizada a distribuidora cujo limite inferior do intervalo de Wilson (95%) fica acima de **mediana + 5 × MAD** das frações (0,838%). Só a COPEL-DIS é sinalizada (12,2%). A mesma regra aplicada a todas as classes sinalizava 14 distribuidoras, quase todas cooperativas rurais, onde 75 kW é porte legítimo.
+
+**Tratamento.** Nenhum registro é excluído e a potência oficial (`potencia_kw`) é preservada. Os registros de 75 kW da distribuidora sinalizada recebem `flag_potencia_suspeita` e potência imputada em `potencia_corrigida_kw`: mediana dos registros não sinalizados no primeiro nível com ao menos 5 registros — município + classe + ano (87,8% dos casos), município + classe, distribuidora + classe + ano, UF + classe —, com o nível em `nivel_imputacao_potencia`. `potencia_conservadora_kw` corrige só as residências (limite conservador).
+
+**Impacto.** A potência solar do Brasil passa de 53.788,3 MW (critério ANEEL) para 50.703,6 MW na visão corrigida (51.828,8 MW no limite conservador); a do PR, de 6.862,7 MW para 3.769,9 MW (4.894,3 MW). O painel e a API usam a visão corrigida como padrão e mantêm o seletor "Critério ANEEL", no mesmo padrão da fonte imputada.
 
 ### 3.5 Camada Gold
 
 |Tabela|Grão|Conteúdo|Tamanho|
 |---|---|---|---|
-|`gold_mmgd_agregado.csv`|UF × ano × classe de consumo × fonte imputada|Potência (kW), quantidade de empreendimentos, indicador de ano parcial|81KB|
-|`gold_uf.csv`|UF|Nome, região, população (Censo 2022), potência (MW), watts por habitante, empreendimentos por 100 mil hab., % de registros imputados|2KB|
+|`gold_mmgd_agregado.csv`|UF × ano × classe de consumo × fonte imputada|Potência oficial, corrigida e conservadora (kW), quantidade de empreendimentos e de registros com potência suspeita, indicador de ano parcial|109KB|
+|`gold_uf.csv`|UF|Nome, região, população (Censo 2022) e, na visão corrigida, potência (MW), watts por habitante, empreendimentos por 100 mil hab., % de registros imputados e % com potência suspeita; potência no critério ANEEL e no limite conservador (MW)|3KB|
 
 **Por que uma tabela no menor grão.** O painel filtra por período, classe de consumo e inclusão de registros imputados. Uma tabela já totalizada por UF impediria recalcular esses recortes. A tabela agregada guarda o menor nível que o painel precisa e a aplicação soma depois de filtrar. O mesmo vale para a potência acumulada, calculada na aplicação.
 
 **Métricas per capita.** Watts por habitante é a métrica principal: ordem de grandeza legível e unidade usual no setor. Empreendimentos por 100 mil habitantes a complementa — potência mede volume investido, contagem mede difusão.
 
-**Escopo.** Apenas fonte solar, incluindo os registros imputados, marcados pela coluna `fonte_imputada`.
+**Escopo.** Apenas fonte solar, incluindo os registros imputados, marcados pela coluna `fonte_imputada`. A visão corrigida (padrão) usa `potencia_corrigida_kw`; o critério ANEEL exclui os imputados e usa a potência oficial.
 
 ### 3.6 Validação contra o painel oficial da ANEEL
 
-O resultado da camada Gold foi comparado com o painel oficial de Geração Distribuída da ANEEL (dados até 31/08/2026). O arquivo processado foi gerado pela ANEEL em 19 de Agosto de 2026.
+> **Atualização (base 10/2026).** A base 10/2026 resolve as duas questões abertas abaixo. O Maranhão tem 97.458 empreendimentos solares, **o mesmo número do painel de agosto**: os registros sem fonte foram retirados da própria base, e a conclusão de que o painel subestimaria o MA não se sustenta. A potência solar total (53.802,8 MW) fica 0,3% acima da que o painel mostrava em agosto (53.650,9 MW), e a contagem (4.665.900), 0,2% acima: a divergência de 6,3% vinha do arquivo de 08/2026, defasado em relação ao painel. Uma nova validação ano a ano, feita em 20/11/2026 para o Paraná, reproduziu o painel com diferença de 0,05% na potência e revelou a anomalia dos registros de 75 kW, tratada na seção 3.4.3. A tabela abaixo documenta a validação feita com a base 08/2026.
+
+O resultado da camada Gold (base 08/2026) foi comparado com o painel oficial de Geração Distribuída da ANEEL (dados até 31/08/2026). O arquivo processado foi gerado pela ANEEL em 19 de Agosto de 2026.
 
 Como o painel não contabiliza os registros sem fonte, a comparação é feita em duas visões:
 
@@ -314,29 +330,34 @@ Por esse motivo, o dashboard oferece as duas visões: "Critério ANEEL", que rep
 
 **Janela padrão: 2022–2025.** 2022 é o ano da Lei 14.300, recorte central do projeto, e 2025 é o último ano completo. Janelas que começam perto de 2012 produzem taxas sem significado, porque estados com parque quase nulo exibem crescimentos de milhares de por cento. O usuário pode escolher outra janela no dashboard e na API, sempre com anos completos.
 
-**Resultado.** O parque solar distribuído passou de 9,9 GW (2021) para 18,3 GW (2022), 27,1 GW (2023), 37,8 GW (2024) e 47,5 GW (2025), chegando a 51,3 GW até agosto de 2026. O crescimento anual desacelera: 84,0%, 48,0%, 39,9% e 25,7%. O CAGR de 2022 a 2025 é de **37,5% ao ano**.
+**Resultado (base 10/2026, visão corrigida).** O parque solar distribuído passou de 9,6 GW (2021) para 17,7 GW (2022), 26,3 GW (2023), 36,8 GW (2024) e 46,3 GW (2025), chegando a 50,7 GW até outubro de 2026. O crescimento anual desacelera: 85,4%, 48,5%, 40,0% e 25,6%. O CAGR de 2022 a 2025 é de **37,7% ao ano** (37,5% na base 08/2026).
+
+**Critério ANEEL.** Com a potência oficial, inflada pelos registros de 75 kW do Paraná em 2019–2022, o parque vai de 20,2 GW (2022) a 49,2 GW (2025) e 53,8 GW em outubro de 2026, e o CAGR cai para 34,6%. No limite conservador, 36,9%.
 
 ### 3.8 Matriz de oportunidade
 
-Cruza a adoção per capita (W/hab acumulado até agosto de 2026) com o crescimento do parque (CAGR 2022–2025). As referências são nacionais: 252,7 W/hab (total do país ÷ população, e não média simples das UFs) e 37,5% ao ano.
+Cruza a adoção per capita (W/hab acumulado até outubro de 2026) com o crescimento do parque (CAGR 2022–2025). As referências são nacionais: 249,7 W/hab (total do país ÷ população, e não média simples das UFs) e 37,7% ao ano, na visão corrigida (264,9 W/hab e 34,6% no critério ANEEL).
 
-|Quadrante|Leitura|UFs (visão corrigida)|
+|Quadrante|Leitura|UFs (visão corrigida, base 10/2026)|
 |---|---|---|
-|Líder em expansão|Adoção e crescimento acima da referência|AP, RO, ES, TO, MT, GO, RN, MS, PI, MA|
-|Mercado maduro|Adoção acima, crescimento abaixo|PR, SC, MG, RS|
-|**Mercado emergente**|Adoção abaixo, crescimento acima — **o próximo mercado solar**|RR, AL, AC, BA, PA, AM, CE, PE, SP, SE|
-|**Lacuna persistente**|Adoção e crescimento abaixo — **foco de política pública (ODS 10)**|RJ, DF, PB|
+|Líder em expansão|Adoção e crescimento acima da referência|AC, ES, GO, MS, MT, PI, RN, RO, TO|
+|Mercado maduro|Adoção acima, crescimento abaixo|MG, PR, RS, SC|
+|**Mercado emergente**|Adoção abaixo, crescimento acima — **o próximo mercado solar**|AL, AP, BA, CE, MA, PA, PE, RR, SE, SP|
+|**Lacuna persistente**|Adoção e crescimento abaixo — **foco de política pública (ODS 10)**|AM, DF, PB, RJ|
 
-**Sensibilidade à correção do Maranhão.** No critério do painel oficial da ANEEL, sem os registros imputados, o Maranhão cai de 279 para 155 W/hab e passa de "líder em expansão" para "lacuna persistente". A decisão de qualidade de dados documentada na seção 3.4 muda, portanto, a recomendação de política pública para o estado. O dashboard e a API permitem alternar entre as duas visões.
+**Mudanças em relação à base 08/2026.** AP e MA deixam "líder em expansão" e AM vai para "lacuna persistente", por alteração dos próprios registros na fonte. O AC passa a "líder em expansão": sua adoção (250,0 W/hab) fica logo acima da nova referência. **No critério ANEEL**, a anomalia dos 75 kW infla as referências nacionais (264,9 W/hab e 34,6%), e RJ e AC aparecem como "mercado emergente"; esse resultado é artefato da anomalia. Detalhes em `docs/potencial/atualizacao_base_10_2026.md`, seções 5 e 6.3.
 
-**Ressalva.** UFs com parque pequeno em 2022 tendem a exibir taxas altas; o caso extremo é o AP, com 105,8% ao ano. O tamanho do círculo no gráfico (potência absoluta) e a ficha da UF na API (`/ufs/{sigla}`, com os parques inicial e final) tornam isso visível.
+**Sensibilidade à correção do Maranhão.** Na base 08/2026, a imputação dos registros sem fonte mudava a classificação do MA: "líder em expansão" na visão corrigida, "lacuna persistente" no critério ANEEL. Na base 10/2026 esses registros não existem mais, e o MA é "mercado emergente" (163,6 W/hab) nas duas visões. As duas visões continuam no dashboard e na API; quanto à fonte, agora diferem em apenas 156 registros, e a diferença principal passou a ser a potência corrigida dos registros de 75 kW (seção 3.4.3).
+
+**Ressalva.** UFs com parque pequeno em 2022 tendem a exibir taxas altas; o caso extremo é o AP, com 90,9% ao ano. O tamanho do círculo no gráfico (potência absoluta) e a ficha da UF na API (`/ufs/{sigla}`, com os parques inicial e final) tornam isso visível.
 
 ### 3.9 Pendências
 
 |Item|Situação|
 |---|---|
-|Classe de consumo `REBR`|39.946 registros em 14 UFs, sem significado documentado. Mantida sem alteração até consulta ao dicionário de dados da ANEEL|
-|Divergência de potência com o painel oficial|Ver seção 3.6|
+|Classe de consumo `REBR`|47.844 registros em 14 UFs (base 10/2026), sem significado documentado. Mantida sem alteração até consulta ao dicionário de dados da ANEEL|
+|Divergência de potência com o painel oficial|Resolvida com a base 10/2026 (seção 3.6)|
+|Registros de 75 kW no Paraná|**Tratamento aplicado** (seção 3.4.3): sinalização por diagnóstico entre distribuidoras e imputação da potência na visão corrigida. Resta registrar a inconsistência junto à ANEEL e rever a regra se a base mudar (a margem da segunda distribuidora é estreita)|
 |Primeira coleta real da Agência Gov|Coletor testado com páginas de exemplo; números a registrar após a execução local|
 |Inclusão de PB, PI, RO e SE no Convênio 16/15|Inferida da redação dada pelo Conv. ICMS 75/16. Confirmar no texto consolidado atual do CONFAZ, por consulta manual|
 |Termos de uso de CNN Brasil e R7|Não localizados; as fontes permanecem fora do corpus até verificação|
@@ -518,7 +539,7 @@ A ODbL exige atribuição e tem cláusula _share-alike_: bases derivadas distrib
   - página Laboratório de IA e resumo/relevância na página Notícias;
   - tom reprovado no benchmark e mantido só como experimental.
 - **Pendências herdadas para o TP5:**
-  - atualizar a base da ANEEL para a referência 10/2026, já baixada. O diagnóstico mostrou que a ANEEL removeu os ~73 mil registros sem fonte do Maranhão, o que confirma o critério do painel oficial e torna a imputação da seção 3.4.1 desnecessária;
+  - ~~atualizar a base da ANEEL para a referência 10/2026~~ — concluído em 20/11/2026 (`docs/potencial/atualizacao_base_10_2026.md`), com tratamento aplicado aos registros de 75 kW do Paraná (seção 3.4.3);
   - ampliar o corpus (Agência Senado, Agência Câmara e agências estaduais), com verificação de termos de uso fonte a fonte.
 - **TP5:**
   - agente inteligente de recomendação que use as rotas da API como ferramentas, lendo só as notícias relevantes e já resumidas;

@@ -3,7 +3,8 @@ PROJETO: SolarGap Brasil
 ARQUIVO: indicadores.py
 AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 21/10/2026
-ATUALIZAÇÃO:
+ATUALIZAÇÃO: 20/11/2026 — TP4.5: a visão corrigida usa também a potência
+             corrigida dos registros de 75 kW suspeitos (filtrar)
 
 DESCRIÇÃO:
     Cálculo dos indicadores do projeto a partir da camada Gold. Funções puras:
@@ -77,6 +78,9 @@ METRICAS: dict[str, Metrica] = {
     ),
 }
 
+# Potência da visão corrigida na Gold (TP4.5: registros de 75 kW suspeitos).
+COLUNA_POTENCIA_CORRIGIDA = "potencia_corrigida_kw"
+
 ANO_BASE_CRESCIMENTO = 2022  # Lei 14.300/2022
 ANO_FINAL_CRESCIMENTO = esquema.ANO_PARCIAL - 1  # último ano completo
 
@@ -145,12 +149,40 @@ def filtrar(
     classes: tuple[str, ...],
     incluir_imputados: bool,
 ) -> pd.DataFrame:
+    """Recorta o agregado e escolhe a potência da visão.
+
+    incluir_imputados=True é a visão corrigida (padrão): conta os registros com
+    fonte imputada e usa a potência corrigida dos registros de 75 kW suspeitos.
+    False é o critério do painel oficial da ANEEL: sem imputados e com a
+    potência oficial. Em ambos, a coluna devolvida chama-se potencia_kw, para
+    que o resto do cálculo não precise saber da visão.
+    """
     filtro = agregado["ano"].between(ano_inicio, ano_fim) & agregado[
         "classe_consumo"
     ].isin(classes)
     if not incluir_imputados:
         filtro &= ~agregado["fonte_imputada"]
-    return agregado[filtro]
+    filtrado = agregado[filtro]
+    if incluir_imputados and COLUNA_POTENCIA_CORRIGIDA in filtrado.columns:
+        filtrado = filtrado.assign(potencia_kw=filtrado[COLUNA_POTENCIA_CORRIGIDA])
+    return filtrado
+
+
+def potencia_suspeita(
+    agregado: pd.DataFrame, ano_inicio: int, ano_fim: int, classes: tuple[str, ...]
+) -> dict[str, float]:
+    """Registros de 75 kW suspeitos no recorte: quantidade e kW oficial x corrigido.
+
+    Usado nos avisos do painel. Zeros se a Gold não tiver as colunas.
+    """
+    if COLUNA_POTENCIA_CORRIGIDA not in agregado.columns:
+        return {"registros": 0, "kw_oficial": 0.0, "kw_corrigido": 0.0}
+    recorte = filtrar(agregado, ano_inicio, ano_fim, classes, incluir_imputados=False)
+    return {
+        "registros": int(recorte["qtd_potencia_suspeita"].sum()),
+        "kw_oficial": float(recorte["potencia_kw"].sum()),
+        "kw_corrigido": float(recorte[COLUNA_POTENCIA_CORRIGIDA].sum()),
+    }
 
 
 # ═══════════════════ Indicadores por UF ═══════════════════

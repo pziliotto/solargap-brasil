@@ -104,9 +104,13 @@ def barra_lateral_filtros(agregado: pd.DataFrame) -> FiltrosPainel:
             list(VISOES)[0],
             options=list(VISOES),
             help=(
-                "Uma distribuidora do Maranhão não informa a fonte de geração em cerca de "
-                "73 mil registros. 'Com correção' os conta como solares (99,98% dos registros "
-                "com fonte conhecida são solares); 'Critério ANEEL' os exclui, como o painel oficial."
+                "Duas correções de preenchimento da base ANEEL. (1) Potência: uma "
+                "distribuidora registra 75 kW, o teto da microgeração, em cerca de 47 mil "
+                "sistemas, inclusive residências; 'Com correção' imputa a potência mediana de "
+                "sistemas semelhantes do mesmo município. (2) Fonte: 156 registros sem fonte "
+                "informada são contados como solares (99,98% dos registros com fonte conhecida "
+                "são solares). 'Critério ANEEL' usa o dado oficial sem correções, como o painel "
+                "da agência."
             ),
         )
         metrica = widget_persistente(
@@ -133,7 +137,7 @@ def barra_lateral_filtros(agregado: pd.DataFrame) -> FiltrosPainel:
             options=classes_todas,
         )
         if ano_fim >= esquema.ANO_PARCIAL:
-            st.caption(f"⚠️ {esquema.ANO_PARCIAL} é parcial: dados até agosto.")
+            st.caption(f"⚠️ {esquema.ANO_PARCIAL} é parcial: dados até outubro.")
 
     return FiltrosPainel(
         visao=visao,
@@ -183,13 +187,32 @@ def para_csv(df: pd.DataFrame) -> bytes:
 # ═══════════════════ Avisos ═══════════════════
 
 
-def aviso_imputados(indicadores_uf: pd.DataFrame, incluir_imputados: bool) -> None:
+def aviso_imputados(
+    indicadores_uf: pd.DataFrame,
+    incluir_imputados: bool,
+    potencia: dict[str, float] | None = None,
+) -> None:
+    """Explica as correções da visão corrigida e como voltar ao dado oficial.
+
+    potencia: saída de indicadores.potencia_suspeita para o mesmo recorte.
+    """
+    if not incluir_imputados:
+        return
+    partes = []
+    if potencia and potencia["registros"]:
+        partes.append(
+            f"corrige a potência de {fmt(potencia['registros'])} sistemas registrados "
+            f"com 75 kW, o teto da microgeração ({fmt(potencia['kw_oficial'] / 1_000, 1)} MW "
+            f"no dado oficial, {fmt(potencia['kw_corrigido'] / 1_000, 1)} MW após a "
+            "imputação)"
+        )
     imputados = int(indicadores_uf["qtd_imputados"].sum())
-    if incluir_imputados and imputados:
+    if imputados:
+        partes.append(f"conta como solares {fmt(imputados)} registros sem fonte informada")
+    if partes:
         st.info(
-            f"Esta visão inclui {fmt(imputados)} registros sem fonte informada "
-            "(quase todos no Maranhão), contados como solares. Alterne para **Critério ANEEL** "
-            "na barra lateral para reproduzir os números do painel oficial.",
+            f"Esta visão {' e '.join(partes)}. Alterne para **Critério ANEEL** na barra "
+            "lateral para reproduzir os números do painel oficial.",
             icon="ℹ️",
         )
 

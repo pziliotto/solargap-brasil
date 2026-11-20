@@ -53,7 +53,7 @@ trás e onde estão as oportunidades ainda não exploradas pelo mercado solar.
     unsafe_allow_html=True,
 )
 
-st.subheader(f"O Brasil solar distribuído, até ago/{esquema.ANO_PARCIAL}")
+st.subheader(f"O Brasil solar distribuído, até out/{esquema.ANO_PARCIAL}")
 k1, k2, k3, k4 = st.columns(4)
 k1.metric(
     "Potência instalada", f"{fmt(indicadores_uf['potencia_mw'].sum() / 1000, 1)} GW"

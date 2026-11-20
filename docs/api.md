@@ -56,7 +56,7 @@ Aceitos por `/ufs`, `/ufs/{sigla}`, `/ranking`, `/series/{sigla}` e `/oportunida
 |---|---|---|
 | `ano_inicio`, `ano_fim` | 2012, 2026 | Período de conexão (2026 é parcial) |
 | `classes` | todas | Classe de consumo; repita o parâmetro: `?classes=Residencial&classes=Rural` |
-| `incluir_imputados` | `true` | `false` reproduz o critério do painel oficial da ANEEL (exclui os ~73 mil registros sem fonte do MA) |
+| `incluir_imputados` | `true` | `true` é a visão corrigida: conta como solares os registros sem fonte informada (156 na base 10/2026) e usa a potência corrigida dos ~47 mil registros de 75 kW suspeitos. `false` reproduz o critério do painel oficial da ANEEL: sem esses registros imputados e com a potência oficial. (Até a base 08/2026, o parâmetro tratava só os ~73 mil registros sem fonte do MA.) |
 
 `/ufs/{sigla}` e `/oportunidades` aceitam também `ano_base` e `ano_final` (janela do crescimento; padrão 2022–2025).
 
@@ -74,9 +74,9 @@ curl "http://127.0.0.1:8000/ranking?metrica=watts_por_habitante&limite=5"
   "rotulo": "Watts por habitante",
   "unidade": "W/hab",
   "ordem": "desc",
-  "media_brasil": 252.75,
+  "media_brasil": 249.67,
   "itens": [
-    {"posicao": 1, "sigla_uf": "MT", "nome_uf": "Mato Grosso", "valor": 863.3, "...": "..."}
+    {"posicao": 1, "sigla_uf": "MT", "nome_uf": "Mato Grosso", "valor": 872.48, "...": "..."}
   ]
 }
 ```

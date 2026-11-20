@@ -20,6 +20,7 @@ Documentação completa:
 - 📊 [Data Summary Report](docs/data_summary_report.md) — fontes, qualidade, tratamento e licenciamento dos dados
 - 🔌 [Documentação da API](docs/api.md) — rotas, parâmetros, exemplos e códigos de erro
 - 🧠 [Escolha dos modelos de linguagem](docs/escolha_modelo.md) — benchmark de cinco modelos locais (TP4)
+- 🔄 [Atualização da base ANEEL 08/2026 → 10/2026](docs/potencial/atualizacao_base_10_2026.md) — antes × depois e tratamento dos 75 kW no PR
 
 ### Indicadores
 
@@ -30,13 +31,16 @@ Documentação completa:
 | Ranking de disparidade | Posição das 27 UFs em cada métrica, com a média nacional como referência |
 | Taxa de crescimento | Crescimento anual do parque instalado e CAGR por UF desde a Lei 14.300 (2022–2025) |
 
-### Principais achados (TP3)
+### Principais achados (base ANEEL 10/2026, visão corrigida)
 
-- O parque solar distribuído passou de 18,3 GW (2022) para 47,5 GW (2025): **37,5% ao ano**. O ritmo desacelera (48% em 2023, 26% em 2025).
-- **10 "mercados emergentes"** — adoção abaixo da média nacional, crescimento acima: RR, AL, AC, BA, PA, AM, CE, PE, SP e SE.
-- **3 "lacunas persistentes"** — adoção e crescimento abaixo da média: RJ, DF e PB.
-- A correção de preenchimento do Maranhão muda a leitura de política pública: com ela, o MA é "líder em expansão"; no critério do painel oficial da ANEEL, cairia em "lacuna persistente".
-- O momento de adesão à isenção de ICMS (Convênio 16/15) não se relaciona com a adoção atual (Spearman −0,06).
+Valores na visão corrigida, padrão do painel; entre parênteses, o critério ANEEL (dado oficial sem correções).
+
+- O parque solar distribuído passou de 17,7 GW (2022) para 46,3 GW (2025): **37,7% ao ano** (34,6%), chegando a 50,7 GW até outubro de 2026 (53,8 GW). O ritmo desacelera (48,5% em 2023, 25,6% em 2025).
+- **10 "mercados emergentes"** — adoção abaixo da média nacional, crescimento acima: AL, AP, BA, CE, MA, PA, PE, RR, SE e SP (no critério ANEEL, também AC e RJ).
+- **4 "lacunas persistentes"** — adoção e crescimento abaixo da média: AM, DF, PB e RJ (no critério ANEEL, só AM, DF e PB).
+- **Tratamento aplicado à anomalia dos 75 kW:** 47 mil registros da COPEL-DIS no Paraná, inclusive 28 mil residências, têm potência de exatamente 75 kW, o teto da microgeração. A base reproduz o painel oficial da ANEEL, então o erro está na fonte. O pipeline sinaliza esses registros por diagnóstico estatístico entre distribuidoras e imputa a potência mediana de sistemas semelhantes: a potência solar do PR cai de 6,9 para 3,8 GW e a do Brasil, de 53,8 para 50,7 GW. Detalhes em [`docs/potencial/atualizacao_base_10_2026.md`](docs/potencial/atualizacao_base_10_2026.md).
+- Na base de 10/2026, a ANEEL retirou os ~73 mil registros do Maranhão sem fonte de geração, que o projeto imputava como solares. O MA passou a ser "mercado emergente" nas duas visões do painel.
+- O momento de adesão à isenção de ICMS (Convênio 16/15) não se relaciona com a adoção atual (Spearman −0,02; −0,06 no critério ANEEL).
 
 ---
 
@@ -206,7 +210,9 @@ python -m src.preparacao.construir_gold         # camada Gold
 
 **Modelos de linguagem.** Leem no máximo 512 tokens (~350 palavras): notícias longas são resumidas e classificadas pelo início, e a API informa `truncado: true`. O tom das notícias ficou abaixo da linha de base no benchmark e não é usado como indicador. Detalhes em `docs/escolha_modelo.md`.
 
-**Ano corrente parcial.** Os dados de 2026 cobrem até agosto e ficam fora do cálculo de crescimento.
+**Ano corrente parcial.** A base ANEEL é a de referência 10/2026 (arquivo gerado em 10/10/2026). Os dados de 2026 cobrem até outubro e ficam fora do cálculo de crescimento.
+
+**Potência de 75 kW no Paraná (tratamento aplicado).** A base oficial traz 47 mil registros da COPEL-DIS com potência de exatamente 75 kW, padrão ausente nas demais distribuidoras. A visão corrigida (padrão) imputa a potência mediana de sistemas semelhantes; a potência oficial é preservada, e o seletor "Critério ANEEL" a reproduz. A imputação pode subestimar um pouco os comércios e propriedades rurais que de fato têm 75 kW; o limite conservador, que corrige só as residências, está na Gold (`potencia_mw_conservadora`). Ver [`docs/potencial/atualizacao_base_10_2026.md`](docs/potencial/atualizacao_base_10_2026.md).
 
 ---
 

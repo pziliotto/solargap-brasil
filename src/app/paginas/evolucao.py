@@ -143,7 +143,7 @@ with aba_crescimento:
         st.plotly_chart(figura, width="stretch")
         st.caption(
             "A série começa em 2016: antes disso, bases de poucos kW geram taxas de milhares "
-            f"de por cento, sem significado. {esquema.ANO_PARCIAL} cobre só até agosto."
+            f"de por cento, sem significado. {esquema.ANO_PARCIAL} cobre só até outubro."
         )
 
     st.subheader("Crescimento médio anual (CAGR) por UF")

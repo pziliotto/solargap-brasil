@@ -64,19 +64,80 @@ def test_rotulo_modalidade_usa_nomes_curtos():
 
 def _registros():
     """Empreendimentos sintéticos de dois municípios."""
-    return pd.DataFrame(
+    return (
+        pd.DataFrame(
+            [
+                # município A: só residencial local e rural local entram na métrica
+                ("3500001", "SP", "Residencial", "Geracao na propria UC", 5.0),
+                ("3500001", "SP", "Residencial", "Geracao na propria UC", 7.0),
+                ("3500001", "SP", "Rural", "Geracao na propria UC", 20.0),
+                ("3500001", "SP", "Residencial", "Auto consumo remoto", 75.0),
+                ("3500001", "SP", "Residencial", "Compartilhada", 1000.0),
+                ("3500001", "SP", "Comercial", "Geracao na propria UC", 30.0),
+                ("3500001", "SP", "Rural", "Condomínio", 40.0),
+                # município B: nada entra na métrica principal
+                ("3500002", "SP", "Industrial", "Geracao na propria UC", 300.0),
+                ("3500002", "SP", None, None, 2.0),
+            ],
+            columns=[
+                "cod_municipio",
+                "sigla_uf",
+                "classe_consumo",
+                "modalidade",
+                "potencia_kw",
+            ],
+        )
+        .astype({"cod_municipio": "Int64"})
+        .assign(
+            # sem correções: as três visões coincidem
+            fonte_imputada=False,
+            flag_potencia_suspeita=False,
+            potencia_corrigida_kw=lambda df: df["potencia_kw"],
+            potencia_conservadora_kw=lambda df: df["potencia_kw"],
+        )
+    )
+
+
+def test_tres_visoes_de_potencia_por_municipio():
+    registros = _registros()
+    # Residencial local de 75 kW suspeito, corrigido para 6 kW nas visões
+    # corrigida e conservadora; rural local de 75 kW suspeito, corrigido só na
+    # corrigida; um registro de fonte imputada, fora do critério ANEEL.
+    extra = pd.DataFrame(
         [
-            # município A: só residencial local e rural local entram na métrica
-            ("3500001", "SP", "Residencial", "Geracao na propria UC", 5.0),
-            ("3500001", "SP", "Residencial", "Geracao na propria UC", 7.0),
-            ("3500001", "SP", "Rural", "Geracao na propria UC", 20.0),
-            ("3500001", "SP", "Residencial", "Auto consumo remoto", 75.0),
-            ("3500001", "SP", "Residencial", "Compartilhada", 1000.0),
-            ("3500001", "SP", "Comercial", "Geracao na propria UC", 30.0),
-            ("3500001", "SP", "Rural", "Condomínio", 40.0),
-            # município B: nada entra na métrica principal
-            ("3500002", "SP", "Industrial", "Geracao na propria UC", 300.0),
-            ("3500002", "SP", None, None, 2.0),
+            (
+                "3500001",
+                "SP",
+                "Residencial",
+                "Geracao na propria UC",
+                75.0,
+                False,
+                True,
+                6.0,
+                6.0,
+            ),
+            (
+                "3500001",
+                "SP",
+                "Rural",
+                "Geracao na propria UC",
+                75.0,
+                False,
+                True,
+                10.0,
+                75.0,
+            ),
+            (
+                "3500001",
+                "SP",
+                "Residencial",
+                "Geracao na propria UC",
+                4.0,
+                True,
+                False,
+                4.0,
+                4.0,
+            ),
         ],
         columns=[
             "cod_municipio",
@@ -84,8 +145,26 @@ def _registros():
             "classe_consumo",
             "modalidade",
             "potencia_kw",
+            "fonte_imputada",
+            "flag_potencia_suspeita",
+            "potencia_corrigida_kw",
+            "potencia_conservadora_kw",
         ],
     ).astype({"cod_municipio": "Int64"})
+    tabela = mmgd_municipal.consolidar(
+        mmgd_municipal.resumir_registros(
+            pd.concat([registros, extra], ignore_index=True)
+        )
+    )
+    a = tabela.set_index("cod_ibge").loc["3500001"]
+    base_local = 5 + 7 + 20
+    assert a["kwp_local_res_rural"] == pytest.approx(base_local + 6 + 10 + 4)
+    assert a["kwp_local_res_rural_conservadora"] == pytest.approx(
+        base_local + 6 + 75 + 4
+    )
+    assert a["kwp_local_res_rural_aneel"] == pytest.approx(base_local + 75 + 75)
+    assert a["n_potencia_suspeita"] == 2
+    assert a["n_local_res_rural"] == 6
 
 
 def test_metrica_principal_so_residencial_e_rural_na_propria_uc():
@@ -158,9 +237,38 @@ def _entradas():
             "kwp_local_res_rural": [300.0, 3300.0],
             "n_local_res_rural": [60, 350],
             "kwp_mod_propria_uc": [500.0, 4000.0],
+            # visões de comparação: ANEEL maior (75 kW oficiais), conservadora no meio
+            "kwp_total_aneel": [900.0, 6500.0],
+            "kwp_total_conservadora": [900.0, 5600.0],
+            "kwp_local_res_rural_aneel": [300.0, 4800.0],
+            "kwp_local_res_rural_conservadora": [300.0, 3900.0],
+            "n_potencia_suspeita": [0, 20],
         }
     )
     return pontos, irradiacao, domicilios, mmgd
+
+
+def test_gold_calcula_y_e_taxa_nas_tres_visoes():
+    gold = potencial_municipal.montar_gold(*_entradas()).set_index("cod_ibge")
+    nuvem = gold.loc["4300001"]  # 3.000 kWp potencial
+    assert nuvem["taxa_realizacao"] == pytest.approx(3300 / 3000)
+    assert nuvem["taxa_realizacao_aneel"] == pytest.approx(4800 / 3000)
+    assert nuvem["taxa_realizacao_conservador"] == pytest.approx(3900 / 3000)
+    assert nuvem["y_aneel_mwh_ano"] == pytest.approx(4800 * 4.0 * FATOR)
+    assert nuvem["y_total_aneel_mwh_ano"] == pytest.approx(6500 * 4.0 * FATOR)
+    assert bool(nuvem["flag_taxa_acima_1_aneel"]) is True
+    # o gap e a flag principais seguem a visão corrigida
+    assert nuvem["gap_mwh_ano"] == pytest.approx(
+        nuvem["x_mwh_ano"] - nuvem["y_mwh_ano"]
+    )
+
+    uf = potencial_municipal.agregar_uf(potencial_municipal.montar_gold(*_entradas()))
+    rs = uf.set_index("uf").loc["RS"]
+    assert rs["n_potencia_suspeita"] == 20
+    assert rs["taxa_realizacao_aneel"] == pytest.approx(
+        rs["y_aneel_mwh_ano"] / rs["x_mwh_ano"]
+    )
+    assert rs["n_municipios_taxa_acima_1_aneel"] == 1
 
 
 def test_gold_aplica_as_formulas():
@@ -263,10 +371,20 @@ def test_taxa_da_uf_e_razao_das_somas_e_nao_media_das_taxas():
 def test_validacao_do_total_nacional_com_tolerancia_de_1_por_cento():
     gold = potencial_municipal.montar_gold(*_entradas())
     total = gold["kwp_total"].sum()
-    problemas = potencial_municipal.validar_gold(gold, total * 1.005)
+    problemas = potencial_municipal.validar_gold(gold, {"silver": total * 1.005})
     assert not any("kWp nacional" in p for p in problemas)
-    problemas = potencial_municipal.validar_gold(gold, total * 1.05)
+    problemas = potencial_municipal.validar_gold(gold, {"silver": total * 1.05})
     assert any("kWp nacional" in p for p in problemas)
+
+
+def test_validacao_exige_tolerancia_contra_cada_referencia():
+    gold = potencial_municipal.montar_gold(*_entradas())
+    total = gold["kwp_total"].sum()
+    problemas = potencial_municipal.validar_gold(
+        gold, {"silver": total, "gold_uf.csv": total * 1.048}
+    )
+    sobre_total = [p for p in problemas if p.startswith("kWp nacional")]
+    assert sobre_total == ["kWp nacional difere 4.58% de gold_uf.csv (limite 1%)"]
 
 
 def test_tabela_epe_completa_e_soma_o_total_impresso():

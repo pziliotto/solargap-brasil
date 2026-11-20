@@ -33,8 +33,9 @@ filtros = filtros_atuais()
 metrica = filtros.info_metrica
 coluna = filtros.metrica
 
+agregado = dados.carregar_agregado()
 indicadores_uf = dados.indicadores_por_uf(
-    dados.carregar_agregado(),
+    agregado,
     dados.carregar_uf(),
     filtros.ano_inicio,
     filtros.ano_fim,
@@ -47,7 +48,13 @@ st.title("📊 Panorama")
 st.caption(
     f"Conexões de {filtros.ano_inicio} a {filtros.ano_fim} · visão: {filtros.visao}"
 )
-aviso_imputados(indicadores_uf, filtros.incluir_imputados)
+aviso_imputados(
+    indicadores_uf,
+    filtros.incluir_imputados,
+    indicadores.potencia_suspeita(
+        agregado, filtros.ano_inicio, filtros.ano_fim, filtros.classes
+    ),
+)
 
 lider = indicadores.ranking(indicadores_uf, coluna).iloc[0]
 k1, k2, k3, k4 = st.columns(4)

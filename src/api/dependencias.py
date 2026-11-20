@@ -116,7 +116,10 @@ def obter_filtros(
     incluir_imputados: Annotated[
         bool,
         Query(
-            description="Contar os registros sem fonte do MA como solares (visão corrigida)."
+            description=(
+                "Visão corrigida (padrão): conta como solares os registros sem fonte e usa a "
+                "potência corrigida dos registros de 75 kW suspeitos. false = critério ANEEL."
+            )
         ),
     ] = True,
 ) -> FiltroAPI:
