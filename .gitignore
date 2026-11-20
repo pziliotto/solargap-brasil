@@ -72,6 +72,10 @@ data/interim/*
 # Exceção: notícias recebidas pela API são estado de execução, não dado do projeto.
 data/external/noticias_enviadas.csv
 
+# ═══════════════════ Modelos treinados ═══════════════════
+# Reproduzíveis a partir das Gold com semente fixa: python -m src.potencial.modelo
+models/
+
 # ═══════════════════ Testes e lint ═══════════════════
 .pytest_cache/
 .ruff_cache/

@@ -182,3 +182,23 @@ UFS_VIZINHAS = {
     "SE": {"AL", "BA"},
     "TO": {"MA", "PI", "BA", "GO", "MT", "PA"},
 }
+
+# ═══════════════════ Modelo explicativo (Tarefa 4) ═══════════════════
+
+PASTA_DOCS_POTENCIAL = PROJECT_ROOT / "docs" / "potencial"
+# Modelos treinados: reproduzíveis a partir das Gold, fora do versionamento
+PASTA_MODELOS = PROJECT_ROOT / "models"
+ARQUIVO_MODELO = PASTA_MODELOS / "modelo_taxa_realizacao.joblib"
+
+ARQUIVO_GOLD_SHAP_MUNICIPAL = PASTA_PROCESSED / "shap_municipal.parquet"
+ARQUIVO_GOLD_SHAP_UF = PASTA_PROCESSED / "shap_uf.parquet"
+
+ARQUIVO_CORRELACAO_PNG = PASTA_DOCS_POTENCIAL / "matriz_correlacao.png"
+ARQUIVO_CORRELACAO_CSV = PASTA_DOCS_POTENCIAL / "matriz_correlacao.csv"
+ARQUIVO_METRICAS_CV = PASTA_DOCS_POTENCIAL / "metricas_validacao_cruzada.csv"
+ARQUIVO_ROBUSTEZ_CSV = PASTA_DOCS_POTENCIAL / "robustez_visoes.csv"
+ARQUIVO_SHAP_BEESWARM = PASTA_DOCS_POTENCIAL / "shap_importancia_global.png"
+ARQUIVO_SHAP_WATERFALL = PASTA_DOCS_POTENCIAL / "shap_waterfall_caxias_do_sul.png"
+
+# Semente única de todo o modelo (folds, LightGBM, amostra de fundo do SHAP)
+SEMENTE = 42

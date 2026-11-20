@@ -176,6 +176,16 @@ duckdb==1.5.6
 openpyxl==3.1.5
 et-xmlfile==2.0.0
 
+# Modelo explicativo e SHAP (TP4.5, Tarefa 4)
+scikit-learn==1.9.1
+lightgbm==4.7.0
+shap==0.54.1
+scipy==1.18.1
+joblib==1.6.0
+threadpoolctl==3.8.0
+cloudpickle==3.1.3
+slicer==0.0.8
+
 # IA local (TP4) — modelos de linguagem com Transformers/PyTorch
 # ATENÇÃO (Windows + GPU NVIDIA): instale o torch ANTES deste arquivo, pelo
 # índice do PyTorch, senão o pip baixa a versão só-CPU do PyPI:
