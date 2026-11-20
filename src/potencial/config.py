@@ -121,3 +121,64 @@ ARQUIVO_MMGD_MUNICIPAL = PASTA_INTERIM_POTENCIAL / "mmgd_municipal.parquet"
 ARQUIVO_GOLD_MUNICIPAL = PASTA_PROCESSED / "potencial_municipal.parquet"
 ARQUIVO_GOLD_MUNICIPAL_CSV = PASTA_PROCESSED / "potencial_municipal.csv"
 ARQUIVO_GOLD_UF = PASTA_PROCESSED / "potencial_uf.parquet"
+
+# ═══════════════════ Fatores municipais (Tarefa 3) ═══════════════════
+
+# Fontes em cache (Bronze)
+PASTA_RAW_IBGE = PROJECT_ROOT / "data" / "raw" / "ibge"
+PASTA_RAW_PIB = PASTA_RAW_IBGE / "pib_municipios"
+PASTA_RAW_ANEEL = PROJECT_ROOT / "data" / "raw" / "aneel"
+PASTA_RAW_MAPBIOMAS = PROJECT_ROOT / "data" / "raw" / "mapbiomas"
+
+# Janela das vigências tarifárias (média ponderada pelos dias de vigência)
+JANELA_TARIFA = ("2023-01-01", "2025-12-31")
+# Conjuntos elétricos considerados atuais: presentes no DEC/FEC a partir deste ano
+ANO_MINIMO_CONJUNTO = 2023
+# Ano do VAB por atividade do PIB dos Municípios: a publicação de 2022-2023 do
+# IBGE (dez/2025) traz só o PIB total e o per capita; o VAB da agropecuária por
+# município vai até 2021 (no SIDRA 5938 e na base do FTP).
+ANO_PIB = 2021
+# Ano da cobertura do solo (MapBiomas): meio da janela da irradiação (2023-2025)
+ANO_MAPBIOMAS = 2023
+
+# Saídas
+ARQUIVO_DISTRIBUIDORA_MUNICIPIO = (
+    PASTA_INTERIM_POTENCIAL / "distribuidora_municipio.parquet"
+)
+ARQUIVO_TARIFA_DISTRIBUIDORA = PASTA_INTERIM_POTENCIAL / "tarifa_distribuidora.parquet"
+ARQUIVO_PIB_RECORTE = PASTA_INTERIM_POTENCIAL / f"pib_municipios_{ANO_PIB}.parquet"
+ARQUIVO_AUSENTES_FATORES = PASTA_INTERIM_POTENCIAL / "fatores_ausentes.csv"
+ARQUIVO_GOLD_FATORES = PASTA_PROCESSED / "fatores_municipais.parquet"
+
+# Fronteiras terrestres entre UFs. Uma distribuidora só é ligada a municípios da
+# sua UF principal ou de UFs vizinhas (o arquivo de ligação da ANEEL tem pares
+# geograficamente impossíveis, como a EPB, da Paraíba, em municípios do Maranhão).
+UFS_VIZINHAS = {
+    "AC": {"AM", "RO"},
+    "AL": {"PE", "SE", "BA"},
+    "AP": {"PA"},
+    "AM": {"AC", "RO", "MT", "PA", "RR"},
+    "BA": {"SE", "AL", "PE", "PI", "TO", "GO", "MG", "ES"},
+    "CE": {"PI", "PE", "PB", "RN"},
+    "DF": {"GO", "MG"},
+    "ES": {"BA", "MG", "RJ"},
+    "GO": {"TO", "BA", "MG", "MS", "MT", "DF"},
+    "MA": {"PA", "TO", "PI"},
+    "MT": {"RO", "AM", "PA", "TO", "GO", "MS"},
+    "MS": {"MT", "GO", "MG", "SP", "PR"},
+    "MG": {"BA", "ES", "RJ", "SP", "GO", "DF", "MS"},
+    "PA": {"AP", "AM", "RR", "MT", "TO", "MA"},
+    "PB": {"RN", "CE", "PE"},
+    "PR": {"SP", "MS", "SC"},
+    "PE": {"PB", "CE", "PI", "BA", "AL"},
+    "PI": {"MA", "TO", "BA", "PE", "CE"},
+    "RJ": {"ES", "MG", "SP"},
+    "RN": {"CE", "PB"},
+    "RS": {"SC"},
+    "RO": {"AC", "AM", "MT"},
+    "RR": {"AM", "PA"},
+    "SC": {"PR", "RS"},
+    "SP": {"MG", "RJ", "PR", "MS"},
+    "SE": {"AL", "BA"},
+    "TO": {"MA", "PI", "BA", "GO", "MT", "PA"},
+}

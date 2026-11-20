@@ -172,6 +172,10 @@ pyogrio==0.13.0
 pyproj==3.8.0
 duckdb==1.5.6
 
+# Leitura de planilhas .xlsx (TP4.5: PIB dos Municípios e MapBiomas)
+openpyxl==3.1.5
+et-xmlfile==2.0.0
+
 # IA local (TP4) — modelos de linguagem com Transformers/PyTorch
 # ATENÇÃO (Windows + GPU NVIDIA): instale o torch ANTES deste arquivo, pelo
 # índice do PyTorch, senão o pip baixa a versão só-CPU do PyPI:

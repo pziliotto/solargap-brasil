@@ -38,6 +38,14 @@ data/raw/*
 data/raw/ibge/*
 !data/raw/ibge/domicilios_municipio_2022.json
 
+# IBGE — fatores municipais do Censo 2022 (TP4.5, Tarefa 3), SIDRA view=flat:
+# 4714 (população, área, densidade, ~3.2 MB), 9923 (população por situação do
+# domicílio, ~3.3 MB) e 10295 (rendimento domiciliar per capita, ~5.5 MB).
+# A base do PIB dos Municípios (pib_municipios/, ~21 MB) segue ignorada.
+!data/raw/ibge/populacao_area_densidade_municipio_2022.json
+!data/raw/ibge/populacao_situacao_municipio_2022.json
+!data/raw/ibge/renda_domiciliar_pc_municipio_2022.json
+
 # ANEEL — base completa tem ~103 MB e estoura o limite de 100 MB do
 # GitHub. Só a amostra usada pelo app demo é versionada.
 # Para obter a base completa: python -m src.data_acquisition.aneel

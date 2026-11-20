@@ -179,6 +179,54 @@ Como a cláusula terceira fixa efeitos a partir de 01/09/2015, adesões anterior
 
 **Modelagem.** A tabela é uma dimensão própria da Gold, unida por `sigla_uf` sob demanda no dashboard e na API. No TP2 o plano era juntá-la ao `gold_uf.csv` dentro do `construir_gold.py`; essa junção foi removida para que atualizar a política não exija reprocessar 4,6 milhões de registros, nem ter a base da ANEEL.
 
+### 2.6 Fatores municipais do potencial solar (TP4.5, Tarefa 3)
+
+**Código:** `src/data_acquisition/coletor_fatores.py` (coleta e registro `FONTES`) e `src/potencial/fatores.py` (montagem) · **Saída:** `data/processed/fatores_municipais.parquet`, 5.570 municípios × 22 colunas.
+
+A tabela reúne os fatores que podem explicar a taxa de realização do potencial solar em telhados. **Regra central:** nenhuma variável é derivada da MMGD, para não vazar o alvo para o modelo. A composição por classe da MMGD fica só como informação descritiva no painel. Nenhum valor ausente é imputado nesta etapa.
+
+|Variável|Fonte e dataset|Ano|Licença|
+|---|---|---|---|
+|Renda domiciliar per capita, média e mediana (R$/mês)|IBGE, Censo 2022, SIDRA 10295 (variáveis 13431 e 13534)|2022|IBGE: uso livre com citação|
+|% da população urbana|IBGE, Censo 2022, SIDRA 9923 (população por situação do domicílio)|2022|IBGE|
+|População, log da população, área (km²), densidade (hab/km²)|IBGE, Censo 2022, SIDRA 4714|2022|IBGE|
+|% do VAB da agropecuária|IBGE, PIB dos Municípios, base de dados 2010–2023 (FTP)|**2021**|IBGE|
+|Tarifa B1 residencial convencional (TE + TUSD, R$/MWh, sem impostos)|ANEEL, Tarifas de aplicação das distribuidoras; média das vigências ponderada pelos dias|2023–2025|ODbL|
+|Distribuidoras do município, `multi_distribuidora`|ANEEL, IndQual Município (conjunto → município) + Indicadores de continuidade DEC/FEC 2020–2029 (conjunto → distribuidora)|conjuntos de 2023 em diante|ODbL|
+|`cooperativa`, `n_cooperativas`|ANEEL, IASC (classificação concessionária × permissionária), pelo CNPJ|2022–2025|ODbL|
+|Ano de início e meses de isenção de ICMS|CONFAZ, Convênio ICMS 16/15 (seção 2.5), por UF|até 31/08/2026|Ato oficial|
+|Irradiação (kWh/m²/dia)|NASA POWER, `ALLSKY_SFC_SW_DWN` (TP4.5, Tarefa 1)|2023–2025|Dados abertos da NASA|
+|% da área em agropecuária|MapBiomas Brasil, Coleção 11, cobertura e uso da terra por município|2023|CC BY 4.0|
+|Região|Cadastro de UFs do projeto (`esquema.py`)|—|—|
+
+**Decisões.**
+
+- **Renda do Censo 2022:** o rendimento domiciliar per capita está publicado em nível municipal (SIDRA 10295) e foi preferido ao PIB per capita.
+- **VAB da agropecuária de 2021:** a base do PIB dos Municípios vai de 2010 a 2023, mas a publicação de 2022–2023 (dez/2025) traz só o PIB total e o PIB per capita. Nas linhas de 2022 e 2023 o VAB por atividade está vazio nos 5.570 municípios; o SIDRA 5938 também mostra "..." nesses anos. 2021 é o último ano com o dado. Cachoeira Dourada (GO) tem VAB total negativo no dado oficial (participação de −41,9%), mantido sem tratamento.
+- **Distribuidora sem passar pela MMGD:** a ligação vem de bases da ANEEL independentes da MMGD. O arquivo de ligação tem pares geograficamente impossíveis (ex.: Energisa Paraíba em municípios do Maranhão). Uma distribuidora só é ligada a municípios da sua UF principal ou de UFs vizinhas, e 14 pares foram descartados. A MMGD foi usada só para conferência: sua distribuidora principal está na ligação oficial em 99,9% dos municípios.
+- **Município com mais de uma distribuidora (567):** tarifa pela média simples, com `multi_distribuidora = True`.
+- **Cooperativa:** permissionária de distribuição, isto é, cooperativa de eletrificação regularizada como distribuidora. São 478 municípios com ao menos uma.
+
+**Valores ausentes** (relatório em `data/interim/potencial/fatores_ausentes.csv`): tarifa e variáveis de distribuidora em 10 municípios (0,18%), sem conjunto elétrico atual no arquivo de ligação; área agropecuária em 1 (Fernando de Noronha, fora do MapBiomas); demais variáveis completas.
+
+**Caches da camada Bronze.** Versionados: os três JSONs do SIDRA em `data/raw/ibge/` (`populacao_area_densidade_municipio_2022.json`, 3,2 MB; `populacao_situacao_municipio_2022.json`, 3,3 MB; `renda_domiciliar_pc_municipio_2022.json`, 5,5 MB). Não versionados, por tamanho (cerca de 165 MB no total):
+
+|Arquivo|Tamanho|
+|---|---|
+|`data/raw/mapbiomas/MAPBIOMAS_BRAZIL-COL.11-BIOME_STATE_MUNICIPALITY.zip`|78,3 MB|
+|`data/raw/aneel/indicadores-continuidade-coletivos-2020-2029.parquet`|58,8 MB|
+|`data/raw/ibge/pib_municipios/base_de_dados_2010_2023_xlsx.zip`|20,7 MB|
+|`data/raw/aneel/indice-aneel-satisfacao-consumidor.csv`|3,3 MB|
+|`data/raw/aneel/indqual-municipio.csv`|2,2 MB|
+|`data/raw/aneel/tarifas-homologadas-distribuidoras-energia-eletrica.parquet`|1,6 MB|
+
+Para regerá-los (só baixa o que falta no cache) e remontar a tabela:
+
+```bash
+python -m src.data_acquisition.coletor_fatores
+python -m src.potencial.fatores
+```
+
 ## 3. Observações sobre Qualidade e Tratamento
 
 - Os dados brutos (ANEEL, IBGE) são armazenados sem alteração em `data/raw/` (camada Bronze) e nunca editados diretamente.
