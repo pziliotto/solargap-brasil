@@ -163,6 +163,15 @@ iniconfig==2.3.1
 pluggy==1.7.0
 ruff==0.17.1
 
+# Geoespacial (TP4.5) — malha municipal do IBGE via geobr
+# duckdb fica em 1.x: o geobr 2.1.1 usa Relation.fetchone(), removido no duckdb 2.0
+geobr==2.1.1
+geopandas==1.2.0
+shapely==2.2.0
+pyogrio==0.13.0
+pyproj==3.8.0
+duckdb==1.5.6
+
 # IA local (TP4) — modelos de linguagem com Transformers/PyTorch
 # ATENÇÃO (Windows + GPU NVIDIA): instale o torch ANTES deste arquivo, pelo
 # índice do PyTorch, senão o pip baixa a versão só-CPU do PyPI:

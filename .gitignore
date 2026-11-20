@@ -37,6 +37,12 @@ data/raw/*
 !data/raw/amostra_*.parquet
 !data/raw/amostra_*.csv
 
+# NASA POWER (TP4.5) — cache de um JSON por célula de 1° (~600 arquivos).
+# Reproduzível e retomável: python -m src.data_acquisition.coletor_nasa_power
+# Já coberto por data/raw/*; a regra explícita impede que uma futura exceção
+# com "!" volte a versionar o cache por engano.
+data/raw/nasa_power/
+
 # ── Camada Silver (interim) ──
 # Sempre reproduzível a partir do raw + scripts de tratamento.
 data/interim/*
