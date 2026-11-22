@@ -131,3 +131,17 @@ def test_potencial_cenarios_trocam_de_ssp(app):
         app.radio(key="pot_cenario").set_value(cenario).run()
         assert not app.exception
     assert any("não previsão" in i.value for i in app.info)
+
+
+def test_potencial_explicacao_separa_sinais_e_compara_com_o_esperado(app):
+    app.switch_page("paginas/potencial.py").run()
+    app.selectbox(key="pot_uf").set_value("RS").run()
+    app.selectbox(key="pot_municipio").set_value("4305108").run()
+    assert not app.exception
+    rotulos = [m.label for m in app.metric]
+    assert "Realiza" in rotulos and "Esperado pelo perfil" in rotulos
+    textos = " ".join(m.value for m in app.markdown)
+    assert "Abaixo do esperado" in textos
+    assert "Puxam a taxa para baixo" in textos and "Puxam a taxa para cima" in textos
+    assert "Renda: **+11,0 p.p.**" in textos
+    assert any(e.label == "Detalhe por variável" for e in app.expander)

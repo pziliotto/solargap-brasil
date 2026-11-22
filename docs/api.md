@@ -79,7 +79,14 @@ As quatro rotas `/potencial` usam `src/servicos/potencial.py`, o mesmo código d
 Valor fora da lista (inclusive com maiúsculas, como `ANEEL`) responde **422**. A visão muda só a produção estimada (y), o gap e a taxa; o potencial técnico (x) não depende da base da ANEEL. Nas agregações (UF, Brasil), a taxa é Σy / Σx.
 
 - **`/potencial/uf`** devolve as 27 UFs, o total do Brasil, as premissas do cálculo (PR 0,75, eficiência 20%, 15 m² de telhado, base 10/2026) e, em cada UF, os três fatores de maior contribuição SHAP.
-- **`/potencial/explicacao/{cod_ibge}`** devolve as contribuições SHAP do município, do maior para o menor efeito, em fração e em pontos percentuais (`contribuicao_pp`), com uma frase por fator e uma `leitura` do conjunto. **É associação, não causalidade.** O modelo foi treinado no alvo da visão corrigida, o único com explicação por município. Nas outras visões, as contribuições são as mesmas, `taxa_observada` é a da visão pedida, `aviso_visao` explica a diferença e `ranking_global_visao` traz os fatores mais importantes do modelo ajustado àquela visão (Tarefa 4, `docs/potencial/robustez_visoes.csv`).
+- **`/potencial/explicacao/{cod_ibge}`** explica a taxa do município em linguagem simples. **É associação, não causalidade.**
+  - `fatores`: a contribuição SHAP de cada uma das 12 variáveis, do maior para o menor efeito, em fração e em pontos percentuais (`contribuicao_pp`), com o `grupo` e uma frase.
+  - `grupos` (novo): soma as variáveis da mesma família, o que é válido porque o SHAP é aditivo. **Renda** = renda média + mediana (ρ = 0,98 entre elas), **Agropecuária** = peso no VAB + área ocupada, **Distribuidora e cooperativa** = mais de uma distribuidora + cooperativa (ρ = 0,84). As demais variáveis formam grupo próprio. Sem a soma, fatores correlacionados dividem o crédito de forma arbitrária.
+  - `puxam_para_baixo` e `puxam_para_cima`: os grupos separados pelo sinal (até 3 de cada lado, com pelo menos 1 p.p.). Só os de contribuição negativa aparecem como "aumenta o gap".
+  - `taxa_observada`, `taxa_prevista`, `diferenca_pp` (observada − prevista) e `comparacao_esperado`. Abaixo do esperado (diferença ≤ −0,5 p.p.) quer dizer que há espaço que os fatores medidos não explicam; acima (≥ +0,5 p.p.), que o município aproveita mais do que o perfil sugere.
+  - `leitura`: junta a comparação e as duas listas.
+  - Na UF e no Brasil, contribuições e previsão são médias ponderadas por domicílios, e a taxa observada é Σy / Σx.
+  - Visões: o modelo foi treinado no alvo da visão corrigida, o único com explicação por município. Nas outras visões, as contribuições e a taxa prevista são as mesmas, `taxa_observada` é a da visão pedida, `aviso_visao` explica a diferença e `ranking_global_visao` traz os fatores mais importantes do modelo ajustado àquela visão (Tarefa 4, `docs/potencial/robustez_visoes.csv`).
 - **`/potencial/cenarios/{cod_ibge}`** devolve, para SSP2-4.5 e SSP5-8.5 e as janelas 2030–2039 e 2040–2050, a variação da irradiação (mediana e faixa de 5 modelos do NEX-GDDP-CMIP6) e x, y e gap projetados, com a potência instalada fixa. A taxa do município não muda, porque a irradiação se cancela em y / x. **É um cenário com faixa de incerteza, não uma previsão.** A Gold traz y projetado das visões corrigida e ANEEL; o da conservadora é derivado pela razão da corrigida, exata no município. Metodologia em `docs/potencial/README.md`, seção "Projeção 2030–2050".
 
 Erros: **404** para código IBGE inexistente, **422** para `visao` inválida e **503** se a Gold de potencial não estiver disponível. A Gold de potencial tem carga própria: sem ela, só as rotas `/potencial` respondem 503 e o resto da API segue no ar.
@@ -148,12 +155,29 @@ curl "http://127.0.0.1:8000/potencial/explicacao/4305108?visao=aneel"
   "taxa_prevista": 0.1081,
   "valor_base": 0.1448,
   "usado_no_treino": true,
-  "leitura": "Em Caxias do Sul (RS), a taxa de realização observada é de 9,0% no critério ANEEL. O modelo prevê 10,8%, contra 14,5% na média dos municípios. O gap está associado, do maior para o menor efeito, a: densidade demográfica, renda domiciliar per capita (média), renda domiciliar per capita (mediana).",
+  "diferenca_pp": -1.85,
+  "comparacao_esperado": "Caxias do Sul (RS) realiza 9,0% no critério ANEEL; pelo perfil, o modelo esperaria 10,8%. Abaixo do esperado em 1,8 p.p.: há espaço que os fatores medidos não explicam.",
+  "leitura": "Caxias do Sul (RS) realiza 9,0% no critério ANEEL; pelo perfil, o modelo esperaria 10,8%. Abaixo do esperado em 1,8 p.p.: há espaço que os fatores medidos não explicam. O que mais puxa a taxa para baixo (aumenta o gap): densidade demográfica (−7,7 p.p.), agropecuária (−3,8 p.p.) e população (−1,5 p.p.). O que mais puxa a taxa para cima (reduz o gap): renda (+11,0 p.p.).",
   "aviso_visao": "As contribuições SHAP vêm do modelo treinado na visão corrigida, o único com explicação por município. ...",
+  "puxam_para_baixo": ["Densidade demográfica", "Agropecuária", "População"],
+  "puxam_para_cima": ["Renda"],
+  "grupos": [
+    {
+      "grupo": "renda",
+      "rotulo": "Renda",
+      "fatores": ["renda_domiciliar_pc_media", "renda_domiciliar_pc_mediana"],
+      "contribuicao": 0.1095,
+      "contribuicao_pp": 10.95,
+      "efeito": "eleva"
+    },
+    {"grupo": "log_densidade_hab_km2", "rotulo": "Densidade demográfica", "contribuicao_pp": -7.71, "efeito": "reduz", "...": "..."}
+  ],
   "fatores": [
     {
       "fator": "log_densidade_hab_km2",
+      "grupo": "log_densidade_hab_km2",
       "rotulo": "Densidade demográfica",
+      "rotulo_no_grupo": "Densidade demográfica",
       "valor": 280.52,
       "valor_texto": "280,5 hab/km²",
       "contribuicao": -0.0771,
@@ -161,13 +185,15 @@ curl "http://127.0.0.1:8000/potencial/explicacao/4305108?visao=aneel"
       "efeito": "reduz",
       "frase": "Densidade demográfica, 280,5 hab/km²: reduz a taxa prevista em 7,7 p.p."
     },
-    {"fator": "renda_domiciliar_pc_media", "contribuicao_pp": 5.57, "efeito": "eleva", "...": "..."}
+    {"fator": "renda_domiciliar_pc_media", "grupo": "renda", "rotulo_no_grupo": "Renda · média", "contribuicao_pp": 5.57, "efeito": "eleva", "...": "..."}
   ],
   "ranking_global_visao": ["Densidade demográfica", "Renda domiciliar per capita (média)", "Renda domiciliar per capita (mediana)", "Peso da agropecuária na economia (VAB)", "Irradiação solar"]
 }
 ```
 
-Caxias do Sul não é atendida pela COPEL-DIS nem tem registros sem fonte: a taxa é a mesma nas três visões. A visão muda só `aviso_visao` e `ranking_global_visao`.
+Caxias do Sul não é atendida pela COPEL-DIS nem tem registros sem fonte: a taxa é a mesma nas três visões. A visão muda só `aviso_visao`, `ranking_global_visao` e o trecho "no critério ANEEL" das frases.
+
+Em `/potencial/uf`, `principais_fatores` traz os três grupos de maior efeito absoluto na UF, com o sinal: `"Renda (+8,6 p.p.)"`.
 
 ## Modelos de linguagem (TP4)
 

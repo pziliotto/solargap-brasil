@@ -140,7 +140,7 @@ FATORES = {
         "Peso da agropecuária na economia (VAB)", "pct_vab_agropecuaria", "{}%", 1
     ),
     "tarifa_b1_rs_mwh": Fator(
-        "Tarifa residencial de energia (B1)", "tarifa_b1_rs_mwh", "R$ {}/MWh"
+        "Tarifa de energia residencial B1", "tarifa_b1_rs_mwh", "R$ {}/MWh"
     ),
     "irradiacao_kwh_m2_dia": Fator(
         "Irradiação solar", "irradiacao_kwh_m2_dia", "{} kWh/m²/dia", 2
@@ -169,6 +169,59 @@ FATORES = {
     ),
 }
 COLUNAS_SHAP = [f"shap_{f}" for f in FATORES]
+
+# Famílias de variáveis que medem a mesma coisa por ângulos diferentes e,
+# correlacionadas, dividem o crédito do SHAP de forma arbitrária (renda média
+# e mediana: ρ = 0,98; mais de uma distribuidora e cooperativa: ρ = 0,84).
+# Como o SHAP é aditivo, a contribuição do grupo é a soma das contribuições.
+# Valor: (rótulo do grupo, {fator: rótulo do fator dentro do grupo}).
+GRUPOS = {
+    "renda": (
+        "Renda",
+        {
+            "renda_domiciliar_pc_media": "média",
+            "renda_domiciliar_pc_mediana": "mediana",
+        },
+    ),
+    "agropecuaria": (
+        "Agropecuária",
+        {
+            "pct_vab_agropecuaria": "peso na economia (VAB)",
+            "pct_area_agropecuaria": "área ocupada",
+        },
+    ),
+    "distribuicao": (
+        "Distribuidora e cooperativa",
+        {
+            "multi_distribuidora": "mais de uma distribuidora",
+            "cooperativa": "cooperativa de eletrificação",
+        },
+    ),
+}
+# Fatores fora das famílias formam um grupo próprio, com o mesmo rótulo.
+GRUPO_DO_FATOR = {
+    fator: grupo for grupo, (_, membros) in GRUPOS.items() for fator in membros
+} | {
+    fator: fator for fator in FATORES if not any(fator in m for _, m in GRUPOS.values())
+}
+
+# Na leitura em linguagem simples: até 3 grupos por sinal, com pelo menos 1 p.p.
+N_GRUPOS_LEITURA = 3
+LIMIAR_LEITURA_PP = 1.0
+# Diferença observada x prevista abaixo disso (em p.p.) é "em linha".
+TOLERANCIA_ESPERADO_PP = 0.5
+
+
+def rotulo_grupo(grupo: str) -> str:
+    return GRUPOS[grupo][0] if grupo in GRUPOS else FATORES[grupo].rotulo
+
+
+def rotulo_no_grupo(fator: str) -> str:
+    """Rótulo do fator para o waterfall: 'Renda · média' ou o rótulo próprio."""
+    grupo = GRUPO_DO_FATOR[fator]
+    if grupo in GRUPOS:
+        return f"{GRUPOS[grupo][0]} · {GRUPOS[grupo][1][fator]}"
+    return FATORES[fator].rotulo
 
 
 class RecorteInexistente(LookupError):
@@ -338,7 +391,8 @@ def tabela_uf(base: BasePotencial, visao: str = VISAO_PADRAO, n_fatores: int = 3
                 **_totais(grupo),
                 "n_municipios_taxa_acima_1": int((grupo["taxa_visao"] > 1).sum()),
                 "principais_fatores": [
-                    f["rotulo"] for f in explicacao["fatores"][:n_fatores]
+                    f"{g['rotulo']} ({_pp(g['contribuicao_pp'])})"
+                    for g in explicacao["grupos"][:n_fatores]
                 ],
             }
         )
@@ -450,7 +504,9 @@ def explicar(
         fatores.append(
             {
                 "fator": chave,
+                "grupo": GRUPO_DO_FATOR[chave],
                 "rotulo": fator.rotulo,
+                "rotulo_no_grupo": rotulo_no_grupo(chave),
                 "valor": valor,
                 "valor_texto": valor_texto,
                 "contribuicao": contribuicao,
@@ -464,15 +520,29 @@ def explicar(
         )
     fatores.sort(key=lambda f: abs(f["contribuicao"]), reverse=True)
 
+    grupos = agrupar(fatores)
     valor_base = float(linha["valor_base"])
     previsao = float(linha["previsao"])
-    principais = [f["rotulo"].lower() for f in fatores[:3]]
     taxa = resumo["taxa_realizacao"]
-    leitura = (
-        f"Em {nome}, a taxa de realização observada é de {_pct(taxa)} "
-        f"{NA_VISAO[visao]}. O modelo prevê {_pct(previsao)}, contra {_pct(valor_base)} na "
-        f"média dos municípios. O gap está associado, do maior para o menor efeito, "
-        f"a: {', '.join(principais)}."
+    diferenca_pp = (taxa - previsao) * 100
+    para_baixo = _destaques(grupos, "reduz")
+    para_cima = _destaques(grupos, "eleva")
+    comparacao = (
+        f"{nome} realiza {_pct(taxa)} {NA_VISAO[visao]}; pelo perfil, o modelo "
+        f"esperaria {_pct(previsao)}. {_frase_esperado(diferenca_pp)}"
+    )
+    leitura = " ".join(
+        [
+            comparacao,
+            _frase_sinal(
+                para_baixo,
+                "O que mais puxa a taxa para baixo (aumenta o gap)",
+                "para baixo",
+            ),
+            _frase_sinal(
+                para_cima, "O que mais puxa a taxa para cima (reduz o gap)", "para cima"
+            ),
+        ]
     )
     aviso = (
         None
@@ -494,11 +564,89 @@ def explicar(
         "taxa_prevista": previsao,
         "valor_base": valor_base,
         "usado_no_treino": usado_no_treino,
+        "diferenca_pp": diferenca_pp,
+        "comparacao_esperado": comparacao,
         "leitura": leitura,
         "aviso_visao": aviso,
+        "puxam_para_baixo": [g["rotulo"] for g in para_baixo],
+        "puxam_para_cima": [g["rotulo"] for g in para_cima],
+        "grupos": grupos,
         "fatores": fatores,
         "ranking_global_visao": ranking_global(base, visao),
     }
+
+
+def agrupar(fatores: list[dict]) -> list[dict]:
+    """Soma as contribuições SHAP por família (SHAP é aditivo), do maior para
+    o menor efeito absoluto."""
+    somas: dict[str, float] = {}
+    membros: dict[str, list[str]] = {}
+    for fator in fatores:
+        grupo = fator["grupo"]
+        somas[grupo] = somas.get(grupo, 0.0) + fator["contribuicao"]
+        membros.setdefault(grupo, []).append(fator["fator"])
+    grupos = [
+        {
+            "grupo": grupo,
+            "rotulo": rotulo_grupo(grupo),
+            "fatores": membros[grupo],
+            "contribuicao": soma,
+            "contribuicao_pp": soma * 100,
+            "efeito": "eleva" if soma >= 0 else "reduz",
+        }
+        for grupo, soma in somas.items()
+    ]
+    return sorted(grupos, key=lambda g: abs(g["contribuicao"]), reverse=True)
+
+
+def _destaques(grupos: list[dict], efeito: str) -> list[dict]:
+    """Até N_GRUPOS_LEITURA grupos do sinal pedido, com |efeito| >= LIMIAR_LEITURA_PP."""
+    return [
+        g
+        for g in grupos
+        if g["efeito"] == efeito and abs(g["contribuicao_pp"]) >= LIMIAR_LEITURA_PP
+    ][:N_GRUPOS_LEITURA]
+
+
+def _pp(valor_pp: float) -> str:
+    sinal = "+" if valor_pp >= 0 else "−"
+    return f"{sinal}{abs(valor_pp):.1f} p.p.".replace(".", ",", 1)
+
+
+def _minuscula(rotulo: str) -> str:
+    """'Renda' -> 'renda'; siglas no início (ex.: 'ICMS') ficam como estão."""
+    if len(rotulo) > 1 and rotulo[1].isupper():
+        return rotulo
+    return rotulo[0].lower() + rotulo[1:]
+
+
+def _lista(itens: list[str]) -> str:
+    return itens[0] if len(itens) == 1 else f"{', '.join(itens[:-1])} e {itens[-1]}"
+
+
+def _frase_sinal(grupos: list[dict], abertura: str, direcao: str) -> str:
+    if not grupos:
+        limiar = f"{LIMIAR_LEITURA_PP:.0f}"
+        return f"Nenhum fator medido puxa a taxa {direcao} mais de {limiar} p.p."
+    partes = [
+        f"{_minuscula(g['rotulo'])} ({_pp(g['contribuicao_pp'])})" for g in grupos
+    ]
+    return f"{abertura}: {_lista(partes)}."
+
+
+def _frase_esperado(diferenca_pp: float) -> str:
+    distancia = f"{abs(diferenca_pp):.1f}".replace(".", ",")
+    if diferenca_pp <= -TOLERANCIA_ESPERADO_PP:
+        return (
+            f"Abaixo do esperado em {distancia} p.p.: há espaço que os fatores "
+            "medidos não explicam."
+        )
+    if diferenca_pp >= TOLERANCIA_ESPERADO_PP:
+        return (
+            f"Acima do esperado em {distancia} p.p.: aproveita mais do que o perfil "
+            "sugere."
+        )
+    return "Em linha com o esperado pelo perfil."
 
 
 def ranking_global(base: BasePotencial, visao: str, n: int = 5) -> list[str]:

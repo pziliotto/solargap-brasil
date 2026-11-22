@@ -80,6 +80,11 @@ def pct(valor: float, casas: int = 1) -> str:
     return "—" if valor is None or pd.isna(valor) else f"{fmt(valor * 100, casas)}%"
 
 
+def pp(valor_pp: float) -> str:
+    """Pontos percentuais com sinal: +5,6 p.p. / −7,7 p.p."""
+    return f"{'+' if valor_pp >= 0 else '−'}{fmt(abs(valor_pp), 1)} p.p."
+
+
 def pct_sinal(valor: float) -> str:
     return f"{'+' if valor >= 0 else '−'}{fmt(abs(valor) * 100, 1)}%"
 
@@ -173,8 +178,34 @@ aba_diagnostico, aba_cenarios, aba_metodologia = st.tabs(
 
 with aba_diagnostico:
     explicacao = dados.explicacao_potencial(base, visao, uf, cod_ibge)
-    st.markdown("#### A que o gap está associado")
-    st.markdown(explicacao["leitura"])
+    st.markdown("#### O que explica a taxa")
+    e1, e2, e3 = st.columns([1, 1, 2])
+    e1.metric("Realiza", pct(explicacao["taxa_observada"]))
+    e2.metric(
+        "Esperado pelo perfil",
+        pct(explicacao["taxa_prevista"]),
+        help="Previsão do modelo a partir dos fatores medidos (renda, densidade, "
+        "tarifa, irradiação etc.).",
+    )
+    e3.markdown(explicacao["comparacao_esperado"])
+
+    grupos = explicacao["grupos"]
+    baixo, cima = st.columns(2)
+    for coluna, efeito, titulo in (
+        (baixo, "reduz", "🔻 Puxam a taxa para baixo (aumentam o gap)"),
+        (cima, "eleva", "🔺 Puxam a taxa para cima (reduzem o gap)"),
+    ):
+        with coluna:
+            st.markdown(f"**{titulo}**")
+            do_sinal = [
+                g
+                for g in grupos
+                if g["efeito"] == efeito and abs(g["contribuicao_pp"]) >= 0.05
+            ]
+            if not do_sinal:
+                st.caption("Nenhum fator medido.")
+            for g in do_sinal:
+                st.markdown(f"- {g['rotulo']}: **{pp(g['contribuicao_pp'])}**")
     if explicacao["aviso_visao"]:
         st.info(
             "As contribuições abaixo vêm do modelo treinado na visão corrigida, o único "
@@ -193,7 +224,7 @@ with aba_diagnostico:
     resto = sum(f["contribuicao"] for f in fatores[N_FATORES_WATERFALL:])
     rotulos = [
         "Média dos municípios",
-        *[f"{f['rotulo']} ({f['valor_texto']})" for f in principais],
+        *[f"{f['rotulo_no_grupo']} ({f['valor_texto']})" for f in principais],
         "Demais fatores",
         "Taxa prevista",
     ]
@@ -205,7 +236,7 @@ with aba_diagnostico:
     ]
     textos = [
         f"{fmt(valores[0], 1)}%",
-        *[f"{'+' if v >= 0 else '−'}{fmt(abs(v), 1)} p.p." for v in valores[1:-1]],
+        *[pp(v) for v in valores[1:-1]],
         f"{fmt(valores[-1], 1)}%",
     ]
     figura = go.Figure(
@@ -232,14 +263,21 @@ with aba_diagnostico:
     )
     st.plotly_chart(figura, width="stretch")
     st.caption(
-        "Azul: o fator eleva a taxa prevista (reduz o gap). Vermelho: reduz a taxa "
-        "(amplia o gap). Valores em pontos percentuais em relação à média dos "
-        "municípios. Na UF e no Brasil, média ponderada por domicílios. "
-        "**Associação, não causalidade.**"
+        "Cada variável do modelo, com o rótulo do grupo. Azul: eleva a taxa prevista "
+        "(reduz o gap). Vermelho: reduz a taxa (aumenta o gap). Pontos percentuais em "
+        "relação à média dos municípios; na UF e no Brasil, média ponderada por "
+        "domicílios. Os grupos acima somam as variáveis da mesma família (o SHAP é "
+        "aditivo). **Associação, não causalidade.**"
     )
-    with st.expander("Os fatores em frases"):
-        for f in fatores:
-            st.markdown(f"- {f['frase']}")
+    with st.expander("Detalhe por variável"):
+        for g in grupos:
+            membros = [f for f in fatores if f["grupo"] == g["grupo"]]
+            if len(membros) > 1:
+                st.markdown(f"**{g['rotulo']}: {pp(g['contribuicao_pp'])}**")
+                for f in membros:
+                    st.markdown(f"  - {f['frase']}")
+            else:
+                st.markdown(f"- {membros[0]['frase']}")
 
     st.markdown("#### Mapa da taxa de realização")
     if uf is None:
@@ -305,7 +343,9 @@ with aba_diagnostico:
             "Irradiação (kWh/m²/dia)": tabela["irradiacao_kwh_m2_dia"],
             "% realizado": tabela["taxa_realizacao"] * 100,
             "Gap (GWh/ano)": tabela["gap_mwh_ano"] / 1e3,
-            "Principais fatores": tabela["principais_fatores"].map(" · ".join),
+            "Principais fatores (efeito na taxa)": tabela["principais_fatores"].map(
+                " · ".join
+            ),
         }
     )
     estilo = (
@@ -330,8 +370,9 @@ with aba_diagnostico:
         )
     st.dataframe(estilo, hide_index=True, width="stretch", height=38 * 28)
     st.caption(
-        "Principais fatores: as três maiores contribuições SHAP (em valor absoluto) da UF, "
-        "elevando ou reduzindo a taxa. Gap em GWh/ano."
+        "Principais fatores: os três grupos de maior contribuição SHAP (em valor "
+        "absoluto) da UF. '+' eleva a taxa (reduz o gap); '−' reduz a taxa (aumenta o "
+        "gap). Gap em GWh/ano."
     )
     st.download_button(
         "Baixar tabela por UF (CSV)",

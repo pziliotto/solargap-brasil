@@ -519,7 +519,10 @@ class PotencialUF(ResumoPotencial):
     uf: str
     regiao: str
     principais_fatores: list[str] = Field(
-        description="Três fatores de maior contribuição SHAP absoluta na UF."
+        description=(
+            "Três grupos de fatores de maior contribuição SHAP absoluta na UF, com o "
+            "sinal: '+' eleva a taxa (reduz o gap), '−' reduz a taxa (aumenta o gap)."
+        )
     )
 
 
@@ -548,7 +551,9 @@ class PotencialMunicipio(ResumoPotencial):
 
 class ContribuicaoFator(BaseModel):
     fator: str = Field(description="Nome técnico do fator no modelo.")
+    grupo: str = Field(description="Família do fator (chave de ExplicacaoPotencial.grupos).")
     rotulo: str
+    rotulo_no_grupo: str = Field(description="Rótulo com o grupo, ex.: 'Renda · média'.")
     valor: float | None = Field(
         description="Valor do fator. Na UF e no Brasil, média ponderada por domicílios."
     )
@@ -557,6 +562,19 @@ class ContribuicaoFator(BaseModel):
     contribuicao_pp: float = Field(description="Contribuição em pontos percentuais.")
     efeito: Literal["eleva", "reduz"]
     frase: str
+
+
+class GrupoFatores(BaseModel):
+    grupo: str
+    rotulo: str
+    fatores: list[str] = Field(description="Fatores somados neste grupo.")
+    contribuicao: float = Field(
+        description="Soma das contribuições SHAP dos fatores (o SHAP é aditivo)."
+    )
+    contribuicao_pp: float
+    efeito: Literal["eleva", "reduz"] = Field(
+        description="eleva: puxa a taxa para cima (reduz o gap); reduz: o contrário."
+    )
 
 
 class ExplicacaoPotencial(BaseModel):
@@ -573,10 +591,30 @@ class ExplicacaoPotencial(BaseModel):
     usado_no_treino: bool = Field(
         description="False para os municípios com y > x, fora do treino."
     )
-    leitura: str = Field(description="Resumo em linguagem simples.")
+    diferenca_pp: float = Field(
+        description="Taxa observada − prevista, em p.p. Negativa: abaixo do esperado."
+    )
+    comparacao_esperado: str = Field(
+        description="Observada x esperada pelo perfil, em linguagem simples."
+    )
+    leitura: str = Field(
+        description="Resumo em linguagem simples: comparação e grupos separados por sinal."
+    )
     aviso_visao: str | None
+    puxam_para_baixo: list[str] = Field(
+        description="Grupos que mais reduzem a taxa (aumentam o gap), até 3, com ≥ 1 p.p."
+    )
+    puxam_para_cima: list[str] = Field(
+        description="Grupos que mais elevam a taxa (reduzem o gap), até 3, com ≥ 1 p.p."
+    )
+    grupos: list[GrupoFatores] = Field(
+        description="Fatores da mesma família somados, do maior para o menor efeito absoluto."
+    )
     fatores: list[ContribuicaoFator] = Field(
-        description="Do maior para o menor efeito absoluto. Associação, não causalidade."
+        description=(
+            "Valores individuais, do maior para o menor efeito absoluto. "
+            "Associação, não causalidade."
+        )
     )
     ranking_global_visao: list[str] = Field(
         description="Fatores mais importantes no modelo ajustado à visão pedida."

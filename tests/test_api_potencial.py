@@ -58,6 +58,17 @@ def test_explicacao_igual_ao_servico(cliente):
         servico["fatores"][0]["contribuicao_pp"]
     )
     assert corpo["aviso_visao"] is None
+    # Grupos (campo novo) e valores individuais mantidos
+    assert len(corpo["fatores"]) == 12
+    renda = next(g for g in corpo["grupos"] if g["grupo"] == "renda")
+    assert renda["contribuicao_pp"] == pytest.approx(
+        sum(f["contribuicao_pp"] for f in corpo["fatores"] if f["grupo"] == "renda")
+    )
+    assert corpo["puxam_para_cima"] == ["Renda"]
+    assert (
+        corpo["diferenca_pp"] < 0
+        and "Abaixo do esperado" in corpo["comparacao_esperado"]
+    )
     outra = cliente.get(f"/potencial/explicacao/{CAXIAS}?visao=conservadora").json()
     assert outra["aviso_visao"] and outra["visao_modelo"] == "corrigida"
 

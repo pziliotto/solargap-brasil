@@ -111,8 +111,94 @@ def test_explicacao_municipio_ordenada_e_aditiva(base):
         primeiro["fator"] == "log_densidade_hab_km2" and primeiro["efeito"] == "reduz"
     )
     assert primeiro["frase"].startswith("Densidade demográfica, 280,5 hab/km²: reduz")
-    assert "densidade demográfica" in explicacao["leitura"]
+    assert primeiro["rotulo_no_grupo"] == "Densidade demográfica"
     assert explicacao["aviso_visao"] is None
+
+
+def test_grupos_somam_as_contribuicoes_da_familia(base):
+    explicacao = potencial.explicar(base, cod_ibge=CAXIAS)
+    por_fator = {f["fator"]: f["contribuicao"] for f in explicacao["fatores"]}
+    grupos = {g["grupo"]: g for g in explicacao["grupos"]}
+    renda = grupos["renda"]
+    assert renda["rotulo"] == "Renda"
+    assert set(renda["fatores"]) == {
+        "renda_domiciliar_pc_media",
+        "renda_domiciliar_pc_mediana",
+    }
+    assert renda["contribuicao"] == pytest.approx(
+        por_fator["renda_domiciliar_pc_media"]
+        + por_fator["renda_domiciliar_pc_mediana"]
+    )
+    assert renda["contribuicao_pp"] == pytest.approx(10.95, abs=0.01)
+    assert grupos["agropecuaria"]["contribuicao"] == pytest.approx(
+        por_fator["pct_vab_agropecuaria"] + por_fator["pct_area_agropecuaria"]
+    )
+    # Cada fator está em exatamente um grupo, e a soma dos grupos é a de todos
+    assert sorted(f for g in explicacao["grupos"] for f in g["fatores"]) == sorted(
+        por_fator
+    )
+    assert sum(g["contribuicao"] for g in explicacao["grupos"]) == pytest.approx(
+        sum(por_fator.values())
+    )
+    assert [abs(g["contribuicao"]) for g in explicacao["grupos"]] == sorted(
+        (abs(g["contribuicao"]) for g in explicacao["grupos"]), reverse=True
+    )
+    rotulos = {f["fator"]: f["rotulo_no_grupo"] for f in explicacao["fatores"]}
+    assert rotulos["renda_domiciliar_pc_media"] == "Renda · média"
+
+
+def test_leitura_separa_os_fatores_pelo_sinal(base):
+    explicacao = potencial.explicar(base, cod_ibge=CAXIAS)
+    leitura = explicacao["leitura"]
+    assert (
+        "O que mais puxa a taxa para baixo (aumenta o gap): densidade demográfica "
+        "(−7,7 p.p.)" in leitura
+    )
+    assert (
+        "O que mais puxa a taxa para cima (reduz o gap): renda (+11,0 p.p.)." in leitura
+    )
+    assert explicacao["puxam_para_cima"] == ["Renda"]
+    assert explicacao["puxam_para_baixo"][0] == "Densidade demográfica"
+    # Nenhum fator de contribuição positiva é descrito como associado ao gap
+    assert "associad" not in leitura
+    trecho_baixo = leitura.split("para baixo")[1].split("para cima")[0]
+    assert "renda" not in trecho_baixo
+
+
+@pytest.mark.parametrize("kwargs", [{"cod_ibge": "4118204"}, {"uf": "PR"}, {}])
+def test_grupos_de_cada_lado_tem_o_sinal_certo(base, kwargs):
+    explicacao = potencial.explicar(base, **kwargs)
+    grupos = {g["rotulo"]: g for g in explicacao["grupos"]}
+    assert all(grupos[r]["contribuicao"] < 0 for r in explicacao["puxam_para_baixo"])
+    assert all(grupos[r]["contribuicao"] > 0 for r in explicacao["puxam_para_cima"])
+    assert len(explicacao["puxam_para_baixo"]) <= 3
+    assert len(explicacao["puxam_para_cima"]) <= 3
+
+
+def test_comparacao_com_o_esperado(base):
+    caxias = potencial.explicar(base, cod_ibge=CAXIAS)
+    assert caxias["diferenca_pp"] == pytest.approx(
+        (caxias["taxa_observada"] - caxias["taxa_prevista"]) * 100
+    )
+    assert caxias["comparacao_esperado"].startswith(
+        "Caxias do Sul (RS) realiza 9,0% na visão corrigida; pelo perfil, o modelo "
+        "esperaria 10,8%. Abaixo do esperado"
+    )
+    assert (
+        "há espaço que os fatores medidos não explicam" in caxias["comparacao_esperado"]
+    )
+    assert caxias["leitura"].startswith(caxias["comparacao_esperado"])
+    assert "Acima do esperado" in potencial._frase_esperado(2.0)
+    assert potencial._frase_esperado(0.3) == "Em linha com o esperado pelo perfil."
+
+
+def test_principais_fatores_da_uf_trazem_o_sinal(base):
+    tabela = potencial.tabela_uf(base).set_index("uf")
+    rs = tabela.loc["RS", "principais_fatores"]
+    assert rs[0] == "Renda (+8,6 p.p.)"
+    assert all(
+        f.endswith(" p.p.)") for linha in tabela["principais_fatores"] for f in linha
+    )
 
 
 def test_explicacao_uf_reproduz_shap_uf(base):
