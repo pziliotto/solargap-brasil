@@ -88,11 +88,32 @@ data/raw/*
 !data/raw/demografico_uf_2022.json
 !data/raw/demografico_municipio_2022.json
 
+# IBGE — domicílios particulares permanentes ocupados por município (TP4.5,
+# SIDRA 4712, ~1.9 MB). Fica em subpasta: libera a pasta, ignora o conteúdo
+# e reinclui só o JSON de domicílios.
+!data/raw/ibge/
+data/raw/ibge/*
+!data/raw/ibge/domicilios_municipio_2022.json
+
+# IBGE — fatores municipais do Censo 2022 (TP4.5, Tarefa 3), SIDRA view=flat:
+# 4714 (população, área, densidade, ~3.2 MB), 9923 (população por situação do
+# domicílio, ~3.3 MB) e 10295 (rendimento domiciliar per capita, ~5.5 MB).
+# A base do PIB dos Municípios (pib_municipios/, ~21 MB) segue ignorada.
+!data/raw/ibge/populacao_area_densidade_municipio_2022.json
+!data/raw/ibge/populacao_situacao_municipio_2022.json
+!data/raw/ibge/renda_domiciliar_pc_municipio_2022.json
+
 # ANEEL — base completa tem ~103 MB e estoura o limite de 100 MB do
 # GitHub. Só a amostra usada pelo app demo é versionada.
 # Para obter a base completa: python -m src.data_acquisition.aneel
 !data/raw/amostra_*.parquet
 !data/raw/amostra_*.csv
+
+# NASA POWER (TP4.5) — cache de um JSON por célula de 1° (~600 arquivos).
+# Reproduzível e retomável: python -m src.data_acquisition.coletor_nasa_power
+# Já coberto por data/raw/*; a regra explícita impede que uma futura exceção
+# com "!" volte a versionar o cache por engano.
+data/raw/nasa_power/
 
 # ── Camada Silver (interim) ──
 # Sempre reproduzível a partir do raw + scripts de tratamento.
@@ -108,6 +129,10 @@ data/interim/*
 # Exceção: notícias recebidas pela API são estado de execução, não dado do projeto.
 data/external/noticias_enviadas.csv
 
+# ═══════════════════ Modelos treinados ═══════════════════
+# Reproduzíveis a partir das Gold com semente fixa: python -m src.potencial.modelo
+models/
+
 # ═══════════════════ Testes e lint ═══════════════════
 .pytest_cache/
 .ruff_cache/
@@ -119,6 +144,9 @@ logs/
 # ═══════════════════ OS ═══════════════════
 .DS_Store
 Thumbs.db
+
+# Travas de edição do LibreOffice (arquivo aberto no editor)
+.~lock.*#
 
 # ═══════════════════ Outputs Gerados ═══════════════════
 outputs/quality_reports/
@@ -196,6 +224,8 @@ soupsieve==2.9.2
 bleach==6.4.0
 defusedxml==0.7.1
 lxml==6.0.0
+# robots.txt conforme a RFC 9309 (curingas * e $), usado pelo Navegador
+protego==0.7.0
 
 # ASGI / Servidor Web
 starlette==1.3.1
@@ -300,6 +330,29 @@ pytest==9.1.1
 iniconfig==2.3.1
 pluggy==1.7.0
 ruff==0.17.1
+
+# Geoespacial (TP4.5) — malha municipal do IBGE via geobr
+# duckdb fica em 1.x: o geobr 2.1.1 usa Relation.fetchone(), removido no duckdb 2.0
+geobr==2.1.1
+geopandas==1.2.0
+shapely==2.2.0
+pyogrio==0.13.0
+pyproj==3.8.0
+duckdb==1.5.6
+
+# Leitura de planilhas .xlsx (TP4.5: PIB dos Municípios e MapBiomas)
+openpyxl==3.1.5
+et-xmlfile==2.0.0
+
+# Modelo explicativo e SHAP (TP4.5, Tarefa 4)
+scikit-learn==1.9.1
+lightgbm==4.7.0
+shap==0.54.1
+scipy==1.18.1
+joblib==1.6.0
+threadpoolctl==3.8.0
+cloudpickle==3.1.3
+slicer==0.0.8
 
 # IA local (TP4) — modelos de linguagem com Transformers/PyTorch
 # ATENÇÃO (Windows + GPU NVIDIA): instale o torch ANTES deste arquivo, pelo

@@ -88,9 +88,13 @@ logs/
 .DS_Store
 Thumbs.db
 
+# Travas de edição do LibreOffice (arquivo aberto no editor)
+.~lock.*#
+
 # ═══════════════════ Outputs Gerados ═══════════════════
 outputs/quality_reports/
 
 # ═══════════════════ Environment variables ═══════════════════
 .env
 .env.local
+
