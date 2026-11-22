@@ -232,7 +232,11 @@ def baixar_celula(
 
         logging.warning(
             "Célula (%.1f, %.1f) — falha %d/%d: %s",
-            lat, lon, tentativa, TENTATIVAS, ultimo_erro,
+            lat,
+            lon,
+            tentativa,
+            TENTATIVAS,
+            ultimo_erro,
         )
         if tentativa < TENTATIVAS:
             time.sleep(calcular_espera_backoff(tentativa, ESPERA_BASE))
@@ -302,15 +306,21 @@ def coletar_nasa_power() -> dict[str, int]:
     celulas = celulas_unicas(pontos)
     logging.info(
         "%d municípios em %d células de %.0f° (%s a %s)",
-        len(pontos), len(celulas), config.RESOLUCAO_GRAUS_POWER,
-        min(config.ANOS_BASE), max(config.ANOS_BASE),
+        len(pontos),
+        len(celulas),
+        config.RESOLUCAO_GRAUS_POWER,
+        min(config.ANOS_BASE),
+        max(config.ANOS_BASE),
     )
 
     contagem = coletar_celulas(celulas)
     duracao = time.perf_counter() - inicio
     logging.info(
         "Coleta concluída em %.1fs — %d baixadas, %d do cache. Log: %s",
-        duracao, contagem["baixada"], contagem["cache"], caminho_log,
+        duracao,
+        contagem["baixada"],
+        contagem["cache"],
+        caminho_log,
     )
     return {**contagem, "celulas": len(celulas), "segundos": round(duracao, 1)}
 

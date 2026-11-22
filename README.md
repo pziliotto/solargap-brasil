@@ -229,8 +229,14 @@ python -m src.preparacao.construir_gold         # camada Gold
 - [x] **TP2** — Camadas Silver/Gold, web scraping (BeautifulSoup), interface com cache, estado de sessão e upload
 - [x] **TP3** — App multipáginas, API própria (FastAPI), novas fontes (Agência Gov, CONFAZ), KPI de crescimento, testes
 - [x] **TP4** — Modelos de linguagem locais (HuggingFace/Transformers): benchmark, resumo e relevância do corpus, `POST /processar_texto` com erros 503/504, Laboratório de IA
-- [x] **TP4.5** — Potencial solar municipal: potencial x produção, fatores (SHAP), cenários de irradiação 2030–2050 (NEX-GDDP-CMIP6), página Potencial Solar e rotas `/potencial`
-- [ ] **TP5** — Agente inteligente de recomendação usando a API como ferramenta e dashboard final
+- [x] **TP4.5** — Potencial solar municipal ([`docs/potencial/README.md`](docs/potencial/README.md))
+  - Potencial técnico municipal (x), geração estimada (y), gap e taxa de realização (NASA POWER + ANEEL + Censo 2022)
+  - Fatores explicativos, modelo com validação agrupada por UF e SHAP
+  - Base ANEEL 10/2026 com o tratamento da anomalia dos 75 kW da COPEL-DIS (validada contra o painel oficial) e as três visões (corrigida, ANEEL, conservadora)
+  - Benchmark de relevância v2: corpus de 553 notícias, ANEEL e MME no gov.br, robots.txt com protego, relevância híbrida
+  - Projeção 2030–2050 com NEX-GDDP-CMIP6: o recurso solar é estável até 2050 (+0,2% a +0,6% no potencial do Brasil); **o gap é socioeconômico, não físico**
+  - Página Potencial Solar e rotas `/potencial`
+- [ ] **TP5** — Agente inteligente que consulta essas tabelas (indicadores, potencial, fatores e cenários, via API) para responder perguntas de gestão e de investimento
 
 ---
 

@@ -64,7 +64,20 @@ Aceitos por `/ufs`, `/ufs/{sigla}`, `/ranking`, `/series/{sigla}` e `/oportunida
 
 `/ufs/{sigla}` e `/oportunidades` aceitam também `ano_base` e `ano_final` (janela do crescimento; padrão 2022–2025).
 
-As rotas de indicadores seguem com o booleano `incluir_imputados` (duas visões). A terceira visão, o limite conservador, está nas rotas `/potencial`, pelo parâmetro `visao`.
+### Visão dos dados: dois parâmetros na API
+
+A API tem hoje **dois parâmetros** para a visão da base ANEEL. O painel já usa as três visões em todas as páginas.
+
+| Rotas | Parâmetro | Valores | Padrão | Visões |
+|---|---|---|---|---|
+| `/ufs`, `/ufs/{sigla}`, `/ranking`, `/series/{sigla}`, `/oportunidades` (query) e `POST /comparacoes` (campo do corpo) | `incluir_imputados` (booleano) | `true` · `false` | `true` | 2: corrigida e ANEEL |
+| `/potencial/*` (TP4.5) | `visao` (texto) | `corrigida` · `aneel` · `conservadora` | `corrigida` | 3 |
+
+Correspondência: `incluir_imputados=true` equivale a `visao=corrigida`, e `incluir_imputados=false` a `visao=aneel`. **O limite conservador não está disponível nas rotas de indicadores.**
+
+Os erros também diferem. `incluir_imputados` aceita só booleano, e outro valor responde 422 na validação da FastAPI. `visao` fora da lista também responde 422, pelo enum `NomeVisao`.
+
+O cálculo já está unificado: `src/servicos/indicadores.py` recebe a visão como texto (`corrigida`, `aneel` ou `conservadora`) e aceita o booleano antigo. A diferença está só na assinatura das rotas, mantida para não quebrar clientes do TP3 e do TP4. Ver a pendência em [Pendências](#pendências).
 
 ### Potencial solar (TP4.5)
 
@@ -251,6 +264,10 @@ Todas as respostas de erro têm o formato `{"detail": "..."}`.
 | 503 | Dados ou modelo indisponíveis | Arquivo obrigatório da Gold ausente (nas rotas `/potencial`, a Gold de potencial); modelo de linguagem **carregando** (com `Retry-After: 30`), **não carregado** ou com **falha de carga** (o `detail` traz o erro). Uma falha em um modelo não afeta as tarefas do outro |
 | 504 | Tempo esgotado | Inferência acima de `SOLARGAP_TIMEOUT_INFERENCIA` segundos |
 | 500 | Erro inesperado | Registrado no log; o cliente recebe mensagem genérica, sem rastro de pilha |
+
+## Pendências
+
+- **Unificar o parâmetro de visão (TP5).** Acrescentar `visao` (`corrigida` | `aneel` | `conservadora`) às rotas de indicadores e a `POST /comparacoes`, com o mesmo enum `NomeVisao` das rotas `/potencial`. Manter `incluir_imputados` por uma versão como alias obsoleto (`deprecated` no OpenAPI); se os dois vierem juntos e divergirem, responder 400. Depois, remover o alias numa versão 2.0. Até lá, o limite conservador só existe nas rotas `/potencial` e no painel.
 
 ## Preparação para os próximos TPs
 

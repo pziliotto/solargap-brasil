@@ -124,7 +124,9 @@ def test_coleta_consulta_cada_celula_uma_vez_e_reusa_cache(
     assert not list(cache_temporario.glob("*.tmp"))
 
 
-def test_coleta_falha_alto_se_alguma_celula_ficar_sem_dado(cache_temporario, monkeypatch):
+def test_coleta_falha_alto_se_alguma_celula_ficar_sem_dado(
+    cache_temporario, monkeypatch
+):
     def sempre_falha(lat, lon, anos=config.ANOS_BASE):
         raise requests.exceptions.ConnectionError("sem rede")
 
@@ -173,7 +175,9 @@ class _RespostaFalsa:
 
     def raise_for_status(self):
         if self.status_code >= 400:
-            raise requests.exceptions.HTTPError(f"HTTP {self.status_code}", response=self)
+            raise requests.exceptions.HTTPError(
+                f"HTTP {self.status_code}", response=self
+            )
 
 
 class _SessaoFalsa:
@@ -188,7 +192,11 @@ class _SessaoFalsa:
 
 def test_retry_em_503_e_429_depois_sucesso(monkeypatch, payload_completo):
     sessao = _SessaoFalsa(
-        [_RespostaFalsa(503), _RespostaFalsa(429), _RespostaFalsa(200, payload_completo)]
+        [
+            _RespostaFalsa(503),
+            _RespostaFalsa(429),
+            _RespostaFalsa(200, payload_completo),
+        ]
     )
     esperas = []
     monkeypatch.setattr(power, "_sessao", lambda: sessao)
@@ -269,9 +277,7 @@ def test_media_ponderada_36_meses_reproduz_energia_do_periodo(payload_completo):
 
     dias_totais = sum(calendar.monthrange(a, m)[1] for a, m in serie.index)
     assert dias_totais == 1096  # 2024 é bissexto
-    energia = sum(
-        v * calendar.monthrange(a, m)[1] for (a, m), v in serie.items()
-    )
+    energia = sum(v * calendar.monthrange(a, m)[1] for (a, m), v in serie.items())
     assert media == pytest.approx(energia / dias_totais)
 
 
@@ -335,7 +341,9 @@ def test_ponto_representativo_fica_dentro_de_poligono_concavo():
     from shapely.geometry import Polygon
 
     # Polígono em "C": o centroide cai no vão, fora do município
-    formato_c = Polygon([(0, 0), (3, 0), (3, 1), (1, 1), (1, 2), (3, 2), (3, 3), (0, 3)])
+    formato_c = Polygon(
+        [(0, 0), (3, 0), (3, 1), (1, 1), (1, 2), (3, 2), (3, 3), (0, 3)]
+    )
     assert not formato_c.contains(formato_c.centroid)
 
     malha = gpd.GeoDataFrame(

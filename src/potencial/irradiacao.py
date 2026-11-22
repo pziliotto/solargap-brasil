@@ -220,7 +220,8 @@ def construir_irradiacao() -> pd.DataFrame:
     silver.to_parquet(config.ARQUIVO_IRRADIACAO, index=False)
     logging.info(
         "Validação OK — %d municípios gravados em %s",
-        len(silver), config.ARQUIVO_IRRADIACAO,
+        len(silver),
+        config.ARQUIVO_IRRADIACAO,
     )
     return silver
 

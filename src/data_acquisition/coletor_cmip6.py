@@ -199,8 +199,7 @@ def baixar(pedido: Pedido, pasta: Path | None = None) -> tuple[Path, int, float]
                 raise requests.HTTPError(f"HTTP {resposta.status_code}")
             resposta.raise_for_status()
             with open(temporario, "wb") as saida:
-                for bloco in resposta.iter_content(2**20):
-                    saida.write(bloco)
+                saida.writelines(resposta.iter_content(2**20))
             if not arquivo_valido(temporario):
                 raise ValueError("arquivo incompleto ou inválido")
             temporario.replace(destino)
