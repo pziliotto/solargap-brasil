@@ -115,6 +115,11 @@ data/raw/ibge/*
 # com "!" volte a versionar o cache por engano.
 data/raw/nasa_power/
 
+# NEX-GDDP-CMIP6 (TP4.5, Tarefa 6) — recortes do Brasil da variável rsds, um
+# NetCDF por modelo/cenário/ano (~19 MB cada, ~5,8 GB no total). Reproduzível:
+# python -m src.data_acquisition.coletor_cmip6
+data/raw/cmip6/
+
 # ── Camada Silver (interim) ──
 # Sempre reproduzível a partir do raw + scripts de tratamento.
 data/interim/*
@@ -343,6 +348,9 @@ duckdb==1.5.6
 # Leitura de planilhas .xlsx (TP4.5: PIB dos Municípios e MapBiomas)
 openpyxl==3.1.5
 et-xmlfile==2.0.0
+
+# Leitura dos recortes NetCDF4/HDF5 do NEX-GDDP-CMIP6 (TP4.5, Tarefa 6)
+h5py==3.16.0
 
 # Modelo explicativo e SHAP (TP4.5, Tarefa 4)
 scikit-learn==1.9.1

@@ -202,3 +202,16 @@ ARQUIVO_SHAP_WATERFALL = PASTA_DOCS_POTENCIAL / "shap_waterfall_caxias_do_sul.pn
 
 # Semente única de todo o modelo (folds, LightGBM, amostra de fundo do SHAP)
 SEMENTE = 42
+
+# ═══════════════════ Projeção da irradiação 2030–2050 (Tarefa 6) ═══════════════════
+
+# rsds do NEX-GDDP-CMIP6 em W/m² (média diária) -> kWh/m²/dia: x 24 h / 1000.
+W_M2_PARA_KWH_M2_DIA = 0.024
+PERIODO_HISTORICO_CMIP6 = (1995, 2014)  # inclusive
+JANELAS_PROJECAO = {"2030-2039": (2030, 2039), "2040-2050": (2040, 2050)}
+CENARIOS_PROJECAO = ("ssp245", "ssp585")
+LIMITE_ALERTA_DELTA = 0.10  # sanidade: variações acima de ±10% são relatadas
+
+ARQUIVO_DELTA_CELULAS = PASTA_INTERIM_POTENCIAL / "cmip6_delta_rsds_celulas.parquet"
+ARQUIVO_PROJECAO_MUNICIPAL = PASTA_PROCESSED / "projecao_irradiacao_municipal.parquet"
+ARQUIVO_PROJECAO_UF = PASTA_PROCESSED / "projecao_irradiacao_uf.parquet"

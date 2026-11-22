@@ -182,6 +182,134 @@ O sinal esperado é: mais renda e tarifa mais alta → mais adoção. Ele foi co
 
 O efeito positivo da tarifa se concentra no topo da escala. As contribuições acima de +0,10 (de +0,15 a +0,19) são os **141 municípios da EMT (MT)**, com tarifa média de R$ 857/MWh e taxa observada média de 0,48. Ali a tarifa funciona em parte como identificador da distribuidora e do estado, com o agronegócio e a alta adoção de MT. O sinal da tarifa deve ser lido com essa ressalva; ele não foi forçado.
 
+## Projeção 2030–2050
+
+**É um cenário com faixa de incerteza, não uma previsão.** Os números abaixo mostram quanto a irradiação de cada município mudaria se o clima seguisse cada trajetória de emissões, na leitura de cinco modelos climáticos. Não dizem o que vai acontecer. A faixa (mínimo e máximo entre os modelos) faz parte do resultado e precisa ser lida junto com a mediana.
+
+### Fonte
+
+- **Base:** NASA NEX-GDDP-CMIP6 v2.0 (Thrasher et al., 2022, *Scientific Data* 9, 262, [doi:10.1038/s41597-022-01393-4](https://doi.org/10.1038/s41597-022-01393-4); dataset [doi:10.7917/OFSG3345](https://doi.org/10.7917/OFSG3345)).
+- **Dados:** projeções diárias do CMIP6 com correção de viés e desagregação espacial (BCSD), em grade de 0,25°.
+- **Variável:** `rsds`, a radiação de onda curta incidente na superfície, em W/m². Multiplicada por 0,024, vira kWh/m²/dia, a mesma unidade do H da NASA POWER.
+- **Cenários:** SSP2-4.5 (intermediário) e SSP5-8.5 (emissões altas), contra o histórico de 1995–2014.
+- **Variante:** `r1i1p1f1`.
+
+### Modelos
+
+Os cinco modelos foram conferidos no inventário oficial (`s3://nex-gddp-cmip6/index_v2.0_md5.txt`). Todos têm `rsds` completo em historical, ssp245 e ssp585, e aparecem como "verdes" (completos) no Apêndice I da Tech Note v2.
+
+| Modelo | Instituição | ECS aprox. (°C) |
+|---|---|---|
+| GFDL-ESM4 | NOAA-GFDL (EUA) | ~2,6 |
+| MPI-ESM1-2-HR | MPI-M (Alemanha) | ~3,0 |
+| MRI-ESM2-0 | MRI (Japão) | ~3,1 |
+| EC-Earth3 | Consórcio EC-Earth (Europa) | ~4,3 |
+| ACCESS-CM2 | CSIRO-ARCCSS (Austrália) | ~4,7 |
+
+Critérios da escolha:
+
+1. **Instituições distintas.** Modelos da mesma família compartilham código e tenderiam a "votar" juntos na mediana.
+2. **Sensibilidade climática variada.** O conjunto cobre de baixa a alta sensibilidade climática de equilíbrio (ECS). Os valores da tabela são aproximados, da literatura do CMIP6.
+3. **Nenhum modelo com lacunas.** Ficaram de fora os modelos marcados como parciais na Tech Note, como GFDL-CM4, KIOST-ESM e NESM3.
+
+### Acesso e volume
+
+O arquivo global do S3 tem cerca de 274 MB por ano. O dado interno vem em blocos de um dia do globo inteiro, então ler só o recorte do Brasil a partir dele exigiria baixar o arquivo todo: cerca de 85 GB no total.
+
+Por isso o coletor usa o serviço de recorte THREDDS (NCSS) da NCCS, com saída NetCDF4. O recorte vai de lat −34 a 6 e lon −74 a −34 e chega com 161 × 161 células.
+
+Medição real da coleta (22/11/2026):
+
+- **Volume:** 310 arquivos (5 modelos × 62 anos), 18,8 MB cada, 5,85 GB no total.
+- **Tempo:** 1,9 h, com 3 requisições simultâneas.
+- **Falhas:** 4 falhas transitórias (HTTP 503 e conexão encerrada), todas resolvidas na segunda tentativa.
+
+O cache bruto fica em `data/raw/cmip6/`, ignorado no Git. Para reproduzir, rode `python -m src.data_acquisition.coletor_cmip6`; o coletor valida cada arquivo e retoma do ponto em que parou.
+
+### Método delta
+
+Para cada modelo, os passos são:
+
+1. Calcular, em cada célula, a média de `rsds` em 1995–2014 (histórico) e em cada janela futura (2030–2039 e 2040–2050).
+2. Calcular `delta_relativo = futuro / histórico − 1` em cada célula de 0,25°.
+3. Associar cada município (ponto de `municipios_pontos.parquet`) à célula **com dado** mais próxima, por distância haversine.
+   - A mediana da distância é de 10,8 km.
+   - A única exceção é Fernando de Noronha (PE, 2605459), que fica a leste do recorte e foi associada a uma célula do litoral a 161 km. O delta dela deve ser lido com essa ressalva.
+4. Projetar a irradiação: `H_projetada = H_observada × (1 + delta)`, em que `H_observada` é o H da NASA POWER de 2023–2025 que já está na Gold de potencial.
+
+Só a variação relativa do modelo é usada, não o seu valor absoluto. A climatologia histórica do CMIP6 fica em média 1,9% acima do H da NASA POWER nos municípios, com 90% dos casos entre −9% e +18% e correlação de 0,56. Usar o valor absoluto do modelo misturaria essa diferença de base com a mudança climática.
+
+O **ensemble** é a mediana, o mínimo e o máximo entre os 5 modelos:
+
+- **Por município:** calculados direto sobre os deltas.
+- **Por UF:** cada modelo é agregado primeiro (Σx projetado / Σx observado − 1) e o resumo entre modelos vem depois. Isso evita tirar a mediana de medianas.
+
+### O que muda e o que não muda
+
+- **x e y mudam junto com H.** São recalculados com a potência instalada fixa no valor atual, e `gap_projetado = x_projetado − y_projetado`.
+- **A taxa de realização não muda com a irradiação.** Como x = kWp × H × PR × 365 / 1000 e y usa a mesma fórmula, H se cancela em y/x. O pipeline confere isso a cada execução.
+- **O gap muda pouco.** Ele muda na mesma proporção do delta: no Brasil, de +0,2% a +0,6% conforme o cenário e a janela.
+- **Visões.** A visão corrigida é a padrão. As colunas da visão ANEEL (`y_aneel_projetado_mwh_ano`, `gap_aneel_projetado_*`) ficam ao lado.
+
+### Resultado por UF
+
+A tabela mostra o delta mediano em %, com a faixa [mínimo; máximo] entre os 5 modelos.
+
+| UF | SSP2-4.5 2030–2039 | SSP2-4.5 2040–2050 | SSP5-8.5 2030–2039 | SSP5-8.5 2040–2050 |
+|---|---|---|---|---|
+| AC | +1,5 [+0,1; +1,7] | +1,2 [+0,6; +1,9] | +1,6 [+0,6; +2,1] | +2,1 [+1,8; +2,4] |
+| AL | −0,1 [−0,7; +0,9] | −0,4 [−1,6; +1,2] | +0,3 [−1,2; +0,9] | −0,3 [−0,8; +1,4] |
+| AM | +0,0 [−0,2; +0,4] | +0,3 [−0,0; +1,0] | +0,8 [−0,0; +1,0] | +0,9 [+0,2; +1,0] |
+| AP | +0,4 [−1,3; +0,8] | −0,4 [−1,5; +1,1] | +0,2 [−0,6; +0,7] | −0,4 [−1,8; +0,6] |
+| BA | +1,0 [+0,4; +1,6] | +0,3 [−1,5; +1,9] | +0,9 [−0,4; +2,1] | +0,5 [+0,3; +2,2] |
+| CE | −0,0 [−0,9; +1,1] | −0,4 [−0,6; +1,6] | −0,1 [−0,7; +1,5] | −0,4 [−1,0; +1,8] |
+| DF | +0,9 [−0,2; +2,3] | +1,1 [−0,2; +2,4] | +1,5 [+1,2; +1,7] | +1,7 [−0,3; +2,1] |
+| ES | +0,8 [+0,0; +2,0] | +0,5 [−0,4; +1,2] | +1,0 [−0,6; +1,7] | +0,6 [−0,7; +0,8] |
+| GO | +0,7 [−0,3; +1,8] | +0,7 [−0,1; +2,4] | +1,2 [+1,2; +1,9] | +1,4 [−0,7; +2,2] |
+| MA | −0,1 [−0,6; +0,8] | −0,3 [−0,8; +1,7] | +0,3 [+0,1; +0,7] | +0,3 [−0,9; +1,5] |
+| MG | +1,2 [−0,1; +2,3] | +1,2 [−0,4; +2,2] | +1,1 [+0,9; +2,2] | +1,3 [−1,0; +1,5] |
+| MS | −0,0 [−1,0; +1,3] | +0,6 [−1,1; +1,5] | +1,0 [−0,1; +1,3] | +0,2 [−1,7; +1,7] |
+| MT | +1,1 [−0,2; +2,3] | +0,9 [−0,0; +3,2] | +1,5 [+0,2; +3,1] | +1,0 [−0,4; +3,7] |
+| PA | +0,3 [−0,7; +0,7] | −0,3 [−0,9; +1,5] | +0,5 [+0,1; +0,7] | +0,4 [−0,8; +1,1] |
+| PB | −0,1 [−1,1; +1,1] | −0,1 [−1,1; +1,4] | −0,1 [−0,8; +1,0] | −0,1 [−1,1; +1,7] |
+| PE | −0,0 [−0,9; +1,1] | −0,2 [−1,3; +1,5] | +0,1 [−1,0; +1,1] | −0,2 [−0,7; +1,6] |
+| PI | +0,1 [−0,4; +1,1] | +0,3 [−1,2; +2,1] | +0,6 [+0,2; +0,9] | +0,3 [−0,9; +2,3] |
+| PR | −0,3 [−1,2; +0,3] | +0,0 [−0,8; +1,3] | +0,2 [−0,8; +2,1] | −0,3 [−1,8; +1,7] |
+| RJ | +0,4 [−0,3; +0,9] | −0,0 [−1,1; +1,4] | +0,5 [+0,1; +0,8] | −0,3 [−1,9; +0,7] |
+| RN | −0,4 [−1,1; +0,9] | −0,1 [−1,0; +1,1] | −0,3 [−0,9; +1,3] | −0,4 [−1,5; +1,4] |
+| RO | +1,3 [−0,0; +1,7] | +1,0 [+0,3; +2,5] | +2,0 [+0,8; +2,7] | +2,1 [+1,2; +3,3] |
+| RR | −0,1 [−0,4; +0,3] | +0,1 [−0,9; +0,7] | −0,0 [−0,6; +1,5] | +0,7 [−0,9; +1,2] |
+| RS | −1,0 [−1,5; −0,0] | −0,4 [−1,4; +0,2] | −1,1 [−1,5; +1,1] | −0,8 [−2,6; +0,0] |
+| SC | −0,9 [−1,4; −0,1] | −0,7 [−1,4; +0,0] | −0,9 [−1,1; +1,5] | −1,0 [−2,2; +0,5] |
+| SE | +0,2 [−0,4; +1,1] | −0,5 [−1,1; +1,3] | +0,3 [−1,5; +1,3] | +0,2 [−0,9; +1,7] |
+| SP | +0,4 [−0,8; +0,7] | +0,3 [−0,8; +2,4] | +1,0 [−0,2; +1,7] | +0,0 [−1,6; +1,9] |
+| TO | +0,8 [−0,1; +1,7] | +0,7 [+0,0; +2,3] | +1,1 [+0,5; +1,5] | +1,5 [−0,3; +2,5] |
+
+Leitura da tabela:
+
+- **As variações são pequenas**, sempre abaixo de ±4% por UF. No Brasil, o potencial x sobe de 0,2% a 0,6%.
+- **Há um padrão geográfico.** Os deltas tendem a ser positivos no oeste da Amazônia e no Centro-Oeste (AC, RO, MT, DF, GO) e negativos no Sul (RS, SC).
+- **Na maioria das UFs, os modelos não concordam nem no sinal.** A faixa [mín; máx] cruza o zero em 16 a 24 das 27 UFs, conforme o cenário e a janela.
+  - Sinal concordante nos 5 modelos em 2040–2050 só no AC e em RO, mais o TO no SSP2-4.5 e o AM e a BA no SSP5-8.5.
+  - Em 2030–2039, os poucos negativos concordantes são RS e SC no SSP2-4.5.
+- **A ordem de grandeza é a conclusão robusta, não o sinal em cada UF.** A mudança climática da irradiação até 2050 é pequena perto das demais incertezas do potencial, como a área de telhado (±33% entre 10 e 20 m²).
+
+### Sanidade
+
+- **Nenhum delta acima de ±10%.** Nenhuma combinação de município, modelo, cenário e janela passou desse limite. O maior |delta| em qualquer célula do recorte é 5,5%.
+- **Deltas municipais (mediana do ensemble):** vão de −3,2% a +2,7%.
+- **Extremos individuais dos modelos:** vão de −3,8% a +5,5%.
+- **Conferências automáticas a cada execução:** o x recalculado bate com a Gold de potencial, e a taxa projetada é igual à atual.
+
+### Limitações específicas
+
+- **BCSD corrige a distribuição, não a física.** A correção de viés ajusta cada célula à climatologia observada de referência. Ela não corrige erros de nebulosidade e aerossóis dos modelos, que são as principais fontes de incerteza do `rsds` (Tech Note v2, seções 5.2 e 5.3). A NASA recomenda o produto para pesquisa e avaliação de impactos, não para decisões de projeto em locais específicos.
+- **Cinco modelos são um ensemble pequeno.** A faixa mín–máx não é um intervalo de confiança, e outro conjunto de modelos poderia alargá-la.
+- **Variabilidade interna.** Janelas de 10 a 11 anos ainda carregam variabilidade natural de década em década. Parte dos deltas pequenos é ruído, não sinal forçado.
+- **Só a irradiação muda.** A temperatura, que reduz a eficiência dos módulos em dias quentes, e a sujidade ficam fora: o PR é fixo. A potência instalada e a área de telhado também ficam congeladas.
+
+Para reproduzir, rode `python -m src.potencial.projecao_irradiacao`. O processamento leva cerca de 1,5 minuto com o cache local.
+
 ## Limitações
 
 - **Associação não é causalidade.** O SHAP descreve como o modelo usa cada fator para prever, não o efeito de mudar o fator. "Mais renda → mais taxa" não quer dizer que aumentar a renda de um município elevaria a adoção na mesma medida.
@@ -199,4 +327,7 @@ O efeito positivo da tarifa se concentra no topo da escala. As contribuições a
 |---|---|
 | `data/processed/shap_municipal.parquet`, `data/processed/shap_uf.parquet` | sim (Gold) |
 | `docs/potencial/*.png`, `*.csv` | sim |
+| `data/processed/projecao_irradiacao_municipal.parquet` (5.570 municípios × 2 cenários × 2 janelas), `data/processed/projecao_irradiacao_uf.parquet` | sim (Gold) |
+| `data/interim/potencial/cmip6_delta_rsds_celulas.parquet` (delta por modelo, cenário, janela e célula) | não (Silver; regerável) |
+| `data/raw/cmip6/` (recortes NetCDF4 do rsds, ~5,9 GB) | não (`.gitignore`; regerável) |
 | `models/modelo_taxa_realizacao.joblib` (modelo, tipo, hiperparâmetros, fatores e semente) | não (`.gitignore`; regerável) |
