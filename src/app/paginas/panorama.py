@@ -40,19 +40,19 @@ indicadores_uf = dados.indicadores_por_uf(
     filtros.ano_inicio,
     filtros.ano_fim,
     filtros.classes,
-    filtros.incluir_imputados,
+    filtros.visao,
 )
 referencia = indicadores.media_brasil(indicadores_uf)
 
 st.title("📊 Panorama")
 st.caption(
-    f"Conexões de {filtros.ano_inicio} a {filtros.ano_fim} · visão: {filtros.visao}"
+    f"Conexões de {filtros.ano_inicio} a {filtros.ano_fim} · visão: {filtros.rotulo_visao}"
 )
 aviso_imputados(
     indicadores_uf,
-    filtros.incluir_imputados,
+    filtros.visao,
     indicadores.potencia_suspeita(
-        agregado, filtros.ano_inicio, filtros.ano_fim, filtros.classes
+        agregado, filtros.ano_inicio, filtros.ano_fim, filtros.classes, filtros.visao
     ),
 )
 

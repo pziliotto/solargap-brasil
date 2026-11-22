@@ -482,3 +482,144 @@ class StatusIA(BaseModel):
     dispositivo: str | None = Field(description="Definido quando a carga começa.")
     timeout_inferencia_s: float
     tarefas: list[EstadoTarefaIA]
+
+
+# ═══════════════════ Potencial solar (TP4.5, Tarefa 7) ═══════════════════
+
+
+class NomeVisao(StrEnum):
+    """Visão da base ANEEL 10/2026. Valor fora da lista: HTTP 422."""
+
+    corrigida = "corrigida"
+    aneel = "aneel"
+    conservadora = "conservadora"
+
+
+class ResumoPotencial(BaseModel):
+    nivel: Literal["brasil", "uf", "municipio"]
+    nome: str
+    visao: NomeVisao
+    n_municipios: int
+    domicilios: int = Field(description="Domicílios particulares permanentes ocupados.")
+    irradiacao_kwh_m2_dia: float = Field(
+        description="Irradiação média (NASA POWER 2023–2025), ponderada pelo kWp potencial."
+    )
+    x_mwh_ano: float = Field(description="Potencial técnico residencial (x), MWh/ano.")
+    y_mwh_ano: float = Field(
+        description="Produção estimada (y) da MMGD residencial e rural na própria UC."
+    )
+    gap_mwh_ano: float = Field(description="x − y. Negativo quando y > x.")
+    taxa_realizacao: float = Field(description="y / x (fração; 0,10 = 10%).")
+    n_municipios_taxa_acima_1: int = Field(
+        description="Municípios com y > x (telhado médio maior que o premissado)."
+    )
+
+
+class PotencialUF(ResumoPotencial):
+    uf: str
+    regiao: str
+    principais_fatores: list[str] = Field(
+        description="Três fatores de maior contribuição SHAP absoluta na UF."
+    )
+
+
+class Premissas(BaseModel):
+    performance_ratio: float
+    eficiencia_painel: float
+    area_util_telhado_m2: float
+    areas_sensibilidade_m2: list[float]
+    base_aneel: str
+
+
+class RespostaPotencialUF(BaseModel):
+    visao: NomeVisao
+    premissas: Premissas
+    brasil: ResumoPotencial
+    itens: list[PotencialUF]
+
+
+class PotencialMunicipio(ResumoPotencial):
+    cod_ibge: str
+    uf: str
+    taxas_por_visao: dict[str, float] = Field(
+        description="Taxa de realização nas três visões, para comparação."
+    )
+
+
+class ContribuicaoFator(BaseModel):
+    fator: str = Field(description="Nome técnico do fator no modelo.")
+    rotulo: str
+    valor: float | None = Field(
+        description="Valor do fator. Na UF e no Brasil, média ponderada por domicílios."
+    )
+    valor_texto: str
+    contribuicao: float = Field(description="Contribuição SHAP, em fração da taxa.")
+    contribuicao_pp: float = Field(description="Contribuição em pontos percentuais.")
+    efeito: Literal["eleva", "reduz"]
+    frase: str
+
+
+class ExplicacaoPotencial(BaseModel):
+    nivel: Literal["brasil", "uf", "municipio"]
+    nome: str
+    cod_ibge: str | None
+    visao: NomeVisao
+    visao_modelo: NomeVisao = Field(
+        description="Visão do alvo em que o modelo SHAP foi treinado."
+    )
+    taxa_observada: float = Field(description="Taxa de realização na visão pedida.")
+    taxa_prevista: float = Field(description="Previsão do modelo (visão corrigida).")
+    valor_base: float = Field(description="Média das previsões (referência do SHAP).")
+    usado_no_treino: bool = Field(
+        description="False para os municípios com y > x, fora do treino."
+    )
+    leitura: str = Field(description="Resumo em linguagem simples.")
+    aviso_visao: str | None
+    fatores: list[ContribuicaoFator] = Field(
+        description="Do maior para o menor efeito absoluto. Associação, não causalidade."
+    )
+    ranking_global_visao: list[str] = Field(
+        description="Fatores mais importantes no modelo ajustado à visão pedida."
+    )
+
+
+class CenarioPotencial(BaseModel):
+    cenario: Literal["ssp245", "ssp585"]
+    rotulo_cenario: str
+    janela: Literal["2030-2039", "2040-2050"]
+    delta_mediano: float = Field(description="Variação relativa da irradiação (mediana).")
+    delta_min: float
+    delta_max: float
+    irradiacao_observada: float
+    irradiacao_projetada: float
+    irradiacao_projetada_min: float
+    irradiacao_projetada_max: float
+    x_atual_mwh_ano: float
+    x_projetado_mwh_ano: float
+    x_projetado_min_mwh_ano: float
+    x_projetado_max_mwh_ano: float
+    y_atual_mwh_ano: float
+    y_projetado_mwh_ano: float
+    y_projetado_min_mwh_ano: float
+    y_projetado_max_mwh_ano: float
+    gap_atual_mwh_ano: float
+    gap_projetado_mwh_ano: float
+    gap_projetado_min_mwh_ano: float
+    gap_projetado_max_mwh_ano: float
+    taxa_realizacao: float
+    taxa_projetada: float = Field(
+        description="Igual à atual no município: a irradiação se cancela em y / x."
+    )
+    n_modelos: int
+
+
+class CenariosMunicipio(BaseModel):
+    cod_ibge: str
+    nome: str
+    uf: str
+    visao: NomeVisao
+    distancia_celula_km: float = Field(
+        description="Distância do município à célula de 0,25° com dado usada."
+    )
+    aviso: str
+    itens: list[CenarioPotencial]

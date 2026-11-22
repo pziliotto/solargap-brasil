@@ -23,7 +23,7 @@ TEMPO_LIMITE_S = 120
 
 
 def test_menu_lista_as_paginas():
-    assert len(PAGINAS) == 8 and "paginas/noticias.py" in PAGINAS
+    assert len(PAGINAS) == 9 and "paginas/potencial.py" in PAGINAS
     for pagina in PAGINAS:
         assert (APP.parent / pagina).exists(), pagina
 

@@ -44,11 +44,11 @@ indicadores_uf = dados.indicadores_por_uf(
     filtros.ano_inicio,
     filtros.ano_fim,
     filtros.classes,
-    filtros.incluir_imputados,
+    filtros.visao,
 )
 
 st.title("📈 Evolução e crescimento")
-st.caption(f"Visão: {filtros.visao}")
+st.caption(f"Visão: {filtros.rotulo_visao}")
 
 # UFs da comparação: a UF em destaque (Panorama) ou as 3 líderes na métrica
 destaque = st.session_state.get("_uf_destaque", "Nenhuma")
@@ -83,7 +83,7 @@ with aba_serie:
             filtros.ano_inicio,
             filtros.ano_fim,
             filtros.classes,
-            filtros.incluir_imputados,
+            filtros.visao,
         )
         coluna = "potencia_mw" if medida == "Potência (MW)" else "qtd_empreendimentos"
         serie = serie[serie["sigla_uf"].isin(ufs)].sort_values(["sigla_uf", "ano"])
@@ -115,7 +115,7 @@ with aba_crescimento:
     )
 
     serie_estoque = dados.serie_acumulada(
-        agregado, filtros.classes, filtros.incluir_imputados
+        agregado, filtros.classes, filtros.visao
     )
     anos_completos = list(range(esquema.ANO_MINIMO, esquema.ANO_PARCIAL))
 
@@ -161,7 +161,7 @@ with aba_crescimento:
     )
 
     tabela, cagr_brasil = dados.taxa_crescimento(
-        agregado, filtros.classes, filtros.incluir_imputados, ano_base, ano_final
+        agregado, filtros.classes, filtros.visao, ano_base, ano_final
     )
     tabela = tabela.merge(
         indicadores_uf[["sigla_uf", "nome_uf", "regiao"]], on="sigla_uf"

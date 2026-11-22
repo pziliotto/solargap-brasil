@@ -41,13 +41,13 @@ estoque = dados.indicadores_por_uf(
     ano_min,
     ano_max,
     filtros.classes,
-    filtros.incluir_imputados,
+    filtros.visao,
 )
 
 st.title("🎯 Oportunidades")
 st.caption(
     f"Adoção acumulada até out/{esquema.ANO_PARCIAL} x crescimento do parque instalado · "
-    f"visão: {filtros.visao}. O filtro de período não se aplica a esta página."
+    f"visão: {filtros.rotulo_visao}. O filtro de período não se aplica a esta página."
 )
 
 anos_completos = list(range(esquema.ANO_MINIMO, esquema.ANO_PARCIAL))
@@ -64,7 +64,7 @@ ano_final = c2.selectbox(
 )
 
 crescimento, cagr_brasil = dados.taxa_crescimento(
-    agregado, filtros.classes, filtros.incluir_imputados, ano_base, ano_final
+    agregado, filtros.classes, filtros.visao, ano_base, ano_final
 )
 matriz, referencia = indicadores.matriz_oportunidade(estoque, crescimento, cagr_brasil)
 

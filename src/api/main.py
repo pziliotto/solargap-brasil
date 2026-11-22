@@ -5,6 +5,7 @@ AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 21/10/2026
 ATUALIZAÇÃO: 16/11/2026 — TP4: rotas de IA, carga dos modelos em segundo plano,
              503 com Retry-After para modelo indisponível
+             22/11/2026 — TP4.5, Tarefa 7: rotas /potencial
 
 DESCRIÇÃO:
     Aplicação FastAPI: metadados da documentação, registro das rotas, carga
@@ -12,7 +13,7 @@ DESCRIÇÃO:
 
 TRATAMENTO DE ERROS (todas as respostas de erro têm o formato {"detail": ...}):
     400  FiltroInvalido      — filtros incoerentes (ex.: ano_inicio > ano_fim)
-    404  HTTPException       — UF ou notícia inexistente
+    404  HTTPException       — UF, notícia ou município (código IBGE) inexistente
     409  HTTPException       — notícia com URL já existente
     422  validação Pydantic  — campos inválidos, com a lista campo a campo
     503  DadosIndisponiveis  — arquivo obrigatório da Gold ausente
@@ -53,6 +54,7 @@ from src.api.rotas import (  # noqa: E402
     indicadores,
     noticias,
     politicas,
+    potencial,
     sistema,
 )
 from src.ia.motor import GerenciadorModelos, ModeloIndisponivel  # noqa: E402
@@ -73,6 +75,9 @@ adesão estadual ao Convênio ICMS 16/15. Os cálculos são os mesmos do dashboa
 * **Notícias** — consulta paginada e envio de novas notícias (POST).
 * **Políticas públicas** — adesão ao Convênio ICMS 16/15.
 * **Comparações** — cruzamento de um indicador próprio com a adoção solar (POST).
+* **Potencial solar** — potencial técnico residencial, produção estimada, gap e taxa de
+  realização por UF e município; fatores associados (SHAP) e cenários de irradiação
+  2030–2050. Parâmetro `visao`: corrigida (padrão), aneel ou conservadora.
 * **IA** — resumo e relevância de textos com modelos de linguagem locais (HuggingFace),
   sem serviço externo. Tom em caráter experimental.
 
@@ -93,6 +98,10 @@ TAGS = [
     {
         "name": "Comparações",
         "description": "Cruzamento de indicadores do usuário com a adoção.",
+    },
+    {
+        "name": "Potencial solar",
+        "description": "Potencial x produção, fatores (SHAP) e cenários 2030–2050 (TP4.5).",
     },
     {
         "name": "IA",
@@ -135,7 +144,7 @@ app = FastAPI(
     },
 )
 
-for modulo in (sistema, indicadores, noticias, politicas, comparacoes, ia):
+for modulo in (sistema, indicadores, potencial, noticias, politicas, comparacoes, ia):
     app.include_router(modulo.roteador)
 
 

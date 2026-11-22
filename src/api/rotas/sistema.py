@@ -15,7 +15,7 @@ from src.api.dependencias import RepositorioDep
 from src.api.modelos import Erro, ResumoDados, Saude
 from src.servicos import indicadores
 
-VERSAO_API = "1.1.0"  # 1.1: rotas de IA (TP4)
+VERSAO_API = "1.2.0"  # 1.1: rotas de IA (TP4); 1.2: rotas /potencial (TP4.5)
 roteador = APIRouter(tags=["Sistema"])
 
 
@@ -32,6 +32,10 @@ def raiz() -> dict:
             "GET /ranking",
             "GET /series/{sigla}",
             "GET /oportunidades",
+            "GET /potencial/uf",
+            "GET /potencial/municipio/{cod_ibge}",
+            "GET /potencial/explicacao/{cod_ibge}",
+            "GET /potencial/cenarios/{cod_ibge}",
             "GET /noticias",
             "GET /noticias/fontes",
             "GET /noticias/{id}",

@@ -4,6 +4,8 @@ ARQUIVO: app.py
 AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 21/10/2026 (substitui demo_app.py, de 20/08/2026)
 ATUALIZAÇÃO: 16/11/2026 — TP4: página Laboratório de IA
+             22/11/2026 — TP4.5, Tarefa 7: página Potencial Solar; seletor de
+             visão (corrigida, ANEEL, conservadora) em todas as páginas
 
 DESCRIÇÃO:
     Arquivo de entrada do dashboard multipáginas (TP3). Configura a página,
@@ -24,7 +26,8 @@ POR QUE st.navigation E NÃO A PASTA pages/:
 
 ESTRUTURA DO MENU:
     Visão geral  — Início
-    Análises     — Panorama · Evolução e crescimento · Oportunidades
+    Análises     — Panorama · Evolução e crescimento · Oportunidades ·
+                   Potencial Solar
     Contexto     — Notícias
     Ferramentas  — Laboratório de IA · Dados · API
 
@@ -61,6 +64,7 @@ PAGINAS = {
         st.Page("paginas/panorama.py", title="Panorama", icon="📊"),
         st.Page("paginas/evolucao.py", title="Evolução e crescimento", icon="📈"),
         st.Page("paginas/oportunidades.py", title="Oportunidades", icon="🎯"),
+        st.Page("paginas/potencial.py", title="Potencial Solar", icon="🏠"),
     ],
     "Contexto": [
         st.Page("paginas/noticias.py", title="Notícias", icon="📰"),
@@ -72,8 +76,9 @@ PAGINAS = {
     ],
 }
 
-# Páginas que usam os filtros de indicadores. Nas demais, a barra lateral
-# mostra só as inspirações, e os valores escolhidos ficam guardados na sessão.
+# Páginas que usam os filtros de indicadores (métrica, período, classe). Nas
+# demais, a barra lateral mostra só o seletor de visão e as inspirações, e os
+# valores escolhidos ficam guardados na sessão.
 PAGINAS_COM_FILTROS = {"Panorama", "Evolução e crescimento", "Oportunidades", "Dados"}
 
 pagina = st.navigation(PAGINAS)
@@ -84,8 +89,10 @@ except DadosIndisponiveis as erro:
     st.error(f"Não foi possível carregar a camada Gold: {erro}")
     st.stop()
 
+# Visão da base: vale para todas as páginas (TP4.5, Tarefa 7).
+visao = componentes.seletor_visao()
 if pagina.title in PAGINAS_COM_FILTROS:
-    st.session_state["filtros"] = componentes.barra_lateral_filtros(agregado)
+    st.session_state["filtros"] = componentes.barra_lateral_filtros(agregado, visao)
 
 with st.sidebar:
     st.divider()
