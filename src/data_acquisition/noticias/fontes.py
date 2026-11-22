@@ -81,6 +81,9 @@ class Fonte:
     padrao_link: re.Pattern | None = None
     padrao_data_texto: re.Pattern | None = None
     descartar_paragrafos: tuple[re.Pattern, ...] = field(default_factory=tuple)
+    # False quando a licença proíbe obra derivada: sem resumo automático
+    # (esquema.FONTES_SEM_DERIVACAO, decisão de 22/11/2026).
+    permite_derivacao: bool = True
 
 
 # ═══════════════════ Agência Brasil (EBC) ═══════════════════
@@ -143,6 +146,7 @@ BASE_AGENCIA_GOV = "https://agenciagov.ebc.com.br"
 
 AGENCIA_GOV = Fonte(
     chave="agenciagov",
+    permite_derivacao=False,
     nome="Agência Gov",
     base=BASE_AGENCIA_GOV,
     licenca="EBC: 'A reprodução é gratuita desde que citada a fonte' (aviso em cada matéria)",
@@ -183,6 +187,7 @@ _NAO_MATERIA = r"(?![\w.-]+\.(?:jpe?g|png|gif|webp|pdf)$)"  # anexos no mesmo ca
 
 ANEEL = Fonte(
     chave="aneel",
+    permite_derivacao=False,
     nome="ANEEL",
     base=BASE_GOV_BR,
     licenca=LICENCA_GOV_BR,
@@ -205,6 +210,7 @@ ANEEL = Fonte(
 
 MME = Fonte(
     chave="mme",
+    permite_derivacao=False,
     nome="MME",
     base=BASE_GOV_BR,
     licenca=LICENCA_GOV_BR,

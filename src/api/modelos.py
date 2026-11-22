@@ -205,7 +205,11 @@ class Noticia(BaseModel):
     nivel_texto: str = Field(description="integral ou metadados.")
     tag_origem: str | None = None
     resumo: str | None = Field(
-        default=None, description="Resumo gerado pelo modelo local (PTT5)."
+        default=None,
+        description=(
+            "Resumo gerado pelo modelo local (PTT5). Sempre nulo para fontes cuja licença "
+            "proíbe obra derivada (CC BY-ND: ANEEL, MME, Agência Gov); leia a matéria pela url."
+        ),
     )
     sentimento: str | None = Field(
         default=None,
@@ -220,6 +224,13 @@ class Noticia(BaseModel):
         ge=0,
         le=1,
         description="Probabilidade de tratar de energia solar.",
+    )
+    relevancia_por_termo: bool | None = Field(
+        default=None,
+        description=(
+            "Relevante pela regra de palavra: o título cita um termo de geração distribuída "
+            "(Lei 14.300, micro/minigeração...), mesmo com probabilidade abaixo do limiar."
+        ),
     )
 
 
@@ -413,6 +424,13 @@ class ResultadoRelevanciaIA(BaseModel):
     limiar: float = Field(description="Probabilidade mínima para considerar relevante.")
     tokens_entrada: int
     truncado: bool
+    por_termo_gd: bool = Field(
+        default=False,
+        description=(
+            "Relevante pela regra de palavra: o título (ou a primeira linha do texto) cita "
+            "um termo de geração distribuída, mesmo com probabilidade abaixo do limiar."
+        ),
+    )
 
 
 class ResultadoTomIA(BaseModel):

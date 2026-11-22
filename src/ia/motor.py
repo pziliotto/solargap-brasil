@@ -207,12 +207,22 @@ class GerenciadorModelos:
         with self._lock_inferencia:
             return modelo.classificar(texto, catalogo.HIPOTESES_TOM)
 
-    def avaliar_relevancia(self, texto: str):
+    def avaliar_relevancia(self, texto: str, titulo: str | None = None):
+        """Estratégia híbrida do catálogo: termo de GD no título OU hipótese zero-shot.
+
+        Sem título (texto livre), vale a primeira linha do texto.
+        """
         modelo = self._instancia(Tarefa.relevancia)
         with self._lock_inferencia:
-            return modelo.avaliar_hipotese(
+            resultado = modelo.avaliar_hipotese(
                 texto, catalogo.HIPOTESE_RELEVANCIA, catalogo.LIMIAR_RELEVANCIA
             )
+        if titulo is None:
+            titulo = (texto or "").strip().split("\n", 1)[0]
+        por_termo = catalogo.termo_gd(titulo)
+        resultado.por_termo_gd = por_termo
+        resultado.relevante = bool(resultado.relevante or por_termo)
+        return resultado
 
     def executar(self, tarefa: Tarefa, texto: str):
         acoes = {

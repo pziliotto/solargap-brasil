@@ -52,6 +52,7 @@ from src.api.modelos import (
 from src.ia import catalogo
 from src.ia.catalogo import Tarefa
 from src.ia.motor import GerenciadorModelos
+from src.preparacao import esquema
 from src.servicos.texto import texto_para_modelo
 
 TIMEOUT_PADRAO_S = 60.0
@@ -115,7 +116,10 @@ def status_ia(gerenciador: GerenciadorDep) -> StatusIA:
 
 
 def _executar(
-    gerenciador: GerenciadorModelos, texto: str, tarefas: list[TarefaIA]
+    gerenciador: GerenciadorModelos,
+    texto: str,
+    tarefas: list[TarefaIA],
+    titulo: str | None = None,
 ) -> ResultadosIA:
     """Roda as tarefas pedidas (em thread). ModeloIndisponivel sobe para o 503."""
     resultados = ResultadosIA()
@@ -124,7 +128,7 @@ def _executar(
             r = gerenciador.resumir(texto)
             resultados.resumo = ResultadoResumoIA(**r.como_dict())
         elif tarefa == TarefaIA.relevancia:
-            r = gerenciador.avaliar_relevancia(texto)
+            r = gerenciador.avaliar_relevancia(texto, titulo)
             resultados.relevancia = ResultadoRelevanciaIA(
                 **r.como_dict(), limiar=catalogo.LIMIAR_RELEVANCIA
             )
@@ -135,7 +139,11 @@ def _executar(
 
 
 async def _processar(
-    gerenciador: GerenciadorModelos, texto: str, tarefas: list[TarefaIA], origem: str
+    gerenciador: GerenciadorModelos,
+    texto: str,
+    tarefas: list[TarefaIA],
+    origem: str,
+    titulo: str | None = None,
 ) -> RespostaProcessamento:
     # Checagem antecipada: com o modelo indisponível, responde 503 na hora,
     # sem ocupar uma thread.
@@ -146,7 +154,8 @@ async def _processar(
     limite = timeout_inferencia()
     try:
         resultados = await asyncio.wait_for(
-            asyncio.to_thread(_executar, gerenciador, texto, tarefas), timeout=limite
+            asyncio.to_thread(_executar, gerenciador, texto, tarefas, titulo),
+            timeout=limite,
         )
     except TimeoutError as erro:
         raise HTTPException(
@@ -203,10 +212,13 @@ async def processar_texto(
     description=(
         "Mesma análise de POST /processar_texto, usando como entrada o texto_para_modelo da "
         "notícia (título, linha fina e texto, conforme o nível de texto da fonte) — a mesma "
-        "entrada do processamento em lote."
+        "entrada do processamento em lote. Para fontes cuja licença proíbe obra derivada "
+        "(CC BY-ND: ANEEL, MME, Agência Gov), o resumo não é gerado: o padrão passa a ser só "
+        "a relevância, e pedir o resumo explicitamente devolve 403."
     ),
     responses={
         **RESPOSTAS_ERRO,
+        403: {"model": Erro, "description": "Resumo pedido para fonte sem derivação."},
         404: {"model": Erro, "description": "Id inexistente."},
     },
 )
@@ -233,7 +245,17 @@ async def processar_noticia(
         noticia.get("texto"),
         noticia["nivel_texto"],
     )
-    escolhidas = list(dict.fromkeys(tarefas or [TarefaIA.resumo, TarefaIA.relevancia]))
+    permite = esquema.permite_resumo(noticia["fonte"])
+    if not permite and tarefas and TarefaIA.resumo in tarefas:
+        raise HTTPException(status_code=403, detail=esquema.MOTIVO_SEM_RESUMO)
+    padrao = (
+        [TarefaIA.resumo, TarefaIA.relevancia] if permite else [TarefaIA.relevancia]
+    )
+    escolhidas = list(dict.fromkeys(tarefas or padrao))
     return await _processar(
-        gerenciador, texto, escolhidas, origem=f"noticia:{id_noticia}"
+        gerenciador,
+        texto,
+        escolhidas,
+        origem=f"noticia:{id_noticia}",
+        titulo=noticia["titulo"],
     )

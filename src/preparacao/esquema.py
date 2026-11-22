@@ -171,6 +171,25 @@ NIVEL_INTEGRAL = "integral"
 NIVEL_METADADOS = "metadados"
 NIVEIS_TEXTO = (NIVEL_INTEGRAL, NIVEL_METADADOS)
 
+# Fontes cuja licença NÃO permite obra derivada (decisão de 22/11/2026). O
+# gov.br (ANEEL, MME) publica sob CC BY-ND 3.0 ("SemDerivações"), e a Agência
+# Gov, portal de notícias do governo federal, segue a mesma regra. O texto
+# literal pode ser reproduzido com citação, mas um resumo automático pode ser
+# visto como adaptação. Para essas fontes não se gera, não se guarda e não se
+# exibe resumo: painel e API mostram título, link, fonte e classificação.
+# Deve coincidir com as fontes de permite_derivacao=False em
+# src/data_acquisition/noticias/fontes.py (há teste para isso).
+FONTES_SEM_DERIVACAO = frozenset({"ANEEL", "MME", "Agência Gov"})
+MOTIVO_SEM_RESUMO = (
+    "Resumo automático não exibido: a licença da fonte (CC BY-ND, gov.br) não "
+    "permite obra derivada. Leia a matéria original pelo link."
+)
+
+
+def permite_resumo(fonte: str | None) -> bool:
+    return fonte not in FONTES_SEM_DERIVACAO
+
+
 # Colunas que o modelo de linguagem preencherá no TP4. Uma nova coleta NUNCA
 # pode apagar o que já foi preenchido nelas (ver mesclar_corpus no coletor).
 COLUNAS_MODELO = ["resumo", "sentimento"]
@@ -198,6 +217,7 @@ COLUNAS_CORPUS_IA = [
     "resumo_truncado",
     "relevante",
     "relevancia_prob",
+    "relevancia_por_termo",  # relevante pelo termo de GD no título (22/11/2026)
     "modelo_resumo",
     "modelo_relevancia",
     "processado_em",

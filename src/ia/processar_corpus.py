@@ -8,11 +8,17 @@ ATUALIZAÇÃO:
 DESCRIÇÃO:
     Processamento em lote do corpus de notícias com os modelos locais:
         resumo      PTT5 (recogna-nlp/ptt5-base-summ)
-        relevância  mDeBERTa zero-shot ("Esta notícia trata de energia solar.")
+        relevância  híbrida: termo de GD no título OU mDeBERTa zero-shot
+                    ("Esta notícia trata de energia solar.", limiar 0,4)
 
     O resultado vai para data/processed/corpus_ia.csv (camada Gold), ligado
     ao corpus pelo id, e é versionado no Git. Assim o dashboard e a API mostram
     resumo e relevância em qualquer máquina, sem GPU e sem baixar os modelos.
+
+FONTES SEM DERIVAÇÃO (22/11/2026):
+    ANEEL, MME e Agência Gov publicam sob licença que proíbe obra derivada
+    (CC BY-ND, gov.br). Para elas só a relevância é calculada; o resumo fica
+    vazio (esquema.FONTES_SEM_DERIVACAO).
 
 POR QUE O TOM NÃO É PROCESSADO:
     No benchmark, o tom zero-shot ficou abaixo da linha de base de classe
@@ -45,6 +51,7 @@ from pathlib import Path
 import pandas as pd
 
 from src.data_acquisition.coletor_base import configurar_logging, obter_project_root
+from src.ia import catalogo
 from src.ia.catalogo import Tarefa
 from src.ia.motor import GerenciadorModelos
 from src.preparacao import esquema
@@ -56,6 +63,12 @@ PASTA_LOGS = PROJECT_ROOT / "logs"
 SEPARADOR = ";"
 
 logger = logging.getLogger(__name__)
+
+
+def modelo_relevancia(gerenciador: GerenciadorModelos) -> str:
+    """Modelo + estratégia: trocar qualquer um dos dois torna a notícia pendente."""
+    hf_id = gerenciador.configs[Tarefa.relevancia].hf_id
+    return f"{hf_id} | {catalogo.ESTRATEGIA_RELEVANCIA}"
 
 
 def pendentes(
@@ -80,7 +93,7 @@ def processar(
     """Executa resumo e relevância em cada notícia; devolve no formato de corpus_ia."""
     modelos = {
         "resumo": gerenciador.configs[Tarefa.resumo].hf_id,
-        "relevancia": gerenciador.configs[Tarefa.relevancia].hf_id,
+        "relevancia": modelo_relevancia(gerenciador),
     }
     alvo = corpus.head(limite) if limite else corpus
     linhas = []
@@ -88,15 +101,21 @@ def processar(
         entrada = texto_para_modelo(
             noticia.titulo, noticia.linha_fina, noticia.texto, noticia.nivel_texto
         )
-        resumo = gerenciador.resumir(entrada)
-        relevancia = gerenciador.avaliar_relevancia(entrada)
+        # Licença sem derivação (CC BY-ND): o resumo nem é gerado nem guardado.
+        resumo = (
+            gerenciador.resumir(entrada)
+            if esquema.permite_resumo(noticia.fonte)
+            else None
+        )
+        relevancia = gerenciador.avaliar_relevancia(entrada, noticia.titulo)
         linhas.append(
             {
                 "id": noticia.id,
-                "resumo": resumo.resumo,
-                "resumo_truncado": resumo.truncado,
+                "resumo": resumo.resumo if resumo else None,
+                "resumo_truncado": resumo.truncado if resumo else None,
                 "relevante": relevancia.relevante,
                 "relevancia_prob": relevancia.probabilidade,
+                "relevancia_por_termo": relevancia.por_termo_gd,
                 "modelo_resumo": modelos["resumo"],
                 "modelo_relevancia": modelos["relevancia"],
                 "processado_em": datetime.now().replace(microsecond=0).isoformat(),
@@ -128,7 +147,7 @@ def executar(
     gerenciador = gerenciador or GerenciadorModelos()
     modelos = {
         "resumo": gerenciador.configs[Tarefa.resumo].hf_id,
-        "relevancia": gerenciador.configs[Tarefa.relevancia].hf_id,
+        "relevancia": modelo_relevancia(gerenciador),
     }
 
     alvo = pendentes(corpus, existente, modelos, refazer)
