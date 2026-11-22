@@ -75,12 +75,15 @@ def amostra_resumo(corpus: pd.DataFrame, limite: int | None = None) -> pd.DataFr
     """Notícias cuja linha fina é um resumo próprio, com a entrada sem a linha fina."""
     linha_fina = corpus["linha_fina"].fillna("").astype(str)
     texto = corpus["texto"].fillna("").astype(str)
-    # Fica de fora a linha fina que aparece em qualquer ponto do texto: ela seria
-    # copiada da entrada e inflaria o ROUGE (vazamento).
+    titulo = corpus["titulo"].fillna("").astype(str)
+    # Fica de fora a linha fina que aparece em qualquer ponto do texto ou do
+    # título (algumas matérias da ANEEL repetem o título na descrição): ela
+    # seria copiada da entrada e inflaria o ROUGE (vazamento).
     propria = [
         len(lf.split()) >= MIN_PALAVRAS_REFERENCIA
         and _espacos(lf)[:60] not in _espacos(tx)
-        for lf, tx in zip(linha_fina, texto)
+        and _espacos(lf)[:60] not in _espacos(ti)
+        for lf, tx, ti in zip(linha_fina, texto, titulo)
     ]
     amostra = corpus[propria].copy()
     amostra["entrada"] = [

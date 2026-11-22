@@ -82,9 +82,11 @@ Título e linha fina vêm das meta tags Open Graph. O corpo é o elemento cujos 
 **Navegação educada.**
 
 - O `robots.txt` é lido uma vez por domínio, com o próprio User-Agent do projeto, e consultado antes de cada URL. O leitor padrão do Python se identifica como "Python-urllib", nome que alguns sites bloqueiam, o que produziria um falso "proibido".
+- A interpretação usa a biblioteca `protego`, que segue a RFC 9309, inclusive os curingas `*` e `$` (ver "Correção de conformidade com o robots.txt", abaixo).
 - Um `robots.txt` ilegível significa não coletar o domínio.
 - O `Crawl-delay` é respeitado quando maior que a pausa padrão de 1,5 segundo.
 - Há retry com espera exponencial, reaproveitando `calcular_espera_backoff` do `coletor_base.py`.
+- Respostas que não são texto (vídeo, imagem) são descartadas sem ir para o cache, e uma página que quebra a extração é registrada no log sem derrubar a fonte.
 - O HTML de cada matéria fica em `data/raw/html/<fonte>/` (Bronze, não versionado).
 
 **Mescla incremental.** O corpus versionado é o ponto de partida de cada execução:
@@ -99,11 +101,44 @@ Um teste automatizado garante que reexecutar a mescla sem notícias novas reprod
 **Agência Gov — método.** O portal usa o CMS Plone, com HTML estático. O coletor percorre duas origens:
 
 - **Editoria Energia** (`/noticias/energia`): é ampla (petróleo, mineração), por isso só segue os links cujo título menciona solar ou geração distribuída;
-- **Busca interna** (`/@@search`) pelos termos "energia solar", "geração distribuída", "micro e minigeração" e "fotovoltaica", com paginação `b_start`.
+- **Sitemap** (`/sitemap.xml.gz`), indicado no próprio `robots.txt` do portal: todas as matérias listadas são baixadas e passam pelo filtro de relevância.
 
-Os links válidos seguem o padrão `/noticias/AAAAMM/<slug>`.
+Os links válidos seguem o padrão `/noticias/AAAAMM/<slug>`. O sitemap também lista imagens nesse caminho (`.jpg`, `.png`), que o padrão descarta; em 20/11/2026 ele tinha 799 matérias, de 08/2023 a 10/2026, concentradas nos meses recentes.
 
-**Situação da coleta.** A Agência Brasil mantém as 114 notícias coletadas em 21/09/2026: período de 27/06/2014 a 08/07/2026, tamanho médio de 3.019 caracteres e UFs mais mencionadas SP (20), RJ (16), MG (12), BA (11) e PR (10). O coletor da Agência Gov foi implementado e testado com páginas de exemplo que reproduzem a estrutura do portal; a primeira coleta real ocorre ao executar `python -m src.data_acquisition.noticias`, e o resumo por fonte fica registrado no log da execução.
+**Agência Brasil — tags.** Além das cinco tags originais (`energia-solar-1`, `energia-solar`, `geracao-distribuida`, `energia-renovavel`, `energias-renovaveis`), a coleta de 20/11/2026 incluiu as tags que existem no portal para as palavras-chave do benchmark v2: `micro-geracao`, `minigeracao`, `fotovoltaica`, `energia-fotovoltaica`, `paineis-solares`, `placas-solares`, `net-metering`, `geracao-de-energia-solar`, `usina-solar` e `usinas-solares`. Não existem tags para Lei 14.300, fio B, compensação de energia ou de créditos, nem `microgeracao` e `micro-e-minigeracao` (todas responderam 404). A busca do portal (`/search/`) é proibida pelo `robots.txt` e não é usada.
+
+**Filtro de relevância da coleta** (`base.PADRAO_RELEVANCIA`, distinto da relevância do modelo de IA): basta a notícia mencionar o tema. Desde 20/11/2026 inclui também "Lei 14.300" (com e sem ponto, com "nº" opcional), "fio B", "compensação de créditos" (exceto "de carbono"), "net metering", geração distribuída, microgeração e minigeração, todos com limite de palavra, para que "fio B" não case em "fio branco" nem "GD" em "GDF". Exemplos positivos e negativos estão nos testes.
+
+**Correção de conformidade com o robots.txt (20/11/2026).** O `robots.txt` da Agência Gov contém `Disallow: /*?`, que pela RFC 9309 proíbe toda URL com parâmetros, inclusive a busca interna (`/@@search?SearchableText=...`) que o coletor usava como listagem. O leitor padrão do Python (`urllib.robotparser`) não entende curingas: tratava `/*?` como caminho literal e respondia "permitido". Com isso, a coleta de 21/10/2026 descobriu as matérias da Agência Gov por um caminho que o site proíbe. As páginas das matérias em si eram permitidas.
+
+Providências:
+
+1. O `Navegador` passou a usar a biblioteca `protego` (RFC 9309). Os testes usam os `robots.txt` reais das duas agências, salvos em `tests/fixtures/`. Eles cobrem a busca da Agência Gov bloqueada, as matérias, a editoria e o sitemap permitidos, o `/search/` da Agência Brasil bloqueado, as tags paginadas (`?page=N`) permitidas e o `Crawl-delay` de 10 s. Também verificam que nenhuma listagem configurada é proibida.
+2. A busca interna foi retirada da configuração da Agência Gov, que passou a ser descoberta pelo sitemap.
+3. As **6 notícias** da Agência Gov descobertas pela busca, que eram todas as dessa fonte no corpus, foram removidas do `corpus_noticias.csv` e do `corpus_ia.csv`. Removê-las não muda nenhuma outra linha.
+4. O sitemap redescobriu **4** delas, que voltaram com `tag_origem = sitemap`: datacenter, hidrogênio, Reduc e a multa à Coelba. As outras **2** não estão no sitemap e ficaram fora do corpus: chuva de meteoros Orionídeas e os 199 anos do Observatório Nacional, que citam "Sistema Solar" de passagem.
+5. As 6 continuam no gabarito `docs/benchmark/rotulos_benchmark.csv`, que não foi alterado. As 4 que voltaram têm o mesmo `id` (hash da URL), e o benchmark as encontra no corpus. As 2 que não voltaram ficam sem texto numa nova execução do benchmark: são duas das 7 notícias "fora do tema" (seção 5.2). Os resultados publicados em `docs/escolha_modelo.md` foram medidos antes da correção, com as 30 notícias.
+
+**Situação da coleta.** Em 20/11/2026, a coleta ampliada trouxe **24 notícias novas**: 21 da Agência Brasil, de 2015 a 2026, pelas tags novas e por páginas antigas das tags originais, e 3 da Agência Gov, pelo sitemap. Somadas às 4 redescobertas, o corpus chegou a 141 notícias: 134 da Agência Brasil e 7 da Agência Gov. Essas 28 (24 novas e 4 redescobertas) foram processadas pelos modelos de IA (`corpus_ia.csv`) com a configuração atual; as 113 linhas já processadas não mudaram.
+
+Na mesma data entraram as duas fontes do gov.br (seção 2.4):
+
+| Fonte | Descoberta | Examinadas | No corpus | GD sem "solar" |
+|---|---|---|---|---|
+| ANEEL | sitemap | 2.355 matérias (2.054 descartadas pelo filtro de relevância) | 298 (301 relevantes; 3 já estavam no corpus por outra fonte) | 70 |
+| MME | listagem paginada, com pré-filtro pelo título | 5.839 links (5.723 descartados pelo título; 2 com erro 500 no servidor) | 114 | 8 |
+
+"GD sem solar" conta as notícias que mencionam um termo de geração distribuída (Lei 14.300, fio B, compensação de créditos, micro ou minigeração, MMGD) e não citam "solar" nem "fotovoltaica". Nas agências da EBC esse caso quase não aparece: são 2 notícias em 141. O corpus passou a ter **553 notícias**: ANEEL 298, Agência Brasil 134, MME 114 e Agência Gov 7. As 412 da ANEEL e do MME ainda não passaram pelo processamento de IA e aparecem como "não avaliadas".
+
+Limitação do MME: o pré-filtro pelo título deixa de fora as notícias que só tratam de GD no corpo do texto.
+
+Três ajustes de coleta surgiram com essas fontes, todos com testes:
+
+- **Paginação com pré-filtro:** uma página de listagem sem nenhum título relevante encerrava a paginação. Agora ela só termina quando a página não traz nenhum link de matéria.
+- **Nomes de cache:** slugs da ANEEL com mais de 200 caracteres estouravam o limite de 260 caracteres de caminho do Windows, e a falha derrubava a fonte. Nomes longos agora são encurtados com um hash do caminho, e uma falha ao gravar o cache não interrompe mais a coleta.
+- **Rodapé do MME:** o contato da assessoria e os links de redes sociais, que fecham as matérias do MME, passaram a ser descartados como parágrafos fixos.
+
+Situação anterior: a Agência Brasil mantinha as 114 notícias coletadas em 21/09/2026: período de 27/06/2014 a 08/07/2026, tamanho médio de 3.019 caracteres e UFs mais mencionadas SP (20), RJ (16), MG (12), BA (11) e PR (10).
 
 **Esquema do corpus** (contrato único em `esquema.COLUNAS_CORPUS`, compartilhado por scrapers, API, dashboard e, no TP4, o modelo de linguagem):
 
@@ -130,6 +165,8 @@ Fontes avaliadas para ampliar o corpus, com foco em energia solar. Os critérios
 |---|---|---|---|
 |Agência Brasil (EBC)|Livre|Reprodução autorizada mediante indicação da fonte|Mantida — texto integral|
 |**Agência Gov (EBC)**|Livre|Cada matéria informa: "A reprodução é gratuita desde que citada a fonte"|**Incluída — texto integral**|
+|**ANEEL (gov.br)**|Livre|Rodapé de todo o gov.br: "Todo o conteúdo deste site está publicado sob a licença Creative Commons Atribuição-SemDerivações 3.0 Não Adaptada"|**Incluída em 20/11/2026 — texto integral**|
+|**MME (gov.br)**|Livre|Mesma licença do gov.br (CC BY-ND 3.0)|**Incluída em 20/11/2026 — texto integral**|
 |eixos (antiga epbr)|Livre (o produto "eixos PRO" é pago)|Uso pessoal e não comercial; proíbe copiar, baixar ou manter cache sem autorização por escrito|Configurada só com metadados (feed RSS) e **desabilitada** até autorização da agência|
 |g1 / Globo|Livre|Os termos gerais da Globo autorizam indexação automatizada apenas por buscadores públicos, para exibir links|Excluída|
 |CNN Brasil|Livre|Termos de uso não localizados na avaliação; todos os direitos reservados|Não incluída até verificação|
@@ -137,6 +174,15 @@ Fontes avaliadas para ampliar o corpus, com foco em energia solar. Os critérios
 |CanalEnergia|Assinatura|—|Excluída: conteúdo sem acesso liberado|
 |MegaWhat|Assinatura|—|Excluída: conteúdo sem acesso liberado|
 |Canal Solar|Livre|Pede contato prévio para reutilizar o material|Excluída|
+
+**ANEEL e MME (avaliação de 20/11/2026).** As duas fontes foram avaliadas para trazer notícias de geração distribuída que não citam "solar" (Lei 14.300, MMGD, compensação de energia), caso pouco presente nas agências da EBC. Pelos quatro critérios:
+
+1. **Acesso:** livre, sem cadastro.
+2. **Termos e licença:** todo o gov.br está sob CC BY-ND 3.0, que autoriza copiar e redistribuir o conteúdo literalmente, inclusive em repositório público, desde que citada a fonte. Os Termos de Uso do gov.br (`/pt-br/termos-de-uso`) tratam de cookies e do uso dos serviços e não proíbem coleta automatizada. **Ressalva:** a cláusula "SemDerivações" proíbe distribuir obra adaptada. O texto do corpus é literal e cumpre a licença. Já o resumo gerado pelo modelo (`corpus_ia.csv`) é curto e não reproduz a obra, mas a fronteira entre resumo e adaptação não é nítida: se o projeto quiser eliminar esse risco, basta não publicar o resumo dessas duas fontes e manter só a relevância.
+3. **robots.txt:** o de `www.gov.br` (salvo em `tests/fixtures/robots_govbr.txt`) não tem regras para `/aneel` nem `/mme` e não tem `Crawl-delay`; vale a pausa padrão de 1,5 s. Os bloqueios com `?` (`Disallow: /mre/*?`, `/ebserh/*?`) valem só para outros órgãos.
+4. **Estrutura:**
+   - **ANEEL:** usa Plone Volto. A listagem de notícias é montada por JavaScript e vem vazia no HTML, por isso a descoberta é pelo sitemap do órgão (`/aneel/sitemap.xml.gz`, 2.355 matérias de 2022 a 2026). Na matéria, o corpo não vem como `<p>`: vem nos blocos do objeto `window.__data`, escrito no próprio HTML. O coletor lê esse objeto (`base.extrair_volto`) sem executar JavaScript.
+   - **MME:** usa Plone clássico, mas não publica sitemap (404). A descoberta é pela listagem `/mme/pt-br/assuntos/noticias`, paginada com `?b_start:int=N`, que o `robots.txt` permite. A listagem é ampla (petróleo, gás, mineração), por isso só segue os links cujo título passa no filtro de relevância.
 
 **Nível de texto proporcional à licença.** Fontes com autorização de reprodução entram no nível `integral`, com o texto completo. Para fontes sem essa autorização, o projeto prevê o nível `metadados`: só título, linha fina, data e link, lidos do feed RSS que o próprio veículo publica para leitores automáticos. Nesse nível nenhuma matéria é baixada nem guardada. O mecanismo está implementado e testado (fonte eixos), mas desabilitado: habilitá-lo depende de autorização, que pode ser solicitada pelo contato informado no site do veículo.
 
@@ -406,7 +452,8 @@ Cruza a adoção per capita (W/hab acumulado até outubro de 2026) com o crescim
 |Classe de consumo `REBR`|47.844 registros em 14 UFs (base 10/2026), sem significado documentado. Mantida sem alteração até consulta ao dicionário de dados da ANEEL|
 |Divergência de potência com o painel oficial|Resolvida com a base 10/2026 (seção 3.6)|
 |Registros de 75 kW no Paraná|**Tratamento aplicado** (seção 3.4.3): sinalização por diagnóstico entre distribuidoras e imputação da potência na visão corrigida. Resta registrar a inconsistência junto à ANEEL e rever a regra se a base mudar (a margem da segunda distribuidora é estreita)|
-|Primeira coleta real da Agência Gov|Coletor testado com páginas de exemplo; números a registrar após a execução local|
+|Agência Gov pelo sitemap|Coleta feita em 20/11/2026 (seção 2.3). O sitemap cobre sobretudo os meses recentes; matérias antigas só entram se aparecerem nele ou na editoria Energia|
+|IA nas notícias da ANEEL e do MME|As 412 notícias coletadas em 20/11/2026 ainda não passaram por `processar_corpus`. Antes de publicar os resumos dessas fontes, decidir sobre a cláusula SemDerivações da CC BY-ND 3.0 (seção 2.4)|
 |Inclusão de PB, PI, RO e SE no Convênio 16/15|Inferida da redação dada pelo Conv. ICMS 75/16. Confirmar no texto consolidado atual do CONFAZ, por consulta manual|
 |Termos de uso de CNN Brasil e R7|Não localizados; as fontes permanecem fora do corpus até verificação|
 
@@ -495,6 +542,12 @@ O corpus de notícias é processado por modelos executados localmente (HuggingFa
 |Linhas finas próprias|Corpus: notícias cuja linha fina não repete o primeiro parágrafo|56 notícias|Referência de resumo (o modelo recebe a notícia **sem** a linha fina, para não haver vazamento)|
 
 Achado de qualidade do corpus: em 56 das 119 notícias, a "linha fina" coletada é o primeiro parágrafo da matéria (o portal repete o lide na meta descrição). A entrada do modelo (`texto_para_modelo`) passou a omitir a linha fina nesses casos, para não gastar a janela de 512 tokens com texto duplicado.
+
+**Decisão: sem notícias sintéticas (20/11/2026).** Foi avaliado gerar notícias sintéticas para ampliar os dados de IA, e a ideia foi descartada. Nenhum modelo do projeto é treinado com dados do projeto: a relevância e o tom são classificados em zero-shot (mDeBERTa NLI), e o resumo usa um PTT5 já ajustado pelos autores. Sem treino, texto sintético não teria uso, e num gabarito de avaliação ele mediria o modelo contra textos escritos já com o rótulo em mente. A melhoria segue dois caminhos com dados reais:
+- a ampliação do benchmark com notícias novas, rotuladas pela autora com o mesmo guia (`src/ia/rotulagem.py --v2`);
+- a engenharia da hipótese de relevância, que hoje fala só em "energia solar" e falha em notícias de geração distribuída que não usam essa palavra (seção 5.4).
+
+**Planilha do benchmark v2 (20/11/2026).** `docs/benchmark/rotulos_benchmark_v2_pendentes.csv` tem **120 notícias reais**, com rótulos vazios para a autora preencher: ANEEL 74, MME 23, Agência Brasil 21 e Agência Gov 2. Elas foram sorteadas, com semente fixa, entre as 525 notícias do corpus que estão fora do gabarito v1. Ficaram de fora também as 2 notícias do v1 descobertas por caminho proibido que não voltaram pelo sitemap (seção 2.3). Entre as 120, **33 são de GD sem "solar"** (30 da ANEEL e 3 do MME): 20 entram pela cota reservada a esse caso, e as demais vieram do sorteio estratificado por fonte e palavra-chave.
 
 ### 5.3 Processamento em lote e armazenamento
 
