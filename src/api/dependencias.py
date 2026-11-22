@@ -3,7 +3,8 @@ PROJETO: SolarGap Brasil
 ARQUIVO: dependencias.py
 AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 21/10/2026
-ATUALIZAÇÃO:
+ATUALIZAÇÃO: 22/11/2026 — TP4.5, Tarefa 7: Gold de potencial no repositório
+             (carga própria: se faltar, só as rotas /potencial respondem 503)
 
 DESCRIÇÃO:
     Dependências injetadas nas rotas (sistema Depends da FastAPI):
@@ -33,6 +34,7 @@ import pandas as pd
 from fastapi import Depends, Query, Request
 
 from src.servicos import dados, indicadores
+from src.servicos import potencial as servico_potencial
 
 
 @dataclass
@@ -46,6 +48,7 @@ class Repositorio:
     carregado_em: datetime = field(
         default_factory=lambda: datetime.now().replace(microsecond=0)
     )
+    potencial: servico_potencial.BasePotencial | None = None
 
     @classmethod
     def carregar(
@@ -62,6 +65,16 @@ class Repositorio:
             pasta_processed=pasta_processed,
             pasta_external=pasta_external,
         )
+
+    def base_potencial(self) -> servico_potencial.BasePotencial:
+        """Gold de potencial (Tarefas 2, 3, 4 e 6), lida na primeira consulta.
+
+        Carga separada das demais: sem esses arquivos, a API continua no ar e
+        só as rotas /potencial respondem 503 (DadosIndisponiveis).
+        """
+        if self.potencial is None:
+            self.potencial = servico_potencial.carregar_base(self.pasta_processed)
+        return self.potencial
 
     def recarregar_corpus(self) -> None:
         self.corpus = dados.carregar_corpus_completo(
@@ -116,7 +129,10 @@ def obter_filtros(
     incluir_imputados: Annotated[
         bool,
         Query(
-            description="Contar os registros sem fonte do MA como solares (visão corrigida)."
+            description=(
+                "Visão corrigida (padrão): conta como solares os registros sem fonte e usa a "
+                "potência corrigida dos registros de 75 kW suspeitos. false = critério ANEEL."
+            )
         ),
     ] = True,
 ) -> FiltroAPI:

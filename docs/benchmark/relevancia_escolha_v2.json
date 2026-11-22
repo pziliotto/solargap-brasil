@@ -1,0 +1,15 @@
+{
+  "estrategia": "hibrido_titulo",
+  "limiar": 0.4,
+  "f1_macro_dev": 0.751,
+  "precisao_sim_dev": 0.892,
+  "f1_sim_gd_sem_solar_dev": 0.667,
+  "f1_macro_sempre_sim_dev": 0.416,
+  "empatadas": [
+    "hibrido_titulo@0.3",
+    "hibrido_titulo@0.35",
+    "hibrido_titulo@0.4"
+  ],
+  "regra": "restrições: F1 macro > 'sempre sim' e F1-sim > 0 em GD sem solar; critério: maior F1 macro; empate (< 0,005): maior precisão de 'sim', menor custo, limiar mais perto de 0,5",
+  "condicao_de_adocao": "no teste, F1 macro maior que o da configuração atual e o de 'sempre sim', com IC 95% da diferença pareada acima de zero nos dois casos"
+}

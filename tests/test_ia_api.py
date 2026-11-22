@@ -315,3 +315,146 @@ def test_api_lista_noticias_com_relevancia(tmp_path, pasta_processed_temporaria)
         and item["relevancia_prob"] == 0.95
         and item["resumo"] == "resumo"
     )
+
+
+# ═══════════════════ Licença sem derivação (CC BY-ND, gov.br) ═══════════════════
+
+
+def _id_da_fonte(fonte: str) -> str:
+    corpus = dados.carregar_corpus()
+    return corpus.loc[corpus["fonte"] == fonte, "id"].iloc[0]
+
+
+def test_fontes_sem_derivacao_coincidem_com_o_cadastro():
+    from src.data_acquisition.noticias.fontes import FONTES
+
+    assert esquema.FONTES_SEM_DERIVACAO == {
+        f.nome for f in FONTES if not f.permite_derivacao
+    }
+    assert esquema.permite_resumo("Agência Brasil") and not esquema.permite_resumo(
+        "ANEEL"
+    )
+
+
+def test_anexar_ia_omite_resumo_das_fontes_cc_by_nd():
+    corpus = pd.DataFrame(
+        {
+            "id": ["a", "b", "c"],
+            "fonte": ["Agência Brasil", "ANEEL", "Agência Gov"],
+            "resumo": [None] * 3,
+        }
+    )
+    ia = pd.DataFrame(
+        {
+            "id": ["a", "b", "c"],
+            "resumo": ["resumo A", "resumo B", "resumo C"],
+            "resumo_truncado": [False, True, False],
+            "relevante": ["True", "True", "False"],
+            "relevancia_prob": [0.9, 0.8, 0.1],
+        }
+    )
+    unido = dados.anexar_ia(corpus, ia).set_index("id")
+    assert unido.loc["a", "resumo"] == "resumo A"
+    assert unido.loc[["b", "c"], "resumo"].isna().all()
+    assert unido.loc[["b", "c"], "resumo_truncado"].isna().all()
+    assert bool(unido.loc["b", "relevante"])  # a classificação continua visível
+    assert dados.anexar_ia(corpus.assign(resumo=["x", "y", "z"]), None)[
+        "resumo"
+    ].tolist() == [
+        "x",
+        None,
+        None,
+    ]
+
+
+def test_api_lista_gov_br_sem_resumo(tmp_path):
+    repositorio = Repositorio.carregar(pasta_external=tmp_path)
+    app.dependency_overrides[obter_repositorio] = lambda: repositorio
+    try:
+        with TestClient(app) as cliente:
+            for fonte in sorted(esquema.FONTES_SEM_DERIVACAO):
+                corpo = cliente.get(
+                    "/noticias", params={"fonte": fonte, "limite": 50}
+                ).json()
+                itens = corpo["itens"] if isinstance(corpo, dict) else corpo
+                assert itens, fonte
+                assert all(item.get("resumo") is None for item in itens), fonte
+    finally:
+        app.dependency_overrides.clear()
+
+
+def test_processar_noticia_gov_br_sem_resumo(cliente_ia):
+    id_aneel = _id_da_fonte("ANEEL")
+    resposta = cliente_ia.post(f"/noticias/{id_aneel}/processar")
+    assert resposta.status_code == 200
+    assert set(resposta.json()["resultados"]) == {"relevancia"}  # padrão sem resumo
+    pedido = cliente_ia.post(f"/noticias/{id_aneel}/processar?tarefas=resumo")
+    assert pedido.status_code == 403 and "CC BY-ND" in pedido.json()["detail"]
+    id_ab = _id_da_fonte("Agência Brasil")
+    corpo = cliente_ia.post(f"/noticias/{id_ab}/processar").json()
+    assert set(corpo["resultados"]) == {"resumo", "relevancia"}
+
+
+def test_lote_nao_gera_resumo_para_gov_br():
+    gerenciador = _gerenciador()
+    corpus = dados.carregar_corpus()
+    amostra = pd.concat(
+        [
+            corpus[corpus["fonte"] == f].head(1)
+            for f in ("Agência Brasil", "ANEEL", "MME")
+        ]
+    )
+    saida = processar_corpus.processar(amostra, gerenciador).set_index("id")
+    linha = dict(zip(amostra["fonte"], amostra["id"]))
+    assert saida.loc[linha["Agência Brasil"], "resumo"]
+    assert pd.isna(saida.loc[linha["ANEEL"], "resumo"]) and pd.isna(
+        saida.loc[linha["MME"], "resumo"]
+    )
+    assert saida["relevancia_prob"].notna().all()
+
+
+# ═══════════════════ Relevância híbrida (benchmark v2, 22/11/2026) ═══════════════════
+
+
+def test_relevancia_hibrida_termo_gd_no_titulo_ou_modelo():
+    gerenciador = _gerenciador()
+    assert catalogo.LIMIAR_RELEVANCIA == 0.4
+    # O modelo falso dá 0,02 sem "solar": só a regra do título salva a notícia de GD.
+    gd = gerenciador.avaliar_relevancia(
+        "texto qualquer", titulo="ANEEL regulamenta a Lei 14.300"
+    )
+    assert gd.relevante and gd.por_termo_gd and gd.probabilidade < 0.4
+    modelo = gerenciador.avaliar_relevancia(
+        "Usina de energia solar", titulo="Usina nova"
+    )
+    assert modelo.relevante and not modelo.por_termo_gd
+    fora = gerenciador.avaliar_relevancia(
+        "Leilão de petróleo", titulo="Leilão de petróleo"
+    )
+    assert not fora.relevante and not fora.por_termo_gd
+    # Termo de GD só no corpo não aciona a regra (ela olha o título).
+    assert not gerenciador.avaliar_relevancia(
+        "Leilão\n\nfala de minigeração", titulo="Leilão"
+    ).relevante
+    # Sem título: vale a primeira linha do texto.
+    assert gerenciador.avaliar_relevancia("Regras da minigeração\n\ncorpo").por_termo_gd
+
+
+def test_processar_texto_informa_regra_de_palavra(cliente_ia):
+    corpo = cliente_ia.post(
+        "/processar_texto",
+        json={
+            "texto": "Aneel revisa regras da micro e minigeração distribuída.",
+            "tarefas": ["relevancia"],
+        },
+    ).json()
+    relevancia = corpo["resultados"]["relevancia"]
+    assert relevancia["relevante"] and relevancia["por_termo_gd"]
+    assert relevancia["limiar"] == 0.4
+
+
+def test_lote_grava_regra_e_estrategia():
+    corpus = dados.carregar_corpus()
+    saida = processar_corpus.processar(corpus.head(3), _gerenciador())
+    assert "relevancia_por_termo" in saida.columns
+    assert saida["modelo_relevancia"].str.endswith(catalogo.ESTRATEGIA_RELEVANCIA).all()

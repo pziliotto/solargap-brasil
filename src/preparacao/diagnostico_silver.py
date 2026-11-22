@@ -6,7 +6,9 @@ CRIAÇÃO: 22/09/2026
 ATUALIZAÇÃO: 22/09/2026 — seções 5 a 7 (tipo de geração, REBR, código municipal)
 
 DESCRIÇÃO:
-    Investiga achados da primeira execução do construir_silver.py:
+    Investiga achados da primeira execução do construir_silver.py. Os números
+    abaixo são HISTÓRICOS, da base ANEEL de referência 08/2026, que motivou as
+    correções da Silver; o script continua válido para qualquer base:
         1. 73.501 registros sem fonte de geração (99,8% no MA);
         2. 41 registros com potência igual a zero (todos no PR);
         3. 1 registro sem UF (código municipal com 6 dígitos);
@@ -16,6 +18,11 @@ DESCRIÇÃO:
 
     O objetivo é decidir, com evidência, se cada grupo deve ser recuperado,
     descartado ou mantido — e documentar a decisão no Data Summary Report.
+
+    Na base 10/2026: 156 registros sem fonte (espalhados; a ANEEL retirou os do
+    MA), 6 com potência <= 0 (PR, 2024–2025) e nenhum código de 6 dígitos. O
+    diagnóstico da potência suspeita (registros de 75 kW) fica em
+    potencia_suspeita.py, executado pelo próprio construir_silver.py.
 
 OBS. DE USO:
     Rodar a partir da raiz, depois do construir_silver:

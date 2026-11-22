@@ -4,6 +4,8 @@ ARQUIVO: construir_silver.py
 AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 22/09/2026
 ATUALIZAÇÃO: 22/09/2026 — correções a partir do diagnostico_silver.py
+             20/11/2026 — TP4.5: distribuidora e modalidade na Silver; tratamento
+             da potência suspeita (75 kW), em potencia_suspeita.py
 
 DESCRIÇÃO:
     Constrói a camada Silver (data/interim) a partir da camada Bronze (data/raw):
@@ -15,19 +17,29 @@ DECISÕES:
     - Todas as fontes de geração são mantidas. Silver é dado limpo, não dado
       recortado: o filtro de fonte solar é decisão analítica e fica na Gold.
     - A base é lida e gravada em chunks (ParquetWriter), sem acumular os
-      ~4,6 milhões de registros em memória.
+      ~4,6 milhões de registros em memória. Exceção: o tratamento da potência
+      suspeita precisa da base inteira (medianas entre distribuidoras e por
+      município), e roda numa segunda passada sobre o arquivo parcial, só com
+      as colunas da Silver.
     - Gravação em arquivo .parcial, renomeado só ao final (mesmo padrão do
       aneel.py): uma execução interrompida nunca deixa Silver pela metade.
 
 CORREÇÕES (evidência no diagnostico_silver.py):
     - Fonte imputada: registros sem DscFonteGeracao E sem SigTipoGeracao
-      (73.501, 99,8% no MA) recebem "Radiação solar". Justificativa: 99,98%
-      dos registros com fonte conhecida são solares e a distribuição de
-      potência do grupo é equivalente à dos solares. A coluna
-      fonte_imputada preserva a rastreabilidade e permite reverter a decisão.
+      recebem "Radiação solar". Justificativa: 99,98% dos registros com fonte
+      conhecida são solares. A coluna fonte_imputada preserva a
+      rastreabilidade e permite reverter a decisão.
+      Histórico: na base ANEEL 08/2026 eram 73.501 registros (99,8% no MA);
+      na base 10/2026 a ANEEL retirou esses registros e restam 156, espalhados.
     - Código municipal com 6 dígitos (sem dígito verificador) é convertido
-      para 7 dígitos pela tabela do IBGE.
+      para 7 dígitos pela tabela do IBGE (1 caso na base 08/2026; nenhum na
+      10/2026).
     - UF ausente é recuperada pelo prefixo do código municipal.
+    - Potência suspeita (TP4.5): registros de exatamente 75 kW das
+      distribuidoras sinalizadas por diagnóstico estatístico recebem
+      flag_potencia_suspeita e potência imputada em potencia_corrigida_kw; a
+      potência oficial (potencia_kw) é preservada. Regras em
+      potencia_suspeita.py.
 
 EXCLUSÕES:
     - Sem data, ano 1900 (sentinela), ano anterior a 2012 (REN 482/2012);
@@ -35,6 +47,7 @@ EXCLUSÕES:
 
 SAÍDAS:
     data/interim/mmgd_silver.parquet
+    data/interim/diagnostico_potencia_suspeita.csv  (por distribuidora)
     data/interim/populacao_uf_silver.csv
     data/interim/populacao_municipio_silver.csv
 
@@ -57,7 +70,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from src.data_acquisition.coletor_base import configurar_logging, obter_project_root
-from src.preparacao import esquema
+from src.preparacao import esquema, potencia_suspeita
 from src.preparacao.gerar_amostra import localizar_csv_no_zip
 
 PROJECT_ROOT = obter_project_root(__file__)
@@ -79,8 +92,10 @@ SEPARADOR = ";"
 # código IBGE da UF -> sigla (inverso do cadastro do esquema)
 SIGLA_POR_COD = {cod: sigla for sigla, (cod, _) in esquema.UFS.items()}
 
-# Esquema fixo do Parquet: garante tipos idênticos em todos os chunks.
-SCHEMA_SILVER = pa.schema(
+SAIDA_DIAGNOSTICO_POTENCIA = PASTA_INTERIM / "diagnostico_potencia_suspeita.csv"
+
+# Esquema fixo do Parquet dos chunks: garante tipos idênticos em todos eles.
+SCHEMA_CHUNK = pa.schema(
     [
         ("sigla_uf", pa.string()),
         ("cod_uf", pa.int64()),
@@ -90,8 +105,21 @@ SCHEMA_SILVER = pa.schema(
         ("fonte_imputada", pa.bool_()),
         ("classe_consumo", pa.string()),
         ("tipo_geracao", pa.string()),
+        ("distribuidora", pa.string()),
+        ("modalidade", pa.string()),
         ("data_conexao", pa.timestamp("ns")),
         ("ano", pa.int64()),
+    ]
+)
+
+# Esquema final: chunks + colunas do tratamento da potência suspeita.
+SCHEMA_SILVER = pa.schema(
+    list(SCHEMA_CHUNK)
+    + [
+        pa.field("flag_potencia_suspeita", pa.bool_()),
+        pa.field("potencia_corrigida_kw", pa.float64()),
+        pa.field("nivel_imputacao_potencia", pa.string()),
+        pa.field("potencia_conservadora_kw", pa.float64()),
     ]
 )
 
@@ -195,7 +223,14 @@ def tratar_chunk(
     df = chunk.rename(columns=esquema.RENOMEAR_ANEEL)
     contagem["lidos"] += len(df)
 
-    for coluna in ("sigla_uf", "fonte_geracao", "classe_consumo", "tipo_geracao"):
+    for coluna in (
+        "sigla_uf",
+        "fonte_geracao",
+        "classe_consumo",
+        "tipo_geracao",
+        "distribuidora",
+        "modalidade",
+    ):
         df[coluna] = df[coluna].str.strip()
     df["sigla_uf"] = df["sigla_uf"].str.upper()
 
@@ -260,7 +295,28 @@ def tratar_chunk(
     contagem["fonte_nula_restante"] += int(df["fonte_geracao"].isna().sum())
 
     contagem["mantidos"] += len(df)
-    return df[SCHEMA_SILVER.names]
+    return df[SCHEMA_CHUNK.names]
+
+
+def tratar_potencia_suspeita(origem: Path, destino: Path) -> None:
+    """Segunda passada: aplica o tratamento da potência suspeita à base inteira.
+
+    Lê o Parquet dos chunks, acrescenta as colunas do tratamento e grava no
+    destino com o esquema final. O diagnóstico por distribuidora vai para
+    data/interim/diagnostico_potencia_suspeita.csv.
+    """
+    silver = pd.read_parquet(origem)
+    tratada, diagnostico = potencia_suspeita.aplicar_tratamento(silver)
+    pq.write_table(
+        pa.Table.from_pandas(
+            tratada[SCHEMA_SILVER.names], schema=SCHEMA_SILVER, preserve_index=False
+        ),
+        destino,
+    )
+    diagnostico.to_csv(
+        SAIDA_DIAGNOSTICO_POTENCIA, sep=SEPARADOR, index=False, encoding="utf-8"
+    )
+    logging.info("Diagnóstico por distribuidora: %s", SAIDA_DIAGNOSTICO_POTENCIA)
 
 
 def registrar_resumo(contagem: Counter, fontes: Counter, imputados_uf: Counter) -> None:
@@ -344,7 +400,7 @@ def construir_mmgd_silver(municipio_7_digitos: dict[int, int]) -> None:
                 usecols=esquema.COLUNAS_ANEEL,
                 chunksize=TAMANHO_CHUNK,
             )
-            writer = pq.ParquetWriter(temporario, SCHEMA_SILVER)
+            writer = pq.ParquetWriter(temporario, SCHEMA_CHUNK)
 
             for numero, chunk in enumerate(leitor, start=1):
                 df = tratar_chunk(chunk, contagem, municipio_7_digitos)
@@ -353,7 +409,7 @@ def construir_mmgd_silver(municipio_7_digitos: dict[int, int]) -> None:
                     df.loc[df["fonte_imputada"], "sigla_uf"].value_counts().to_dict()
                 )
                 writer.write_table(
-                    pa.Table.from_pandas(df, schema=SCHEMA_SILVER, preserve_index=False)
+                    pa.Table.from_pandas(df, schema=SCHEMA_CHUNK, preserve_index=False)
                 )
                 logging.info(
                     "  chunk %d — %s registros lidos até agora",
@@ -363,7 +419,15 @@ def construir_mmgd_silver(municipio_7_digitos: dict[int, int]) -> None:
 
         writer.close()
         writer = None
-        temporario.replace(SAIDA_MMGD)
+
+        logging.info("--- Tratamento da potência suspeita (base inteira) ---")
+        tratado = SAIDA_MMGD.with_suffix(".parquet.tratado")
+        try:
+            tratar_potencia_suspeita(temporario, tratado)
+            tratado.replace(SAIDA_MMGD)
+        finally:
+            tratado.unlink(missing_ok=True)
+            temporario.unlink(missing_ok=True)
 
     finally:
         # Só entra aqui com writer aberto se algo falhou no meio do caminho.

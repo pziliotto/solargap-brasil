@@ -36,7 +36,7 @@ indicadores_uf = dados.indicadores_por_uf(
     filtros.ano_inicio,
     filtros.ano_fim,
     filtros.classes,
-    filtros.incluir_imputados,
+    filtros.visao,
 )
 
 st.session_state.setdefault("upload", None)
@@ -51,7 +51,7 @@ st.markdown("Os arquivos respeitam os filtros aplicados na barra lateral.")
 crescimento, _ = dados.taxa_crescimento(
     agregado,
     filtros.classes,
-    filtros.incluir_imputados,
+    filtros.visao,
     indicadores.ANO_BASE_CRESCIMENTO,
     indicadores.ANO_FINAL_CRESCIMENTO,
 )
@@ -70,7 +70,7 @@ arquivos = [
             filtros.ano_inicio,
             filtros.ano_fim,
             filtros.classes,
-            filtros.incluir_imputados,
+            filtros.visao,
         ),
         "solargap_serie_anual.csv",
     ),

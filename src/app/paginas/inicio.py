@@ -3,22 +3,24 @@ PROJETO: SolarGap Brasil
 ARQUIVO: paginas/inicio.py
 AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 21/10/2026
-ATUALIZAÇÃO:
+ATUALIZAÇÃO: 22/11/2026 — TP4.5, Tarefa 7: números-chave seguem a visão da
+             barra lateral; link para a página Potencial Solar
 
 DESCRIÇÃO:
     Página inicial: problema de negócio, objetivo, números-chave do Brasil e
     um guia das demais páginas. Substitui o expander "Sobre o projeto" do TP2.
 
 OBS.:
-    Os números-chave usam a visão padrão (com correção de preenchimento e
-    período completo), e não os filtros da barra lateral — a página inicial é
-    o retrato geral, igual para todo visitante.
+    Os números-chave usam o período completo e todas as classes, e não os
+    filtros dos indicadores — a página inicial é o retrato geral. A visão da
+    base (corrigida, ANEEL ou conservadora) segue o seletor da barra lateral,
+    que vale para todas as páginas.
 """
 
 import streamlit as st
 
 from src.app import carregamento as dados
-from src.app.componentes import fmt, rodape
+from src.app.componentes import VISOES, fmt, rodape, visao_atual
 from src.preparacao import esquema
 from src.servicos import indicadores
 
@@ -29,7 +31,7 @@ corpus = dados.carregar_corpus()
 ano_min, ano_max = indicadores.anos_disponiveis(agregado)
 classes = tuple(indicadores.classes_disponiveis(agregado))
 indicadores_uf = dados.indicadores_por_uf(
-    agregado, dim_uf, ano_min, ano_max, classes, True
+    agregado, dim_uf, ano_min, ano_max, classes, visao_atual()
 )
 referencia = indicadores.media_brasil(indicadores_uf)
 abaixo_media = int(
@@ -53,7 +55,8 @@ trás e onde estão as oportunidades ainda não exploradas pelo mercado solar.
     unsafe_allow_html=True,
 )
 
-st.subheader(f"O Brasil solar distribuído, até ago/{esquema.ANO_PARCIAL}")
+st.subheader(f"O Brasil solar distribuído, até out/{esquema.ANO_PARCIAL}")
+st.caption(f"Visão: {VISOES[visao_atual()]}")
 k1, k2, k3, k4 = st.columns(4)
 k1.metric(
     "Potência instalada", f"{fmt(indicadores_uf['potencia_mw'].sum() / 1000, 1)} GW"
@@ -81,6 +84,11 @@ with c1:
         "paginas/oportunidades.py",
         label="**Oportunidades** — adoção x crescimento e política de ICMS",
         icon="🎯",
+    )
+    st.page_link(
+        "paginas/potencial.py",
+        label="**Potencial Solar** — potencial x produção, fatores e cenários 2030–2050",
+        icon="🏠",
     )
 with c2:
     st.page_link(

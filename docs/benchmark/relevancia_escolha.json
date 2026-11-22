@@ -1,0 +1,19 @@
+{
+  "estrategia": "curtas",
+  "limiar": 0.5,
+  "f1_geral_dev": 0.848,
+  "f1_gd_sem_solar_dev": 0.737,
+  "empatados": [
+    "curtas@0.4",
+    "curtas@0.45",
+    "curtas@0.5",
+    "curtas@0.55",
+    "curtas@0.6"
+  ],
+  "regra": "maior F1 geral no desenvolvimento; empate (< 0,005): maior F1 em GD sem solar; depois menor custo e limiar mais perto de 0,5",
+  "referencia_sempre_sim_dev": {
+    "f1_geral": 0.832,
+    "f1_gd_sem_solar": 0.7
+  },
+  "condicao_de_adocao": "no teste, F1 geral maior que o da configuração atual E maior que o de 'sempre sim', com IC 95% da diferença pareada acima de zero nos dois casos. A comparação com 'sempre sim' foi acrescentada em 22/11/2026 depois de ver o desenvolvimento (a escolhida acertou 2 de 17 'nao') e antes de abrir o teste."
+}

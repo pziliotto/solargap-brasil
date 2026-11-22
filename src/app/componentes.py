@@ -3,11 +3,13 @@ PROJETO: SolarGap Brasil
 ARQUIVO: componentes.py
 AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 21/10/2026
-ATUALIZAÇÃO:
+ATUALIZAÇÃO: 22/11/2026 — TP4.5, Tarefa 7: seletor com três visões
+             (corrigida, ANEEL, conservadora), desenhado em todas as páginas
 
 DESCRIÇÃO:
     Peças reutilizadas pelas páginas do app multipáginas (TP3):
-        - filtros globais da barra lateral (visão, métrica, período, classe);
+        - seletor de visão da base (todas as páginas) e filtros dos
+          indicadores (métrica, período, classe; só nas páginas de análise);
         - formatação de números no padrão brasileiro e exportação CSV;
         - avisos padronizados (ano parcial, registros imputados) e rodapé.
 
@@ -42,7 +44,33 @@ import streamlit as st
 from src.preparacao import esquema
 from src.servicos import indicadores
 
-VISOES = {"Com correção de preenchimento": True, "Critério ANEEL": False}
+VISOES = indicadores.ROTULOS_VISAO  # chave -> rótulo do seletor
+URL_REPOSITORIO = "https://github.com/pziliotto/solargap-brasil/blob/main/"
+
+
+def link_doc(caminho: str) -> str:
+    """Link para um documento do repositório (ex.: docs/potencial/README.md)."""
+    return URL_REPOSITORIO + caminho
+
+
+DOC_ATUALIZACAO_BASE = link_doc("docs/potencial/atualizacao_base_10_2026.md")
+AJUDA_VISAO = (
+    "A base é a da ANEEL de 10/2026 (2026 parcial, até outubro). As visões diferem em "
+    "duas correções de preenchimento.\n\n"
+    "**75 kW da COPEL-DIS.** A distribuidora do Paraná registra 75 kW, o teto da "
+    "microgeração, em cerca de 47 mil sistemas, inclusive residências. A **visão "
+    "corrigida** (padrão) atribui a esses registros a potência mediana de sistemas "
+    "semelhantes do mesmo município. O **limite conservador** corrige só os "
+    "residenciais (cerca de 28 mil) e mantém os 75 kW de comércios, propriedades "
+    "rurais e indústrias, que podem de fato ter essa potência.\n\n"
+    "**Registros sem fonte (MA).** Na base de 08/2026, 44% dos registros do MA vinham "
+    "sem fonte de geração e o projeto os contava como solares. Na base de 10/2026, a "
+    "ANEEL retirou esses registros e o MA não depende mais da visão. Restam 156 "
+    "registros sem fonte no país (PE, SC, MG e outros), contados como solares na "
+    "corrigida e na conservadora.\n\n"
+    "O **critério ANEEL** usa o dado oficial sem correções, como o painel da agência.\n\n"
+    f"Detalhes: [atualização da base 10/2026]({DOC_ATUALIZACAO_BASE})."
+)
 SIGLAS = sorted(esquema.UFS)
 COR_DESTAQUE = "#F4A300"
 COR_BASE = "#B8C2CC"
@@ -57,8 +85,7 @@ CORES_QUADRANTE = {
 
 @dataclass(frozen=True)
 class FiltrosPainel:
-    visao: str
-    incluir_imputados: bool
+    visao: str  # chave: corrigida | aneel | conservadora
     metrica: str
     ano_inicio: int
     ano_fim: int
@@ -67,6 +94,14 @@ class FiltrosPainel:
     @property
     def info_metrica(self) -> indicadores.Metrica:
         return indicadores.METRICAS[self.metrica]
+
+    @property
+    def rotulo_visao(self) -> str:
+        return VISOES[self.visao]
+
+    @property
+    def incluir_imputados(self) -> bool:
+        return self.visao != "aneel"
 
 
 # ═══════════════════ Persistência de widgets ═══════════════════
@@ -91,24 +126,37 @@ def widget_persistente(funcao, rotulo: str, chave: str, padrao, **kwargs):
 # ═══════════════════ Filtros globais ═══════════════════
 
 
-def barra_lateral_filtros(agregado: pd.DataFrame) -> FiltrosPainel:
+def seletor_visao() -> str:
+    """Seletor de visão da base, desenhado pelo app.py em todas as páginas.
+
+    Devolve a chave (corrigida | aneel | conservadora) e a grava em
+    st.session_state["visao_base"], lida pelas páginas com visao_atual().
+    """
+    with st.sidebar:
+        visao = widget_persistente(
+            st.radio,
+            "Visão dos dados",
+            "visao",
+            indicadores.VISAO_PADRAO,
+            options=list(VISOES),
+            format_func=VISOES.get,
+            help=AJUDA_VISAO,
+        )
+    st.session_state["visao_base"] = visao
+    return visao
+
+
+def visao_atual() -> str:
+    """Visão escolhida na barra lateral (padrão: corrigida)."""
+    return st.session_state.get("visao_base", indicadores.VISAO_PADRAO)
+
+
+def barra_lateral_filtros(agregado: pd.DataFrame, visao: str) -> FiltrosPainel:
     ano_min, ano_max = indicadores.anos_disponiveis(agregado)
     classes_todas = indicadores.classes_disponiveis(agregado)
 
     with st.sidebar:
         st.header("Filtros")
-        visao = widget_persistente(
-            st.radio,
-            "Visão dos dados",
-            "visao",
-            list(VISOES)[0],
-            options=list(VISOES),
-            help=(
-                "Uma distribuidora do Maranhão não informa a fonte de geração em cerca de "
-                "73 mil registros. 'Com correção' os conta como solares (99,98% dos registros "
-                "com fonte conhecida são solares); 'Critério ANEEL' os exclui, como o painel oficial."
-            ),
-        )
         metrica = widget_persistente(
             st.selectbox,
             "Métrica",
@@ -133,11 +181,10 @@ def barra_lateral_filtros(agregado: pd.DataFrame) -> FiltrosPainel:
             options=classes_todas,
         )
         if ano_fim >= esquema.ANO_PARCIAL:
-            st.caption(f"⚠️ {esquema.ANO_PARCIAL} é parcial: dados até agosto.")
+            st.caption(f"⚠️ {esquema.ANO_PARCIAL} é parcial: dados até outubro.")
 
     return FiltrosPainel(
         visao=visao,
-        incluir_imputados=VISOES[visao],
         metrica=metrica,
         ano_inicio=int(ano_inicio),
         ano_fim=int(ano_fim),
@@ -183,13 +230,37 @@ def para_csv(df: pd.DataFrame) -> bytes:
 # ═══════════════════ Avisos ═══════════════════
 
 
-def aviso_imputados(indicadores_uf: pd.DataFrame, incluir_imputados: bool) -> None:
+def aviso_imputados(
+    indicadores_uf: pd.DataFrame,
+    visao: str,
+    potencia: dict[str, float] | None = None,
+) -> None:
+    """Explica as correções da visão escolhida e como voltar ao dado oficial.
+
+    potencia: saída de indicadores.potencia_suspeita para o mesmo recorte e visão.
+    """
+    if visao == "aneel":
+        return
+    partes = []
+    if potencia and potencia["registros"]:
+        alcance = (
+            "dos residenciais entre os"
+            if visao == "conservadora"
+            else "de"
+        )
+        partes.append(
+            f"corrige a potência {alcance} {fmt(potencia['registros'])} sistemas registrados "
+            f"com 75 kW, o teto da microgeração ({fmt(potencia['kw_oficial'] / 1_000, 1)} MW "
+            f"no dado oficial, {fmt(potencia['kw_corrigido'] / 1_000, 1)} MW após a "
+            "imputação)"
+        )
     imputados = int(indicadores_uf["qtd_imputados"].sum())
-    if incluir_imputados and imputados:
+    if imputados:
+        partes.append(f"conta como solares {fmt(imputados)} registros sem fonte informada")
+    if partes:
         st.info(
-            f"Esta visão inclui {fmt(imputados)} registros sem fonte informada "
-            "(quase todos no Maranhão), contados como solares. Alterne para **Critério ANEEL** "
-            "na barra lateral para reproduzir os números do painel oficial.",
+            f"Esta visão {' e '.join(partes)}. Alterne para **Critério ANEEL** na barra "
+            "lateral para reproduzir os números do painel oficial.",
             icon="ℹ️",
         )
 

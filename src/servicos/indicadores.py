@@ -3,7 +3,10 @@ PROJETO: SolarGap Brasil
 ARQUIVO: indicadores.py
 AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 21/10/2026
-ATUALIZAÇÃO:
+ATUALIZAÇÃO: 20/11/2026 — TP4.5: a visão corrigida usa também a potência
+             corrigida dos registros de 75 kW suspeitos (filtrar)
+             22/11/2026 — TP4.5, Tarefa 7: três visões (corrigida, aneel,
+             conservadora); o parâmetro visao aceita também o booleano antigo
 
 DESCRIÇÃO:
     Cálculo dos indicadores do projeto a partir da camada Gold. Funções puras:
@@ -77,6 +80,39 @@ METRICAS: dict[str, Metrica] = {
     ),
 }
 
+# Potência da visão corrigida na Gold (TP4.5: registros de 75 kW suspeitos).
+COLUNA_POTENCIA_CORRIGIDA = "potencia_corrigida_kw"
+COLUNA_POTENCIA_CONSERVADORA = "potencia_conservadora_kw"
+
+# ═══════════════════ Visões da base ANEEL (TP4.5) ═══════════════════
+# corrigida ..... padrão: conta os registros sem fonte informada como solares e
+#                 imputa a potência dos 75 kW suspeitos (todas as classes)
+# aneel ......... dado oficial, sem imputados, como o painel da agência
+# conservadora .. limite de sensibilidade: como a corrigida, mas imputa a
+#                 potência só dos residenciais de 75 kW
+# Detalhes: docs/potencial/atualizacao_base_10_2026.md, seção 6.
+VISAO_PADRAO = "corrigida"
+VISOES = ("corrigida", "aneel", "conservadora")
+ROTULOS_VISAO = {
+    "corrigida": "Visão corrigida (padrão)",
+    "aneel": "Critério ANEEL",
+    "conservadora": "Limite conservador",
+}
+POTENCIA_POR_VISAO = {
+    "corrigida": COLUNA_POTENCIA_CORRIGIDA,
+    "aneel": "potencia_kw",
+    "conservadora": COLUNA_POTENCIA_CONSERVADORA,
+}
+
+
+def normalizar_visao(visao: str | bool) -> str:
+    """Chave da visão. Aceita o booleano antigo (True = corrigida, False = aneel)."""
+    if isinstance(visao, bool):
+        return VISAO_PADRAO if visao else "aneel"
+    if visao not in VISOES:
+        raise FiltroInvalido(f"Visão desconhecida: {visao!r}. Válidas: {list(VISOES)}.")
+    return visao
+
 ANO_BASE_CRESCIMENTO = 2022  # Lei 14.300/2022
 ANO_FINAL_CRESCIMENTO = esquema.ANO_PARCIAL - 1  # último ano completo
 
@@ -143,14 +179,53 @@ def filtrar(
     ano_inicio: int,
     ano_fim: int,
     classes: tuple[str, ...],
-    incluir_imputados: bool,
+    visao: str | bool,
 ) -> pd.DataFrame:
+    """Recorta o agregado e escolhe a potência da visão.
+
+    corrigida (padrão, ou True): conta os registros com fonte imputada e usa a
+    potência corrigida dos registros de 75 kW suspeitos. aneel (ou False):
+    critério do painel oficial, sem imputados e com a potência oficial.
+    conservadora: com imputados e a potência que corrige só os residenciais.
+    Em todas, a coluna devolvida chama-se potencia_kw, para que o resto do
+    cálculo não precise saber da visão.
+    """
+    visao = normalizar_visao(visao)
+    incluir_imputados = visao != "aneel"
     filtro = agregado["ano"].between(ano_inicio, ano_fim) & agregado[
         "classe_consumo"
     ].isin(classes)
     if not incluir_imputados:
         filtro &= ~agregado["fonte_imputada"]
-    return agregado[filtro]
+    filtrado = agregado[filtro]
+    coluna = POTENCIA_POR_VISAO[visao]
+    if coluna != "potencia_kw" and coluna in filtrado.columns:
+        filtrado = filtrado.assign(potencia_kw=filtrado[coluna])
+    return filtrado
+
+
+def potencia_suspeita(
+    agregado: pd.DataFrame,
+    ano_inicio: int,
+    ano_fim: int,
+    classes: tuple[str, ...],
+    visao: str | bool = VISAO_PADRAO,
+) -> dict[str, float]:
+    """Registros de 75 kW suspeitos no recorte: quantidade e kW oficial x
+    corrigido na visão pedida (corrigida ou conservadora).
+
+    Usado nos avisos do painel. Zeros se a Gold não tiver as colunas.
+    """
+    visao = normalizar_visao(visao)
+    coluna = POTENCIA_POR_VISAO["corrigida" if visao == "aneel" else visao]
+    if coluna not in agregado.columns:
+        return {"registros": 0, "kw_oficial": 0.0, "kw_corrigido": 0.0}
+    recorte = filtrar(agregado, ano_inicio, ano_fim, classes, visao="aneel")
+    return {
+        "registros": int(recorte["qtd_potencia_suspeita"].sum()),
+        "kw_oficial": float(recorte["potencia_kw"].sum()),
+        "kw_corrigido": float(recorte[coluna].sum()),
+    }
 
 
 # ═══════════════════ Indicadores por UF ═══════════════════
@@ -162,10 +237,10 @@ def indicadores_por_uf(
     ano_inicio: int,
     ano_fim: int,
     classes: tuple[str, ...],
-    incluir_imputados: bool,
+    visao: str | bool,
 ) -> pd.DataFrame:
     """Soma o agregado filtrado por UF e recalcula os indicadores per capita."""
-    filtrado = filtrar(agregado, ano_inicio, ano_fim, classes, incluir_imputados)
+    filtrado = filtrar(agregado, ano_inicio, ano_fim, classes, visao)
     filtrado = filtrado.assign(
         qtd_imputados=filtrado["qtd_empreendimentos"].where(
             filtrado["fonte_imputada"], 0
@@ -241,10 +316,10 @@ def serie_anual(
     ano_inicio: int,
     ano_fim: int,
     classes: tuple[str, ...],
-    incluir_imputados: bool,
+    visao: str | bool,
 ) -> pd.DataFrame:
     """Potência (MW) e empreendimentos conectados por UF e ano, já filtrados."""
-    filtrado = filtrar(agregado, ano_inicio, ano_fim, classes, incluir_imputados)
+    filtrado = filtrar(agregado, ano_inicio, ano_fim, classes, visao)
     serie = filtrado.groupby(["sigla_uf", "ano"], as_index=False).agg(
         potencia_kw=("potencia_kw", "sum"),
         qtd_empreendimentos=("qtd_empreendimentos", "sum"),
@@ -256,7 +331,7 @@ def serie_anual(
 def serie_acumulada(
     agregado: pd.DataFrame,
     classes: tuple[str, ...],
-    incluir_imputados: bool,
+    visao: str | bool,
 ) -> pd.DataFrame:
     """Estoque de potência por UF ao fim de cada ano, com crescimento anual.
 
@@ -268,7 +343,7 @@ def serie_acumulada(
     que o acumulado seja carregado adiante corretamente.
     """
     ano_min, ano_max = anos_disponiveis(agregado)
-    filtrado = filtrar(agregado, ano_min, ano_max, classes, incluir_imputados)
+    filtrado = filtrar(agregado, ano_min, ano_max, classes, visao)
     anual = filtrado.groupby(["sigla_uf", "ano"]).agg(
         potencia_kw=("potencia_kw", "sum"),
         qtd_empreendimentos=("qtd_empreendimentos", "sum"),
@@ -317,7 +392,7 @@ def ajustar_janela(ano_base: int, ano_final: int) -> tuple[int, int]:
 def taxa_crescimento(
     agregado: pd.DataFrame,
     classes: tuple[str, ...],
-    incluir_imputados: bool,
+    visao: str | bool,
     ano_base: int = ANO_BASE_CRESCIMENTO,
     ano_final: int = ANO_FINAL_CRESCIMENTO,
 ) -> tuple[pd.DataFrame, float]:
@@ -328,7 +403,7 @@ def taxa_crescimento(
     ano_base, ano_final = ajustar_janela(ano_base, ano_final)
     anos = ano_final - ano_base
 
-    serie = serie_acumulada(agregado, classes, incluir_imputados)
+    serie = serie_acumulada(agregado, classes, visao)
     estoque = serie.pivot(
         index="sigla_uf", columns="ano", values="potencia_acumulada_mw"
     )

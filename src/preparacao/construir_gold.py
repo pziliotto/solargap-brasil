@@ -4,6 +4,8 @@ ARQUIVO: construir_gold.py
 AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 21/09/2026
 ATUALIZAÇÃO: 21/10/2026 — TP3: junção opcional do ICMS removida (dimensão própria)
+             20/11/2026 — TP4.5: potência corrigida (registros de 75 kW
+             suspeitos) e limite conservador como medidas da Gold
 
 DESCRIÇÃO:
     Constrói a camada Gold (data/processed) a partir da Silver (data/interim).
@@ -12,15 +14,22 @@ DESCRIÇÃO:
 TABELAS:
     gold_mmgd_agregado.csv
         Grão: UF x ano x classe de consumo x fonte_imputada.
-        Medidas: potência (kW) e quantidade de empreendimentos.
+        Medidas: potência oficial (potencia_kw), potência corrigida
+        (potencia_corrigida_kw, com os 75 kW suspeitos imputados), potência
+        conservadora (potencia_conservadora_kw, só residenciais imputados),
+        quantidade de empreendimentos e de registros com potência suspeita.
         Fica no menor nível que o painel precisa: filtros de período, classe
-        e inclusão de registros imputados são aplicados no app, que soma
+        e visão (corrigida ou critério ANEEL) são aplicados no app, que soma
         depois de filtrar. Uma tabela já totalizada travaria esses filtros.
 
     gold_uf.csv
         Grão: UF. Dimensão (nome, região, população) + indicadores do
-        período completo, com imputados: potência (MW), watts por habitante,
-        empreendimentos por 100 mil habitantes e % de registros imputados.
+        período completo na VISÃO CORRIGIDA (padrão do painel: com imputados
+        e potência corrigida): potência (MW), watts por habitante,
+        empreendimentos por 100 mil habitantes, % de registros imputados e %
+        com potência suspeita. Para comparação: potencia_mw_aneel (critério do
+        painel oficial: sem imputados, potência oficial) e
+        potencia_mw_conservadora (limite conservador).
 
 DECISÕES:
     - Apenas fonte solar (esquema.FONTE_SOLAR), incluindo registros com
@@ -63,7 +72,8 @@ SAIDA_UF = PASTA_PROCESSED / "gold_uf.csv"
 
 SEPARADOR = ";"
 CHAVES_AGREGADO = ["sigla_uf", "ano", "classe_consumo", "fonte_imputada"]
-COLUNAS_SILVER = CHAVES_AGREGADO + ["potencia_kw"]
+COLUNAS_POTENCIA = ["potencia_kw", "potencia_corrigida_kw", "potencia_conservadora_kw"]
+COLUNAS_SILVER = CHAVES_AGREGADO + COLUNAS_POTENCIA + ["flag_potencia_suspeita"]
 
 
 def formatar(numero: float, casas: int = 0) -> str:
@@ -105,9 +115,13 @@ def carregar_solar() -> pd.DataFrame:
 def construir_agregado(solar: pd.DataFrame) -> pd.DataFrame:
     agregado = solar.groupby(CHAVES_AGREGADO, as_index=False).agg(
         potencia_kw=("potencia_kw", "sum"),
+        potencia_corrigida_kw=("potencia_corrigida_kw", "sum"),
+        potencia_conservadora_kw=("potencia_conservadora_kw", "sum"),
         qtd_empreendimentos=("potencia_kw", "size"),
+        qtd_potencia_suspeita=("flag_potencia_suspeita", "sum"),
     )
-    agregado["potencia_kw"] = agregado["potencia_kw"].round(3)
+    agregado[COLUNAS_POTENCIA] = agregado[COLUNAS_POTENCIA].round(3)
+    agregado["qtd_potencia_suspeita"] = agregado["qtd_potencia_suspeita"].astype(int)
     agregado["ano_parcial"] = agregado["ano"] == esquema.ANO_PARCIAL
 
     # Conferência: nenhum registro pode se perder no agrupamento.
@@ -154,9 +168,19 @@ def montar_dimensao_uf() -> pd.DataFrame:
 def construir_uf(agregado: pd.DataFrame) -> pd.DataFrame:
     dimensao = montar_dimensao_uf()
 
+    # Visão corrigida (padrão): todos os registros, potência corrigida.
     totais = agregado.groupby("sigla_uf", as_index=False).agg(
-        potencia_kw=("potencia_kw", "sum"),
+        potencia_kw=("potencia_corrigida_kw", "sum"),
+        potencia_conservadora_kw=("potencia_conservadora_kw", "sum"),
         qtd_empreendimentos=("qtd_empreendimentos", "sum"),
+        qtd_potencia_suspeita=("qtd_potencia_suspeita", "sum"),
+    )
+    # Critério ANEEL: sem os registros imputados, potência oficial.
+    aneel = (
+        agregado[~agregado["fonte_imputada"]]
+        .groupby("sigla_uf")["potencia_kw"]
+        .sum()
+        .rename("potencia_kw_aneel")
     )
     imputados = (
         agregado[agregado["fonte_imputada"]]
@@ -167,7 +191,9 @@ def construir_uf(agregado: pd.DataFrame) -> pd.DataFrame:
 
     uf = dimensao.merge(totais, on="sigla_uf", how="left", validate="one_to_one")
     uf = uf.merge(imputados, on="sigla_uf", how="left")
+    uf = uf.merge(aneel, on="sigla_uf", how="left")
     uf["qtd_imputados"] = uf["qtd_imputados"].fillna(0).astype(int)
+    uf["potencia_kw_aneel"] = uf["potencia_kw_aneel"].fillna(0)
 
     sem_dado = uf[uf["qtd_empreendimentos"].isna()]
     if not sem_dado.empty:
@@ -182,8 +208,21 @@ def construir_uf(agregado: pd.DataFrame) -> pd.DataFrame:
     uf["pct_imputados"] = (uf["qtd_imputados"] / uf["qtd_empreendimentos"] * 100).round(
         2
     )
+    uf["pct_potencia_suspeita"] = (
+        uf["qtd_potencia_suspeita"] / uf["qtd_empreendimentos"] * 100
+    ).round(2)
+    uf["potencia_mw_aneel"] = (uf["potencia_kw_aneel"] / 1_000).round(3)
+    uf["potencia_mw_conservadora"] = (uf["potencia_conservadora_kw"] / 1_000).round(3)
 
-    uf = uf.drop(columns=["potencia_kw", "qtd_imputados"])
+    uf = uf.drop(
+        columns=[
+            "potencia_kw",
+            "potencia_kw_aneel",
+            "potencia_conservadora_kw",
+            "qtd_imputados",
+            "qtd_potencia_suspeita",
+        ]
+    )
 
     if len(uf) != esquema.TOTAL_UFS:
         abortar(f"Tabela por UF com {len(uf)} linhas; esperado {esquema.TOTAL_UFS}.")
@@ -196,7 +235,13 @@ def construir_uf(agregado: pd.DataFrame) -> pd.DataFrame:
 
 def registrar_resumo(uf: pd.DataFrame) -> None:
     logging.info("--- Resumo da Gold ---")
-    logging.info("Potência solar total : %s MW", formatar(uf["potencia_mw"].sum(), 1))
+    logging.info(
+        "Potência solar total : %s MW (corrigida) | %s MW (critério ANEEL) | "
+        "%s MW (conservadora)",
+        formatar(uf["potencia_mw"].sum(), 1),
+        formatar(uf["potencia_mw_aneel"].sum(), 1),
+        formatar(uf["potencia_mw_conservadora"].sum(), 1),
+    )
     logging.info("Empreendimentos .....: %s", formatar(uf["qtd_empreendimentos"].sum()))
     logging.info("População ...........: %s", formatar(uf["populacao"].sum()))
 

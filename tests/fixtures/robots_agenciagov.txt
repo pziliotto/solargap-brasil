@@ -1,0 +1,22 @@
+Sitemap: https://agenciagov.ebc.com.br/sitemap.xml.gz
+
+# Define access-restrictions for robots/spiders
+# http://www.robotstxt.org/wc/norobots.html
+
+
+User-agent: *
+
+Disallow: /*?
+Disallow: /*atct_album_view$
+Disallow: /*folder_contents$
+Disallow: /*folder_factories$
+Disallow: /*folder_summary_view$
+Disallow: /*login$
+Disallow: /*mail_password_form$
+Disallow: /*@@search$
+Disallow: /*@@login*
+Disallow: /*search_rss$
+Disallow: /*sendto_form$
+Disallow: /*summary_view$
+Disallow: /*thumbnail_view$
+Disallow: /*view$

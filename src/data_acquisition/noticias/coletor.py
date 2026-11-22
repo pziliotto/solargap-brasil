@@ -9,7 +9,7 @@ DESCRIÇÃO:
     Orquestra a coleta de todas as fontes habilitadas e grava o corpus.
 
 FLUXO POR FONTE:
-    HTML: listagens -> links (padrão de URL da fonte) -> matéria (cache em
+    HTML: listagens e sitemaps -> links (padrão de URL da fonte) -> matéria (cache em
           data/raw/html/<fonte>/) -> extração -> filtro de relevância
     RSS:  feed -> itens (título, link, data, descrição) -> filtro de relevância.
           Nenhuma matéria é baixada: nível "metadados".
@@ -35,6 +35,7 @@ SAÍDA:
 
 from __future__ import annotations
 
+import gzip
 import logging
 from collections import Counter
 from datetime import datetime
@@ -51,6 +52,7 @@ from src.data_acquisition.noticias.base import (
     eh_relevante,
     extrair_corpo,
     extrair_data,
+    extrair_volto,
     ler_meta,
     limpar_html,
     normalizar_titulo,
@@ -72,6 +74,7 @@ SAIDA_CORPUS = PASTA_PROCESSED / "corpus_noticias.csv"
 
 SEPARADOR = ";"
 LIMITE_LINHA_FINA_RSS = 300
+LIMITE_NOME_CACHE = 180
 
 
 # ═══════════════════ Registro ═══════════════════
@@ -101,10 +104,18 @@ def montar_registro(
 
 
 def caminho_cache(fonte: Fonte, caminho_url: str, pasta: Path | None = None) -> Path:
-    """/economia/noticia/2023-08/slug -> data/raw/html/agenciabrasil/2023-08_slug.html"""
+    """/economia/noticia/2023-08/slug -> data/raw/html/agenciabrasil/2023-08_slug.html
+
+    Nomes acima de LIMITE_NOME_CACHE (slugs longos da ANEEL passam de 200
+    caracteres) são encurtados com um hash do caminho, para não estourar o
+    limite de 260 caracteres de caminho do Windows.
+    """
     partes = caminho_url.strip("/").split("/")
     pasta = pasta or PASTA_CACHE  # resolvido na chamada: os testes trocam PASTA_CACHE
-    return pasta / fonte.chave / f"{partes[-2]}_{partes[-1]}.html"
+    nome = f"{partes[-2]}_{partes[-1]}"
+    if len(nome) > LIMITE_NOME_CACHE:
+        nome = f"{nome[: LIMITE_NOME_CACHE - 13]}_{esquema.id_noticia(caminho_url)}"
+    return pasta / fonte.chave / f"{nome}.html"
 
 
 def coletar_links(
@@ -125,7 +136,7 @@ def coletar_links(
             if html is None:
                 break
 
-            novos = 0
+            novos = encontrados = 0  # encontrados: inclui os descartados pelo título
             for ancora in BeautifulSoup(html, "html.parser").find_all("a", href=True):
                 destino = urlparse(urljoin(fonte.base, ancora["href"]))
                 caminho = destino.path.rstrip("/")
@@ -135,6 +146,7 @@ def coletar_links(
                     or caminho in links
                 ):
                     continue
+                encontrados += 1
                 if listagem.prefiltrar_titulo and not eh_relevante(
                     ancora.get_text(" ", strip=True)
                 ):
@@ -146,11 +158,65 @@ def coletar_links(
             logging.info(
                 "  %s, página %d: %d links novos", listagem.rotulo, pagina, novos
             )
-            if novos == 0:
+            if encontrados == 0:
                 break  # fim da paginação ou só repetidos
+
+    for sitemap in fonte.sitemaps:
+        for caminho in links_do_sitemap(fonte, navegador, sitemap, contagem):
+            links.setdefault(caminho, "sitemap")
 
     logging.info("  %s: %d notícias distintas nas listagens", fonte.nome, len(links))
     return links
+
+
+def ler_sitemap(conteudo: bytes) -> tuple[list[str], list[str]]:
+    """Conteúdo de sitemap (XML ou .gz) -> (URLs de páginas, URLs de sub-sitemaps)."""
+    if conteudo[:2] == b"\x1f\x8b":  # assinatura gzip
+        conteudo = gzip.decompress(conteudo)
+    soup = BeautifulSoup(conteudo, "xml")
+    paginas = [
+        loc.get_text(strip=True)
+        for url in soup.find_all("url")
+        for loc in url.find_all("loc")
+    ]
+    filhos = [
+        loc.get_text(strip=True)
+        for sm in soup.find_all("sitemap")
+        for loc in sm.find_all("loc")
+    ]
+    return paginas, filhos
+
+
+def links_do_sitemap(
+    fonte: Fonte,
+    navegador: Navegador,
+    url: str,
+    contagem: Counter,
+    profundidade: int = 1,
+) -> list[str]:
+    """Caminhos de matérias listados no sitemap (segue um nível de índice de sitemaps)."""
+    if not navegador.pode_acessar(url):
+        logging.warning("Bloqueado pelo robots.txt: %s", url)
+        contagem["listagens_bloqueadas"] += 1
+        return []
+    conteudo = navegador.baixar_bytes(url)
+    if conteudo is None:
+        return []
+    paginas, filhos = ler_sitemap(conteudo)
+    dominio = urlparse(fonte.base).netloc
+    caminhos = []
+    for pagina in paginas:
+        destino = urlparse(pagina)
+        caminho = destino.path.rstrip("/")
+        if destino.netloc == dominio and fonte.padrao_link.match(caminho):
+            caminhos.append(caminho)
+    if profundidade > 0:
+        for filho in filhos:
+            caminhos += links_do_sitemap(
+                fonte, navegador, filho, contagem, profundidade - 1
+            )
+    logging.info("  sitemap %s: %d matérias", url, len(caminhos))
+    return caminhos
 
 
 def obter_html(
@@ -172,8 +238,11 @@ def obter_html(
         contagem["falha_download"] += 1
         return None
 
-    arquivo.parent.mkdir(parents=True, exist_ok=True)
-    arquivo.write_text(html, encoding="utf-8")
+    try:
+        arquivo.parent.mkdir(parents=True, exist_ok=True)
+        arquivo.write_text(html, encoding="utf-8")
+    except OSError as erro:  # cache é otimização: falhar nele não perde a matéria
+        logging.warning("Cache não gravado (%s): %s", erro, arquivo.name)
     contagem["baixadas"] += 1
     return html
 
@@ -186,6 +255,10 @@ def extrair_noticia(fonte: Fonte, html: str, caminho_url: str, rotulo: str) -> d
     linha_fina = ler_meta(soup, "og:description", "description")
     data_publicacao = extrair_data(soup, fonte.padrao_data_texto)
     texto = extrair_corpo(soup, fonte.descartar_paragrafos)
+    texto_volto, data_volto = extrair_volto(html, fonte.descartar_paragrafos)
+    if len(texto_volto) > len(texto or ""):  # Plone Volto (gov.br/aneel)
+        texto = texto_volto
+    data_publicacao = data_publicacao or data_volto
     return montar_registro(
         fonte,
         urljoin(fonte.base, caminho_url),
@@ -216,7 +289,12 @@ def coletar_fonte_html(
         if html is None:
             continue
 
-        noticia = extrair_noticia(fonte, html, caminho_url, rotulo)
+        try:
+            noticia = extrair_noticia(fonte, html, caminho_url, rotulo)
+        except Exception as erro:  # noqa: BLE001 — uma página ruim não derruba a fonte
+            logging.warning("Extração falhou em %s: %s", caminho_url, erro)
+            contagem["falha_extracao"] += 1
+            continue
         if not noticia["texto"]:
             contagem["sem_corpo"] += 1
             continue

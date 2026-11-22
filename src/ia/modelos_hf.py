@@ -70,6 +70,7 @@ class ResultadoRelevancia:
     probabilidade: float
     tokens_entrada: int
     truncado: bool
+    por_termo_gd: bool = False  # relevante pela regra de palavra do título
 
     def como_dict(self) -> dict:
         return asdict(self)

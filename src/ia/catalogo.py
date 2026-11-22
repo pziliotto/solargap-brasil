@@ -168,7 +168,22 @@ def candidatos_da_tarefa(
 # A coluna do corpus continua se chamando "sentimento" (contrato do TP3).
 
 HIPOTESE_RELEVANCIA = "Esta notícia trata de energia solar."
-LIMIAR_RELEVANCIA = 0.5
+# Benchmark v2 (22/11/2026, docs/escolha_modelo.md, seção 9.6): estratégia
+# híbrida, escolhida pelo F1 macro no desenvolvimento e confirmada no teste
+# congelado (segunda consulta). A notícia é relevante se o TÍTULO menciona um
+# termo de geração distribuída (Lei 14.300, fio B, compensação de créditos,
+# net metering, micro/minigeração, GD) OU se a hipótese acima passa do limiar.
+# Corrige o ponto cego da hipótese, que não reconhecia GD sem "solar".
+LIMIAR_RELEVANCIA = 0.4
+ESTRATEGIA_RELEVANCIA = "hibrido_titulo@0.4"
+
+
+def termo_gd(texto: str | None) -> bool:
+    """Título menciona termo do vocabulário de GD (mesmo vocabulário do benchmark)."""
+    from src.ia import rotulagem  # importação tardia: o catálogo não carrega pandas
+
+    return bool(texto) and rotulagem.palavra_chave(texto) in rotulagem.PALAVRAS_GD
+
 
 HIPOTESES_TOM = {
     "favoravel": "Esta notícia relata avanços, benefícios ou incentivos para a energia solar.",

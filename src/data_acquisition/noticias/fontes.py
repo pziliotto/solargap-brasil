@@ -31,11 +31,15 @@ RESULTADO DA AVALIAÇÃO (outubro/2026):
     eixos (epbr)    DESABILITADA metadados termos restringem a uso pessoal e proíbem copiar,
                                            baixar ou manter cache sem autorização por escrito.
                                            Habilitar só após autorização (contato no rodapé)
+    ANEEL e MME     habilitadas integral   (20/11/2026) gov.br sob CC BY-ND 3.0: reprodução
+                                           literal com atribuição. Descoberta: sitemap (ANEEL)
+                                           e listagem paginada permitida (MME, sem sitemap)
     Demais veículos: ver NAO_INCLUIDAS, ao fim do arquivo.
 
 SELENIUM:
     Nenhuma fonte viável exige renderização por JavaScript: listagens, matérias
-    e feeds chegam completos no HTML/XML. Seguindo a orientação do enunciado
+    e feeds chegam completos no HTML/XML. Na ANEEL (Plone Volto), o corpo vem
+    como JSON embutido no HTML (window.__data), lido sem executar JavaScript. Seguindo a orientação do enunciado
     ("mantenha a simplicidade quando possível"), o projeto não usa Selenium.
 """
 
@@ -44,7 +48,6 @@ from __future__ import annotations
 import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from urllib.parse import quote_plus
 
 from src.preparacao import esquema
 
@@ -73,10 +76,14 @@ class Fonte:
     motivo: str
     tipo: str = "html"  # "html" (listagem + matéria) ou "rss" (só feed)
     listagens: tuple[Listagem, ...] = ()
+    sitemaps: tuple[str, ...] = ()  # sitemap.xml(.gz) indicado no robots.txt da fonte
     feeds: tuple[str, ...] = ()
     padrao_link: re.Pattern | None = None
     padrao_data_texto: re.Pattern | None = None
     descartar_paragrafos: tuple[re.Pattern, ...] = field(default_factory=tuple)
+    # False quando a licença proíbe obra derivada: sem resumo automático
+    # (esquema.FONTES_SEM_DERIVACAO, decisão de 22/11/2026).
+    permite_derivacao: bool = True
 
 
 # ═══════════════════ Agência Brasil (EBC) ═══════════════════
@@ -88,6 +95,19 @@ TAGS_AGENCIA_BRASIL = [
     "geracao-distribuida",
     "energia-renovavel",
     "energias-renovaveis",
+    # Tarefa 5a (20/11/2026): tags que existem no portal para as palavras-chave
+    # do benchmark v2. Não existem: lei-14300 (e variações), microgeracao,
+    # micro-e-minigeracao, compensacao-de-energia (e variações) e fio-b.
+    "micro-geracao",
+    "minigeracao",
+    "fotovoltaica",
+    "energia-fotovoltaica",
+    "paineis-solares",
+    "placas-solares",
+    "net-metering",
+    "geracao-de-energia-solar",
+    "usina-solar",
+    "usinas-solares",
 ]
 
 
@@ -118,24 +138,15 @@ AGENCIA_BRASIL = Fonte(
 # ═══════════════════ Agência Gov (EBC) ═══════════════════
 
 BASE_AGENCIA_GOV = "https://agenciagov.ebc.com.br"
-TERMOS_BUSCA_AGENCIA_GOV = [
-    "energia solar",
-    "geração distribuída",
-    "micro e minigeração",
-    "fotovoltaica",
-]
-TAMANHO_LOTE_PLONE = 10  # resultados por página na busca do Plone (b_start)
-
-
-def _url_busca_agencia_gov(termo: str) -> Callable[[int], str]:
-    return lambda pagina: (
-        f"{BASE_AGENCIA_GOV}/@@search?SearchableText={quote_plus(termo)}"
-        f"&b_start:int={pagina * TAMANHO_LOTE_PLONE}"
-    )
+# A busca interna (/@@search?SearchableText=...) NÃO é usada: o robots.txt da
+# Agência Gov proíbe toda URL com "?" (Disallow: /*?). Até 20/11/2026 o parser
+# do projeto não entendia curingas e a liberava; ver Data Summary Report, 2.3.
+# As matérias são descobertas pelo sitemap que o próprio robots.txt indica.
 
 
 AGENCIA_GOV = Fonte(
     chave="agenciagov",
+    permite_derivacao=False,
     nome="Agência Gov",
     base=BASE_AGENCIA_GOV,
     licenca="EBC: 'A reprodução é gratuita desde que citada a fonte' (aviso em cada matéria)",
@@ -151,16 +162,88 @@ AGENCIA_GOV = Fonte(
             max_paginas=1,
             prefiltrar_titulo=True,
         ),
-        *(
-            Listagem(f"busca:{termo}", _url_busca_agencia_gov(termo))
-            for termo in TERMOS_BUSCA_AGENCIA_GOV
-        ),
     ),
+    sitemaps=(f"{BASE_AGENCIA_GOV}/sitemap.xml.gz",),
     padrao_link=re.compile(r"^/noticias/\d{6}/[\w-]+$"),
     descartar_paragrafos=(
         re.compile(r"^A reprodução é gratuita", re.IGNORECASE),
         re.compile(r"^Link:\s*https?://", re.IGNORECASE),
         re.compile(r"^Leia mais", re.IGNORECASE),
+    ),
+)
+
+# ═══════════════════ ANEEL e MME (gov.br) ═══════════════════
+# Avaliação de 20/11/2026 (Data Summary Report, 2.4):
+#   acesso livre; rodapé de todo o gov.br: "Todo o conteúdo deste site está
+#   publicado sob a licença Creative Commons Atribuição-SemDerivações 3.0 Não
+#   Adaptada" (reprodução literal com atribuição); os Termos de Uso do gov.br
+#   não proíbem coleta automatizada; robots.txt de www.gov.br sem regras para
+#   /aneel e /mme e sem Crawl-delay (vale a pausa padrão de 1,5 s).
+
+BASE_GOV_BR = "https://www.gov.br"
+LICENCA_GOV_BR = "gov.br: Creative Commons Atribuição-SemDerivações 3.0 (CC BY-ND 3.0)"
+TERMOS_GOV_BR = "https://www.gov.br/pt-br/termos-de-uso"
+_NAO_MATERIA = r"(?![\w.-]+\.(?:jpe?g|png|gif|webp|pdf)$)"  # anexos no mesmo caminho
+
+ANEEL = Fonte(
+    chave="aneel",
+    permite_derivacao=False,
+    nome="ANEEL",
+    base=BASE_GOV_BR,
+    licenca=LICENCA_GOV_BR,
+    termos_url=TERMOS_GOV_BR,
+    nivel_texto=esquema.NIVEL_INTEGRAL,
+    habilitada=True,
+    motivo=(
+        "Nova na Tarefa 5a. Regulador da geração distribuída: notícias sobre Lei 14.300, "
+        "MMGD e compensação de energia. Site Plone Volto: a listagem é montada por "
+        "JavaScript, por isso a descoberta é pelo sitemap do órgão."
+    ),
+    sitemaps=(f"{BASE_GOV_BR}/aneel/sitemap.xml.gz",),
+    padrao_link=re.compile(
+        rf"^/aneel/pt-br/assuntos/noticias/\d{{4}}/{_NAO_MATERIA}[\w.-]+$"
+    ),
+    padrao_data_texto=re.compile(
+        r"Publicado em\s+(\d{2}/\d{2}/\d{4})\s+(\d{2}[:h]\d{2})"
+    ),
+)
+
+MME = Fonte(
+    chave="mme",
+    permite_derivacao=False,
+    nome="MME",
+    base=BASE_GOV_BR,
+    licenca=LICENCA_GOV_BR,
+    termos_url=TERMOS_GOV_BR,
+    nivel_texto=esquema.NIVEL_INTEGRAL,
+    habilitada=True,
+    motivo=(
+        "Nova na Tarefa 5a. O MME não publica sitemap (404); a listagem de notícias é "
+        "permitida pelo robots.txt, inclusive a paginação. É ampla (petróleo, gás, "
+        "mineração), por isso o pré-filtro pelo título."
+    ),
+    listagens=(
+        Listagem(
+            "noticias",
+            lambda pagina: (
+                f"{BASE_GOV_BR}/mme/pt-br/assuntos/noticias"
+                + (f"?b_start:int={30 * pagina}" if pagina else "")
+            ),
+            max_paginas=250,
+            prefiltrar_titulo=True,
+        ),
+    ),
+    padrao_link=re.compile(
+        rf"^/mme/pt-br/assuntos/noticias/(?:[\w-]+/)?{_NAO_MATERIA}[\w.-]+$"
+    ),
+    padrao_data_texto=re.compile(
+        r"Publicado em\s+(\d{2}/\d{2}/\d{4})\s+(\d{2}[:h]\d{2})"
+    ),
+    descartar_paragrafos=(  # contato da assessoria e redes sociais, ao fim das matérias
+        re.compile(r"^Assessoria (?:Especial )?de Comunica", re.IGNORECASE),
+        re.compile(r"^Instagram\s*●", re.IGNORECASE),
+        re.compile(r"^ascom@mme\.gov\.br", re.IGNORECASE),
+        re.compile(r"^Ministério de Minas e Energia \(61\)", re.IGNORECASE),
     ),
 )
 
@@ -185,7 +268,7 @@ EIXOS = Fonte(
     ),
 )
 
-FONTES: tuple[Fonte, ...] = (AGENCIA_BRASIL, AGENCIA_GOV, EIXOS)
+FONTES: tuple[Fonte, ...] = (AGENCIA_BRASIL, AGENCIA_GOV, ANEEL, MME, EIXOS)
 FONTES_POR_CHAVE = {fonte.chave: fonte for fonte in FONTES}
 
 # ═══════════════════ Avaliadas e não incluídas ═══════════════════

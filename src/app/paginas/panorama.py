@@ -33,21 +33,28 @@ filtros = filtros_atuais()
 metrica = filtros.info_metrica
 coluna = filtros.metrica
 
+agregado = dados.carregar_agregado()
 indicadores_uf = dados.indicadores_por_uf(
-    dados.carregar_agregado(),
+    agregado,
     dados.carregar_uf(),
     filtros.ano_inicio,
     filtros.ano_fim,
     filtros.classes,
-    filtros.incluir_imputados,
+    filtros.visao,
 )
 referencia = indicadores.media_brasil(indicadores_uf)
 
 st.title("📊 Panorama")
 st.caption(
-    f"Conexões de {filtros.ano_inicio} a {filtros.ano_fim} · visão: {filtros.visao}"
+    f"Conexões de {filtros.ano_inicio} a {filtros.ano_fim} · visão: {filtros.rotulo_visao}"
 )
-aviso_imputados(indicadores_uf, filtros.incluir_imputados)
+aviso_imputados(
+    indicadores_uf,
+    filtros.visao,
+    indicadores.potencia_suspeita(
+        agregado, filtros.ano_inicio, filtros.ano_fim, filtros.classes, filtros.visao
+    ),
+)
 
 lider = indicadores.ranking(indicadores_uf, coluna).iloc[0]
 k1, k2, k3, k4 = st.columns(4)

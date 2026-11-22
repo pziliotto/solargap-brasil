@@ -20,6 +20,8 @@ Documentação completa:
 - 📊 [Data Summary Report](docs/data_summary_report.md) — fontes, qualidade, tratamento e licenciamento dos dados
 - 🔌 [Documentação da API](docs/api.md) — rotas, parâmetros, exemplos e códigos de erro
 - 🧠 [Escolha dos modelos de linguagem](docs/escolha_modelo.md) — benchmark de cinco modelos locais (TP4)
+- 🔄 [Atualização da base ANEEL 08/2026 → 10/2026](docs/potencial/atualizacao_base_10_2026.md) — antes × depois e tratamento dos 75 kW no PR
+- 🏠 [Potencial solar municipal](docs/potencial/README.md) — potencial x produção, fatores (SHAP), validação e projeção 2030–2050 (TP4.5)
 
 ### Indicadores
 
@@ -29,14 +31,19 @@ Documentação completa:
 | Empreendimentos por 100 mil hab. | Difusão: sistemas conectados para cada 100 mil habitantes |
 | Ranking de disparidade | Posição das 27 UFs em cada métrica, com a média nacional como referência |
 | Taxa de crescimento | Crescimento anual do parque instalado e CAGR por UF desde a Lei 14.300 (2022–2025) |
+| Taxa de realização (TP4.5) | Produção estimada da MMGD residencial e rural (y) sobre o potencial técnico dos telhados residenciais (x), por município e UF; gap = x − y |
 
-### Principais achados (TP3)
+### Principais achados (base ANEEL 10/2026, visão corrigida)
 
-- O parque solar distribuído passou de 18,3 GW (2022) para 47,5 GW (2025): **37,5% ao ano**. O ritmo desacelera (48% em 2023, 26% em 2025).
-- **10 "mercados emergentes"** — adoção abaixo da média nacional, crescimento acima: RR, AL, AC, BA, PA, AM, CE, PE, SP e SE.
-- **3 "lacunas persistentes"** — adoção e crescimento abaixo da média: RJ, DF e PB.
-- A correção de preenchimento do Maranhão muda a leitura de política pública: com ela, o MA é "líder em expansão"; no critério do painel oficial da ANEEL, cairia em "lacuna persistente".
-- O momento de adesão à isenção de ICMS (Convênio 16/15) não se relaciona com a adoção atual (Spearman −0,06).
+Valores na visão corrigida, padrão do painel; entre parênteses, o critério ANEEL (dado oficial sem correções).
+
+- O parque solar distribuído passou de 17,7 GW (2022) para 46,3 GW (2025): **37,7% ao ano** (34,6%), chegando a 50,7 GW até outubro de 2026 (53,8 GW). O ritmo desacelera (48,5% em 2023, 25,6% em 2025).
+- **10 "mercados emergentes"** — adoção abaixo da média nacional, crescimento acima: AL, AP, BA, CE, MA, PA, PE, RR, SE e SP (no critério ANEEL, também AC e RJ).
+- **4 "lacunas persistentes"** — adoção e crescimento abaixo da média: AM, DF, PB e RJ (no critério ANEEL, só AM, DF e PB).
+- **Tratamento aplicado à anomalia dos 75 kW:** 47 mil registros da COPEL-DIS no Paraná, inclusive 28 mil residências, têm potência de exatamente 75 kW, o teto da microgeração. A base reproduz o painel oficial da ANEEL, então o erro está na fonte. O pipeline sinaliza esses registros por diagnóstico estatístico entre distribuidoras e imputa a potência mediana de sistemas semelhantes: a potência solar do PR cai de 6,9 para 3,8 GW e a do Brasil, de 53,8 para 50,7 GW. Detalhes em [`docs/potencial/atualizacao_base_10_2026.md`](docs/potencial/atualizacao_base_10_2026.md).
+- Na base de 10/2026, a ANEEL retirou os ~73 mil registros do Maranhão sem fonte de geração, que o projeto imputava como solares. O MA passou a ser "mercado emergente" nas duas visões do painel.
+- O momento de adesão à isenção de ICMS (Convênio 16/15) não se relaciona com a adoção atual (Spearman −0,02; −0,06 no critério ANEEL).
+- **Potencial solar residencial (TP4.5):** os telhados residenciais poderiam gerar 302,6 TWh/ano; a micro e minigeração residencial e rural produz cerca de 31,5 TWh/ano, ou **10,4% do potencial** (11,4% no critério ANEEL; 10,6% no limite conservador). A taxa está associada sobretudo à densidade demográfica (municípios densos aproveitam menos) e à renda (associação, não causalidade). Até 2050, a irradiação muda poucos por cento nos cenários climáticos, com faixa de incerteza que cruza o zero na maioria das UFs. Detalhes em [`docs/potencial/README.md`](docs/potencial/README.md).
 
 ---
 
@@ -62,12 +69,13 @@ solargap-brasil/
 │   ├── raw/                      # 🥉 Bronze — dados originais e cache HTML (parcialmente versionado)
 │   ├── interim/                  # 🥈 Silver — limpos e tipados (não versionado)
 │   ├── processed/                # 🥇 Gold — agregados, prontos para app e API
-│   └── external/                 # referências de terceiros curadas (texto do Convênio ICMS 16/15)
+│   └── external/                 # referências de terceiros curadas (Convênio ICMS 16/15, malhas do IBGE)
 ├── docs/
 │   ├── project_charter_solargap.docx
 │   ├── data_summary_report.md
 │   ├── api.md
 │   ├── escolha_modelo.md         # justificativa dos modelos de linguagem (TP4)
+│   ├── potencial/                # potencial solar municipal: método, SHAP, cenários (TP4.5)
 │   └── benchmark/                # rótulos manuais, saídas e métricas do benchmark (TP4)
 ├── src/
 │   ├── data_acquisition/
@@ -84,7 +92,8 @@ solargap-brasil/
 │   │   ├── construir_silver.py   # camada Silver
 │   │   ├── construir_gold.py     # camada Gold
 │   │   └── ...                   # amostra e diagnósticos
-│   ├── servicos/                 # regra de negócio usada pelo app E pela API (TP3)
+│   ├── servicos/                 # regra de negócio usada pelo app E pela API (TP3; potencial.py no TP4.5)
+│   ├── potencial/                # pipeline do potencial solar: x, y, fatores, SHAP, CMIP6 (TP4.5)
 │   ├── ia/                       # modelos de linguagem locais (TP4)
 │   │   ├── catalogo.py           #   candidatos, modelo de cada tarefa, hipóteses zero-shot
 │   │   ├── modelos_hf.py         #   carga e inferência (único módulo que importa torch)
@@ -94,11 +103,11 @@ solargap-brasil/
 │   ├── api/                      # API FastAPI (TP3)
 │   │   ├── main.py               #   aplicação e tratamento de erros
 │   │   ├── modelos.py            #   modelos Pydantic de entrada e resposta
-│   │   └── rotas/                #   sistema, indicadores, notícias, políticas, comparações, ia
+│   │   └── rotas/                #   sistema, indicadores, potencial, notícias, políticas, comparações, ia
 │   └── app/                      # dashboard Streamlit multipáginas (TP3)
-│       ├── app.py                #   entrada: menu de navegação e filtros globais
-│       └── paginas/              #   Início, Panorama, Evolução, Oportunidades, Notícias, Laboratório de IA, Dados, API
-├── tests/                        # 104 testes automatizados (pytest)
+│       ├── app.py                #   entrada: menu, seletor de visão (todas as páginas) e filtros
+│       └── paginas/              #   Início, Panorama, Evolução, Oportunidades, Potencial Solar, Notícias, Laboratório de IA, Dados, API
+├── tests/                        # 402 testes automatizados (pytest)
 ├── requirements.txt
 ├── setup_project.py
 └── README.md
@@ -161,6 +170,8 @@ uvicorn src.api.main:app --reload
 # Documentação interativa: http://127.0.0.1:8000/docs
 ```
 
+**Visão dos dados.** O seletor da barra lateral vale para todas as páginas: **visão corrigida** (padrão; imputa a potência dos registros de 75 kW da COPEL-DIS e conta como solares os 156 registros sem fonte), **critério ANEEL** (dado oficial) e **limite conservador** (corrige só os residenciais de 75 kW). Na API, as rotas `/potencial` recebem o parâmetro `visao`; as de indicadores, `incluir_imputados`. Ver [`docs/api.md`](docs/api.md).
+
 O dashboard funciona sem a API; as páginas **API** e **Laboratório de IA** usam a API quando ela está no ar. Na primeira execução, a API baixa os modelos de linguagem (~2 GB) para o cache do HuggingFace; enquanto carregam, as rotas de IA respondem 503 e o resto funciona normalmente. Para subir a API sem os modelos: `SOLARGAP_CARREGAR_MODELOS=0`.
 
 **Modelos de linguagem (opcional — os resultados já estão versionados):**
@@ -206,7 +217,9 @@ python -m src.preparacao.construir_gold         # camada Gold
 
 **Modelos de linguagem.** Leem no máximo 512 tokens (~350 palavras): notícias longas são resumidas e classificadas pelo início, e a API informa `truncado: true`. O tom das notícias ficou abaixo da linha de base no benchmark e não é usado como indicador. Detalhes em `docs/escolha_modelo.md`.
 
-**Ano corrente parcial.** Os dados de 2026 cobrem até agosto e ficam fora do cálculo de crescimento.
+**Ano corrente parcial.** A base ANEEL é a de referência 10/2026 (arquivo gerado em 10/10/2026). Os dados de 2026 cobrem até outubro e ficam fora do cálculo de crescimento.
+
+**Potência de 75 kW no Paraná (tratamento aplicado).** A base oficial traz 47 mil registros da COPEL-DIS com potência de exatamente 75 kW, padrão ausente nas demais distribuidoras. A visão corrigida (padrão) imputa a potência mediana de sistemas semelhantes; a potência oficial é preservada, e o seletor "Critério ANEEL" a reproduz. A imputação pode subestimar um pouco os comércios e propriedades rurais que de fato têm 75 kW; o limite conservador, que corrige só as residências, está na Gold (`potencia_mw_conservadora`) e no seletor de visão do painel. Ver [`docs/potencial/atualizacao_base_10_2026.md`](docs/potencial/atualizacao_base_10_2026.md).
 
 ---
 
@@ -216,7 +229,14 @@ python -m src.preparacao.construir_gold         # camada Gold
 - [x] **TP2** — Camadas Silver/Gold, web scraping (BeautifulSoup), interface com cache, estado de sessão e upload
 - [x] **TP3** — App multipáginas, API própria (FastAPI), novas fontes (Agência Gov, CONFAZ), KPI de crescimento, testes
 - [x] **TP4** — Modelos de linguagem locais (HuggingFace/Transformers): benchmark, resumo e relevância do corpus, `POST /processar_texto` com erros 503/504, Laboratório de IA
-- [ ] **TP5** — Agente inteligente de recomendação usando a API como ferramenta e dashboard final
+- [x] **TP4.5** — Potencial solar municipal ([`docs/potencial/README.md`](docs/potencial/README.md))
+  - Potencial técnico municipal (x), geração estimada (y), gap e taxa de realização (NASA POWER + ANEEL + Censo 2022)
+  - Fatores explicativos, modelo com validação agrupada por UF e SHAP
+  - Base ANEEL 10/2026 com o tratamento da anomalia dos 75 kW da COPEL-DIS (validada contra o painel oficial) e as três visões (corrigida, ANEEL, conservadora)
+  - Benchmark de relevância v2: corpus de 553 notícias, ANEEL e MME no gov.br, robots.txt com protego, relevância híbrida
+  - Projeção 2030–2050 com NEX-GDDP-CMIP6: o recurso solar é estável até 2050 (+0,2% a +0,6% no potencial do Brasil); **o gap é socioeconômico, não físico**
+  - Página Potencial Solar e rotas `/potencial`
+- [ ] **TP5** — Agente inteligente que consulta essas tabelas (indicadores, potencial, fatores e cenários, via API) para responder perguntas de gestão e de investimento
 
 ---
 

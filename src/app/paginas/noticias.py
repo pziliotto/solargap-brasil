@@ -4,6 +4,7 @@ ARQUIVO: paginas/noticias.py
 AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 21/10/2026 (origem: aba Notícias do demo_app.py, TP2)
 ATUALIZAÇÃO: 16/11/2026 — TP4: resumo e relevância gerados pelos modelos locais
+             22/11/2026 — sem resumo para fontes CC BY-ND (ANEEL, MME, Agência Gov)
 
 DESCRIÇÃO:
     Estatísticas do corpus de notícias, agora com várias fontes (TP3):
@@ -67,8 +68,9 @@ so_relevantes = c0.toggle(
     key="so_relevantes",
     disabled=not avaliadas.any(),
     help=(
-        "Relevância estimada por modelo de linguagem local (mDeBERTa, zero-shot). "
-        "No benchmark, acertou 77% das notícias rotuladas à mão; veja docs/escolha_modelo.md."
+        "Relevância híbrida: o título cita um termo de geração distribuída (Lei 14.300, "
+        "micro/minigeração...) OU o modelo local (mDeBERTa, zero-shot) estima ao menos 40%. "
+        "No teste congelado, F1 macro de 0,68; veja docs/escolha_modelo.md, seção 9."
     ),
 )
 fontes_escolhidas = c1.multiselect(
@@ -102,7 +104,7 @@ if avaliadas.any():
     k2.metric(
         "Fora do tema (IA)",
         f"{fora} de {int(avaliadas.sum())}",
-        help="Notícias do corpus que o modelo julgou não tratar de energia solar.",
+        help="Notícias que a classificação híbrida julgou fora do tema (energia solar e GD).",
     )
 else:
     k2.metric("Fontes", selecao["fonte"].nunique())
@@ -182,6 +184,13 @@ st.subheader("Notícias")
 tabela = selecao.assign(
     relevancia_pct=pd.to_numeric(selecao["relevancia_prob"], errors="coerce") * 100
 )
+# Fontes sob CC BY-ND (gov.br): sem resumo automático, só título, link e classificação.
+sem_derivacao = tabela["fonte"].isin(esquema.FONTES_SEM_DERIVACAO)
+tabela["resumo"] = (
+    tabela["resumo"]
+    .astype("object")
+    .where(~sem_derivacao, "— licença CC BY-ND: abra a original")
+)
 st.dataframe(
     tabela[
         [
@@ -208,7 +217,10 @@ st.dataframe(
             min_value=0,
             max_value=100,
             format="%.0f%%",
-            help="Probabilidade estimada pelo mDeBERTa (zero-shot). Acima de 50% conta como relevante.",
+            help=(
+                "Probabilidade estimada pelo mDeBERTa (zero-shot). Conta como relevante a partir "
+                "de 40%, ou quando o título cita um termo de geração distribuída."
+            ),
         ),
         "ufs_mencionadas": "UFs",
         "url": st.column_config.LinkColumn("Link", display_text="abrir"),
@@ -216,6 +228,10 @@ st.dataframe(
     hide_index=True,
     width="stretch",
 )
+if sem_derivacao.any():
+    st.caption(
+        esquema.MOTIVO_SEM_RESUMO.replace("Leia", "Para ANEEL, MME e Agência Gov, leia")
+    )
 
 com_resumo = selecao[
     selecao["resumo"].notna() & (selecao["resumo"].astype(str).str.strip() != "")

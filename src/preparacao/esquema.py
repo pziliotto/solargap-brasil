@@ -5,6 +5,8 @@ AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 21/09/2026
 ATUALIZAÇÃO: 21/10/2026 — TP3: contrato do corpus de notícias (colunas, níveis
              de texto e regra de identificação), remoção de import duplicado
+             20/11/2026 — TP4.5: distribuidora e modalidade na Silver; constantes
+             do tratamento da potência suspeita (registros de 75 kW)
 
 DESCRIÇÃO:
     Constantes compartilhadas entre as camadas Silver e Gold e, a partir da etapa 2,
@@ -46,6 +48,8 @@ COLUNAS_ANEEL = [
     "DscClasseConsumo",
     "DthAtualizaCadastralEmpreend",
     "SigTipoGeracao",
+    "SigAgente",  # distribuidora (TP4.5: diagnóstico da potência suspeita)
+    "DscModalidadeHabilitado",  # modalidade (TP4.5: geração na própria UC)
 ]
 
 # Renomeação para snake_case na camada Silver.
@@ -60,6 +64,8 @@ RENOMEAR_ANEEL = {
     "DscClasseConsumo": "classe_consumo",
     "DthAtualizaCadastralEmpreend": "data_conexao",
     "SigTipoGeracao": "tipo_geracao",
+    "SigAgente": "distribuidora",
+    "DscModalidadeHabilitado": "modalidade",
 }
 
 # Fonte única da lista de colunas com dado pessoal (LGPD). Os scripts do TP1
@@ -72,7 +78,23 @@ FONTE_SOLAR = "Radiação solar"
 
 ANO_SENTINELA = 1900  # Data de preenchimento sem significado real
 ANO_MINIMO = 2012  # REN nº 482/2012 - início do marco regulatório da MMGD
-ANO_PARCIAL = 2026  # ano corrente, dados até a referência 08/2026
+ANO_PARCIAL = 2026  # ano corrente, dados até a referência 10/2026
+
+# ═══════════════════ Potência suspeita (TP4.5) ═══════════════════
+# Regras em src/preparacao/potencia_suspeita.py; justificativa em
+# docs/potencial/atualizacao_base_10_2026.md, seção 6.
+
+# Valor de preenchimento investigado: teto da microgeração (75 kW).
+POTENCIA_SUSPEITA_KW = 75.0
+# Classe em que o valor é fisicamente implausível e serve de diagnóstico.
+CLASSE_DIAGNOSTICO_POTENCIA = "Residencial"
+# Distribuidora sinalizada se a fração de 75 kW na classe de diagnóstico
+# ultrapassar mediana + FATOR_MAD x MAD (entre distribuidoras) com evidência
+# estatística: limite inferior do intervalo de Wilson (95%) acima do limite.
+FATOR_MAD = 5
+Z_WILSON = 1.959964
+# Mínimo de registros não sinalizados para uma mediana valer na imputação.
+MIN_AMOSTRA_IMPUTACAO = 5
 
 # ═══════════════════ Cadastro das UFs ═══════════════════
 
@@ -149,6 +171,25 @@ NIVEL_INTEGRAL = "integral"
 NIVEL_METADADOS = "metadados"
 NIVEIS_TEXTO = (NIVEL_INTEGRAL, NIVEL_METADADOS)
 
+# Fontes cuja licença NÃO permite obra derivada (decisão de 22/11/2026). O
+# gov.br (ANEEL, MME) publica sob CC BY-ND 3.0 ("SemDerivações"), e a Agência
+# Gov, portal de notícias do governo federal, segue a mesma regra. O texto
+# literal pode ser reproduzido com citação, mas um resumo automático pode ser
+# visto como adaptação. Para essas fontes não se gera, não se guarda e não se
+# exibe resumo: painel e API mostram título, link, fonte e classificação.
+# Deve coincidir com as fontes de permite_derivacao=False em
+# src/data_acquisition/noticias/fontes.py (há teste para isso).
+FONTES_SEM_DERIVACAO = frozenset({"ANEEL", "MME", "Agência Gov"})
+MOTIVO_SEM_RESUMO = (
+    "Resumo automático não exibido: a licença da fonte (CC BY-ND, gov.br) não "
+    "permite obra derivada. Leia a matéria original pelo link."
+)
+
+
+def permite_resumo(fonte: str | None) -> bool:
+    return fonte not in FONTES_SEM_DERIVACAO
+
+
 # Colunas que o modelo de linguagem preencherá no TP4. Uma nova coleta NUNCA
 # pode apagar o que já foi preenchido nelas (ver mesclar_corpus no coletor).
 COLUNAS_MODELO = ["resumo", "sentimento"]
@@ -176,6 +217,7 @@ COLUNAS_CORPUS_IA = [
     "resumo_truncado",
     "relevante",
     "relevancia_prob",
+    "relevancia_por_termo",  # relevante pelo termo de GD no título (22/11/2026)
     "modelo_resumo",
     "modelo_relevancia",
     "processado_em",

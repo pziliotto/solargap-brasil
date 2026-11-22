@@ -5,6 +5,8 @@ AUTORA: Pâmela Lima Ziliotto
 CRIAÇÃO: 21/10/2026
 ATUALIZAÇÃO: 13/11/2026 — TP4: texto_para_modelo não repete a linha fina quando
              ela é o próprio primeiro parágrafo do texto
+             22/11/2026 — stopwords revisadas (negações, NLTK e spaCy) e filtro
+             sem maiúsculas e acentos
 
 DESCRIÇÃO:
     Processamento de texto do corpus de notícias, sem dependência de interface:
@@ -26,8 +28,10 @@ PREPARAÇÃO PARA O TP4 (LLM):
 from __future__ import annotations
 
 import re
+import unicodedata
 from collections import Counter
 from collections.abc import Iterable
+from functools import lru_cache
 
 from src.preparacao import esquema
 
@@ -244,6 +248,64 @@ STOPWORDS = set(
         "quanta",
     ]
 )
+
+# Revisão de 22/11/2026: "não" era um dos termos mais frequentes da nuvem.
+# Comparada com as listas em português do NLTK (207 palavras) e do spaCy (416),
+# sem adicionar dependência: entram todas as do NLTK que faltavam e, do spaCy,
+# só palavras funcionais, negações e numerais. Ficam de fora palavras da lista
+# do spaCy que têm sentido neste domínio, como "sistema", "estado", "corrente",
+# "valor", "conselho", "área", "nível", "potência" e "geral".
+NEGACOES = set(
+    """
+    não nao nunca jamais nada nenhum nenhuma nenhuns nenhumas ninguém nem
+    tampouco sequer
+    """.split()
+)
+FUNCIONAIS_NLTK = set(
+    """
+    estamos estavam esteja estejam estejamos esteve estive estivemos estiver
+    estivera estiveram estiverem estivermos estivesse estivessem estivéramos
+    estivéssemos estou estávamos fomos for fora forem formos fosse fossem fui
+    fôramos fôssemos haja hajam hajamos havemos haver hei houve houvemos houver
+    houvera houveram houverei houverem houveremos houveria houveriam houvermos
+    houverá houverão houveríamos houvesse houvessem houvéramos houvéssemos hão
+    meus minhas nossa nossas nosso nossos seja sejam sejamos serei seremos
+    seriam seríamos somos sou temos tenha tenham tenhamos tenho terei teremos
+    teria teriam terá terão teríamos teu teus teve tive tivemos tiver tivera
+    tiveram tiverem tivermos tivesse tivessem tivéramos tivéssemos tu tua tuas
+    tínhamos vos éramos
+    """.split()
+)
+FUNCIONAIS_SPACY = set(
+    """
+    acerca ademais agora algo algum alguma algumas alguns ali ambas ambos antes
+    atrás bastante cá certamente contudo cuja cujas cujo cujos daquela daquelas
+    daquele daqueles daquilo dar demais dentro diante disso disto diz dizem
+    dizer dão embora fazem fazia faz faço fez inclusive ir irá logo menos
+    muita muitas muitos naquela naquele nuns ora parece perante pode poder
+    podia porquanto portanto posso pouca poucas pouco poucos quais qualquer
+    quaisquer quer sempre sim sob somente tais tal talvez tudo vem vêm ver
+    vária várias vários
+    zero um dois duas três quatro cinco seis sete oito nove dez onze doze
+    treze catorze quatorze quinze dezesseis dezessete dezoito dezenove vinte
+    cem cento
+    """.split()
+)
+STOPWORDS |= NEGACOES | FUNCIONAIS_NLTK | FUNCIONAIS_SPACY
+
+
+def sem_acento(palavra: str) -> str:
+    """Minúsculas e sem acentos: "Não" e "nao" viram a mesma chave."""
+    return (
+        unicodedata.normalize("NFKD", palavra.lower())
+        .encode("ascii", "ignore")
+        .decode()
+    )
+
+
+# Comparação sem maiúsculas e sem acentos: "nao" (sem til, comum em texto
+# digitado) é filtrado como "não". A nuvem continua exibindo a grafia original.
+STOPWORDS_NORMALIZADAS = frozenset(sem_acento(p) for p in STOPWORDS)
 PADRAO_TOKEN = re.compile(r"[a-záàâãéêíóôõúüç]+")
 TAMANHO_MINIMO_TOKEN = 3
 
@@ -251,12 +313,20 @@ TAMANHO_MINIMO_TOKEN = 3
 LIMITE_CARACTERES_MODELO = 4_000
 
 
+@lru_cache(maxsize=50_000)
+def _chave(token: str) -> str:
+    return sem_acento(token)
+
+
 def frequencia_termos(textos: Iterable[str]) -> dict[str, int]:
     """Conta os termos do corpus, sem stopwords, números e palavras curtas."""
     contagem: Counter = Counter()
     for texto in textos:
         for token in PADRAO_TOKEN.findall(str(texto).lower()):
-            if len(token) >= TAMANHO_MINIMO_TOKEN and token not in STOPWORDS:
+            if (
+                len(token) >= TAMANHO_MINIMO_TOKEN
+                and _chave(token) not in STOPWORDS_NORMALIZADAS
+            ):
                 contagem[token] += 1
     return dict(contagem)
 

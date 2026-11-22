@@ -142,11 +142,21 @@ def anexar_ia(corpus: pd.DataFrame, ia: pd.DataFrame | None) -> pd.DataFrame:
     resumo já existente no corpus, se houver). Notícias ainda não processadas
     ficam com relevante/relevancia_prob nulos — "não avaliada", não "irrelevante".
     """
-    extras = ["relevante", "relevancia_prob", "resumo_truncado"]
+    extras = [
+        "relevante",
+        "relevancia_prob",
+        "relevancia_por_termo",
+        "resumo_truncado",
+    ]
     if ia is None or ia.empty:
-        return corpus.assign(**{coluna: pd.NA for coluna in extras})
+        return _sem_resumo_derivado(
+            corpus.assign(**{coluna: pd.NA for coluna in extras})
+        )
+    ia = ia.reindex(
+        columns=["id", "resumo", *extras]
+    )  # arquivos antigos sem colunas novas
     unido = corpus.merge(
-        ia[["id", "resumo", *extras]].rename(columns={"resumo": "resumo_ia"}),
+        ia.rename(columns={"resumo": "resumo_ia"}),
         on="id",
         how="left",
     )
@@ -155,10 +165,29 @@ def anexar_ia(corpus: pd.DataFrame, ia: pd.DataFrame | None) -> pd.DataFrame:
     resumo = unido["resumo"].astype("object")
     vazio = resumo.isna() | (resumo.astype(str).str.strip() == "")
     unido["resumo"] = resumo.where(~vazio, unido["resumo_ia"].astype("object"))
-    unido["relevante"] = unido["relevante"].map(
-        lambda v: v if pd.isna(v) else str(v).strip().lower() in {"true", "1", "sim"}
-    )
-    return unido.drop(columns="resumo_ia")
+    for coluna in ("relevante", "relevancia_por_termo"):
+        unido[coluna] = unido[coluna].map(
+            lambda v: (
+                v if pd.isna(v) else str(v).strip().lower() in {"true", "1", "sim"}
+            )
+        )
+    return _sem_resumo_derivado(unido.drop(columns="resumo_ia"))
+
+
+def _sem_resumo_derivado(corpus: pd.DataFrame) -> pd.DataFrame:
+    """Apaga o resumo das fontes cuja licença proíbe obra derivada (CC BY-ND).
+
+    É o único ponto por onde painel e API recebem o resumo: a regra vale para
+    os dois e para qualquer resumo antigo que ainda esteja em corpus_ia.csv.
+    """
+    if "fonte" not in corpus.columns or corpus.empty:
+        return corpus
+    proibido = corpus["fonte"].isin(esquema.FONTES_SEM_DERIVACAO)
+    corpus = corpus.copy()
+    for coluna in ("resumo", "resumo_truncado"):
+        if coluna in corpus.columns:
+            corpus[coluna] = corpus[coluna].astype("object").where(~proibido, None)
+    return corpus
 
 
 def carregar_corpus_completo(

@@ -198,6 +198,11 @@ if resposta is not None:
                     delta_color="off",
                 )
                 st.progress(r["probabilidade"])
+                if r.get("por_termo_gd"):
+                    st.caption(
+                        "Relevante pela regra de palavra: a primeira linha cita um termo de "
+                        "geração distribuída, mesmo com probabilidade abaixo de 40%."
+                    )
 
         if "tom" in resultados:
             r = resultados["tom"]

@@ -65,7 +65,11 @@ def test_extracao_agencia_brasil_mantem_regra_do_tp2(fixture):
 def test_listagem_prefiltra_e_respeita_dominio(fixture):
     url = AGENCIA_GOV.listagens[0].montar_url(0)
     fonte = type(AGENCIA_GOV)(
-        **{**AGENCIA_GOV.__dict__, "listagens": AGENCIA_GOV.listagens[:1]}
+        **{
+            **AGENCIA_GOV.__dict__,
+            "listagens": AGENCIA_GOV.listagens[:1],
+            "sitemaps": (),
+        }
     )
     contagem = Counter()
     links = coletor.coletar_links(
@@ -78,7 +82,11 @@ def test_listagem_prefiltra_e_respeita_dominio(fixture):
 def test_robots_bloqueia_listagem(fixture):
     url = AGENCIA_GOV.listagens[0].montar_url(0)
     fonte = type(AGENCIA_GOV)(
-        **{**AGENCIA_GOV.__dict__, "listagens": AGENCIA_GOV.listagens[:1]}
+        **{
+            **AGENCIA_GOV.__dict__,
+            "listagens": AGENCIA_GOV.listagens[:1],
+            "sitemaps": (),
+        }
     )
     navegador = NavegadorFalso(
         {url: fixture("agenciagov_listagem.html")}, proibidas={url}
@@ -95,7 +103,11 @@ def test_coleta_html_usa_cache_e_pula_existentes(fixture, tmp_path, monkeypatch)
         "https://agenciagov.ebc.com.br/noticias/202607/geracao-distribuida-supera-50-gw"
     )
     fonte = type(AGENCIA_GOV)(
-        **{**AGENCIA_GOV.__dict__, "listagens": AGENCIA_GOV.listagens[:1]}
+        **{
+            **AGENCIA_GOV.__dict__,
+            "listagens": AGENCIA_GOV.listagens[:1],
+            "sitemaps": (),
+        }
     )
     navegador = NavegadorFalso(
         {
