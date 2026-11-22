@@ -1,0 +1,251 @@
+{
+  "escolha_dev": {
+    "estrategia": "curtas",
+    "limiar": 0.5,
+    "f1_geral_dev": 0.848,
+    "f1_gd_sem_solar_dev": 0.737,
+    "empatados": [
+      "curtas@0.4",
+      "curtas@0.45",
+      "curtas@0.5",
+      "curtas@0.55",
+      "curtas@0.6"
+    ],
+    "regra": "maior F1 geral no desenvolvimento; empate (< 0,005): maior F1 em GD sem solar; depois menor custo e limiar mais perto de 0,5",
+    "referencia_sempre_sim_dev": {
+      "f1_geral": 0.832,
+      "f1_gd_sem_solar": 0.7
+    },
+    "condicao_de_adocao": "no teste, F1 geral maior que o da configuração atual E maior que o de 'sempre sim', com IC 95% da diferença pareada acima de zero nos dois casos. A comparação com 'sempre sim' foi acrescentada em 22/11/2026 depois de ver o desenvolvimento (a escolhida acertou 2 de 17 'nao') e antes de abrir o teste."
+  },
+  "configuracao_atual": {
+    "estrategia": "atual",
+    "limiar": 0.5
+  },
+  "relevancia": {
+    "geral": {
+      "n": 89,
+      "n_sim": 64,
+      "escolhida": {
+        "precisao": 0.724,
+        "recall": 0.984,
+        "f1": 0.834,
+        "ic95_f1": [
+          0.764,
+          0.892
+        ]
+      },
+      "atual": {
+        "precisao": 0.778,
+        "recall": 0.656,
+        "f1": 0.712,
+        "ic95_f1": [
+          0.628,
+          0.8
+        ]
+      },
+      "sempre_sim": {
+        "precisao": 0.719,
+        "recall": 1.0,
+        "f1": 0.837,
+        "ic95_f1": [
+          0.764,
+          0.894
+        ]
+      },
+      "escolhida_menos_atual": {
+        "diferenca_f1": 0.123,
+        "ic95": [
+          0.035,
+          0.208
+        ]
+      },
+      "escolhida_menos_sempre_sim": {
+        "diferenca_f1": -0.002,
+        "ic95": [
+          -0.022,
+          0.016
+        ]
+      },
+      "atual_menos_sempre_sim": {
+        "diferenca_f1": -0.125,
+        "ic95": [
+          -0.21,
+          -0.032
+        ]
+      }
+    },
+    "gd_sem_solar": {
+      "n": 21,
+      "n_sim": 12,
+      "escolhida": {
+        "precisao": 0.571,
+        "recall": 1.0,
+        "f1": 0.727,
+        "ic95_f1": [
+          0.5,
+          0.865
+        ]
+      },
+      "atual": {
+        "precisao": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "ic95_f1": [
+          0.0,
+          0.0
+        ]
+      },
+      "sempre_sim": {
+        "precisao": 0.571,
+        "recall": 1.0,
+        "f1": 0.727,
+        "ic95_f1": [
+          0.5,
+          0.865
+        ]
+      },
+      "escolhida_menos_atual": {
+        "diferenca_f1": 0.727,
+        "ic95": [
+          0.5,
+          0.865
+        ]
+      },
+      "escolhida_menos_sempre_sim": {
+        "diferenca_f1": 0.0,
+        "ic95": [
+          0.0,
+          0.0
+        ]
+      },
+      "atual_menos_sempre_sim": {
+        "diferenca_f1": -0.727,
+        "ic95": [
+          -0.865,
+          -0.5
+        ]
+      }
+    },
+    "por_fonte": {
+      "ANEEL": {
+        "escolhida": {
+          "n": 44,
+          "precisao": 0.5581395348837209,
+          "recall": 0.96,
+          "f1": 0.7058823529411763
+        },
+        "atual": {
+          "n": 44,
+          "precisao": 0.5263157894736842,
+          "recall": 0.4,
+          "f1": 0.45454545454545453
+        },
+        "sempre_sim": {
+          "n": 44,
+          "precisao": 0.5681818181818182,
+          "recall": 1.0,
+          "f1": 0.7246376811594203
+        }
+      },
+      "Agência Brasil": {
+        "escolhida": {
+          "n": 27,
+          "precisao": 0.8888888888888888,
+          "recall": 1.0,
+          "f1": 0.9411764705882353
+        },
+        "atual": {
+          "n": 27,
+          "precisao": 0.9130434782608695,
+          "recall": 0.875,
+          "f1": 0.8936170212765957
+        },
+        "sempre_sim": {
+          "n": 27,
+          "precisao": 0.8888888888888888,
+          "recall": 1.0,
+          "f1": 0.9411764705882353
+        }
+      },
+      "Agência Gov": {
+        "escolhida": {
+          "n": 4,
+          "precisao": 0.3333333333333333,
+          "recall": 1.0,
+          "f1": 0.5
+        },
+        "atual": {
+          "n": 4,
+          "precisao": 0.0,
+          "recall": 0.0,
+          "f1": 0.0
+        },
+        "sempre_sim": {
+          "n": 4,
+          "precisao": 0.25,
+          "recall": 1.0,
+          "f1": 0.4
+        }
+      },
+      "MME": {
+        "escolhida": {
+          "n": 14,
+          "precisao": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        },
+        "atual": {
+          "n": 14,
+          "precisao": 1.0,
+          "recall": 0.7857142857142857,
+          "f1": 0.88
+        },
+        "sempre_sim": {
+          "n": 14,
+          "precisao": 1.0,
+          "recall": 1.0,
+          "f1": 1.0
+        }
+      }
+    }
+  },
+  "escolhida_vence": false,
+  "tom": {
+    "desenvolvimento": {
+      "n": 42,
+      "distribuicao": {
+        "favoravel": 28,
+        "neutro": 12,
+        "desfavoravel": 2
+      },
+      "zero_shot": {
+        "f1_macro": 0.422,
+        "acuracia": 0.619
+      },
+      "linha_base": {
+        "classe": "favoravel",
+        "f1_macro": 0.267,
+        "acuracia": 0.667
+      }
+    },
+    "teste": {
+      "n": 64,
+      "distribuicao": {
+        "favoravel": 48,
+        "neutro": 12,
+        "desfavoravel": 4
+      },
+      "zero_shot": {
+        "f1_macro": 0.248,
+        "acuracia": 0.359
+      },
+      "linha_base": {
+        "classe": "favoravel",
+        "f1_macro": 0.286,
+        "acuracia": 0.75
+      }
+    }
+  },
+  "sha256_teste": "3233b8176ad38bb377f5a2f9ac8d04379b2d1cb04fc987fc4b942627612e8577"
+}

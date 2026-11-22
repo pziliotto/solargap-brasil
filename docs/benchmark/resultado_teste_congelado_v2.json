@@ -1,0 +1,281 @@
+{
+  "consulta": 2,
+  "aviso": "Segunda consulta ao teste congelado, feita depois de corrigir a métrica de escolha (F1-sim para F1 macro). A evidência é mais fraca que a de uma consulta única.",
+  "escolha_dev_v2": {
+    "estrategia": "hibrido_titulo",
+    "limiar": 0.4,
+    "f1_macro_dev": 0.751,
+    "precisao_sim_dev": 0.892,
+    "f1_sim_gd_sem_solar_dev": 0.667,
+    "f1_macro_sempre_sim_dev": 0.416,
+    "empatadas": [
+      "hibrido_titulo@0.3",
+      "hibrido_titulo@0.35",
+      "hibrido_titulo@0.4"
+    ],
+    "regra": "restrições: F1 macro > 'sempre sim' e F1-sim > 0 em GD sem solar; critério: maior F1 macro; empate (< 0,005): maior precisão de 'sim', menor custo, limiar mais perto de 0,5",
+    "condicao_de_adocao": "no teste, F1 macro maior que o da configuração atual e o de 'sempre sim', com IC 95% da diferença pareada acima de zero nos dois casos"
+  },
+  "relevancia": {
+    "geral": {
+      "n": 89,
+      "n_sim": 64,
+      "escolhida_v2": {
+        "precisao_sim": 0.809,
+        "recall_sim": 0.859,
+        "f1_sim": 0.833,
+        "precisao_nao": 0.571,
+        "recall_nao": 0.48,
+        "f1_nao": 0.522,
+        "f1_macro": 0.678,
+        "ic95_f1_macro": [
+          0.572,
+          0.783
+        ]
+      },
+      "atual": {
+        "precisao_sim": 0.778,
+        "recall_sim": 0.656,
+        "f1_sim": 0.712,
+        "precisao_nao": 0.371,
+        "recall_nao": 0.52,
+        "f1_nao": 0.433,
+        "f1_macro": 0.573,
+        "ic95_f1_macro": [
+          0.468,
+          0.677
+        ]
+      },
+      "sempre_sim": {
+        "precisao_sim": 0.719,
+        "recall_sim": 1.0,
+        "f1_sim": 0.837,
+        "precisao_nao": 0.0,
+        "recall_nao": 0.0,
+        "f1_nao": 0.0,
+        "f1_macro": 0.418,
+        "ic95_f1_macro": [
+          0.382,
+          0.447
+        ]
+      },
+      "escolhida_v2_menos_atual": {
+        "diferenca_f1_macro": 0.105,
+        "ic95": [
+          0.028,
+          0.177
+        ]
+      },
+      "escolhida_v2_menos_sempre_sim": {
+        "diferenca_f1_macro": 0.259,
+        "ic95": [
+          0.143,
+          0.367
+        ]
+      },
+      "atual_menos_sempre_sim": {
+        "diferenca_f1_macro": 0.154,
+        "ic95": [
+          0.039,
+          0.27
+        ]
+      }
+    },
+    "gd_sem_solar": {
+      "n": 21,
+      "n_sim": 12,
+      "escolhida_v2": {
+        "precisao_sim": 0.917,
+        "recall_sim": 0.917,
+        "f1_sim": 0.917,
+        "precisao_nao": 0.889,
+        "recall_nao": 0.889,
+        "f1_nao": 0.889,
+        "f1_macro": 0.903,
+        "ic95_f1_macro": [
+          0.741,
+          1.0
+        ]
+      },
+      "atual": {
+        "precisao_sim": 0.0,
+        "recall_sim": 0.0,
+        "f1_sim": 0.0,
+        "precisao_nao": 0.429,
+        "recall_nao": 1.0,
+        "f1_nao": 0.6,
+        "f1_macro": 0.3,
+        "ic95_f1_macro": [
+          0.192,
+          0.4
+        ]
+      },
+      "sempre_sim": {
+        "precisao_sim": 0.571,
+        "recall_sim": 1.0,
+        "f1_sim": 0.727,
+        "precisao_nao": 0.0,
+        "recall_nao": 0.0,
+        "f1_nao": 0.0,
+        "f1_macro": 0.364,
+        "ic95_f1_macro": [
+          0.25,
+          0.432
+        ]
+      },
+      "escolhida_v2_menos_atual": {
+        "diferenca_f1_macro": 0.603,
+        "ic95": [
+          0.416,
+          0.77
+        ]
+      },
+      "escolhida_v2_menos_sempre_sim": {
+        "diferenca_f1_macro": 0.539,
+        "ic95": [
+          0.355,
+          0.677
+        ]
+      },
+      "atual_menos_sempre_sim": {
+        "diferenca_f1_macro": -0.064,
+        "ic95": [
+          -0.24,
+          0.15
+        ]
+      }
+    },
+    "por_fonte": {
+      "ANEEL": {
+        "escolhida_v2": {
+          "n": 44,
+          "precisao_sim": 0.655,
+          "recall_sim": 0.76,
+          "f1_sim": 0.704,
+          "precisao_nao": 0.6,
+          "recall_nao": 0.474,
+          "f1_nao": 0.529,
+          "f1_macro": 0.617
+        },
+        "atual": {
+          "n": 44,
+          "precisao_sim": 0.526,
+          "recall_sim": 0.4,
+          "f1_sim": 0.455,
+          "precisao_nao": 0.4,
+          "recall_nao": 0.526,
+          "f1_nao": 0.455,
+          "f1_macro": 0.455
+        },
+        "sempre_sim": {
+          "n": 44,
+          "precisao_sim": 0.568,
+          "recall_sim": 1.0,
+          "f1_sim": 0.725,
+          "precisao_nao": 0.0,
+          "recall_nao": 0.0,
+          "f1_nao": 0.0,
+          "f1_macro": 0.362
+        }
+      },
+      "Agência Brasil": {
+        "escolhida_v2": {
+          "n": 27,
+          "precisao_sim": 0.913,
+          "recall_sim": 0.875,
+          "f1_sim": 0.894,
+          "precisao_nao": 0.25,
+          "recall_nao": 0.333,
+          "f1_nao": 0.286,
+          "f1_macro": 0.59
+        },
+        "atual": {
+          "n": 27,
+          "precisao_sim": 0.913,
+          "recall_sim": 0.875,
+          "f1_sim": 0.894,
+          "precisao_nao": 0.25,
+          "recall_nao": 0.333,
+          "f1_nao": 0.286,
+          "f1_macro": 0.59
+        },
+        "sempre_sim": {
+          "n": 27,
+          "precisao_sim": 0.889,
+          "recall_sim": 1.0,
+          "f1_sim": 0.941,
+          "precisao_nao": 0.0,
+          "recall_nao": 0.0,
+          "f1_nao": 0.0,
+          "f1_macro": 0.471
+        }
+      },
+      "Agência Gov": {
+        "escolhida_v2": {
+          "n": 4,
+          "precisao_sim": 0.5,
+          "recall_sim": 1.0,
+          "f1_sim": 0.667,
+          "precisao_nao": 1.0,
+          "recall_nao": 0.667,
+          "f1_nao": 0.8,
+          "f1_macro": 0.733
+        },
+        "atual": {
+          "n": 4,
+          "precisao_sim": 0.0,
+          "recall_sim": 0.0,
+          "f1_sim": 0.0,
+          "precisao_nao": 0.667,
+          "recall_nao": 0.667,
+          "f1_nao": 0.667,
+          "f1_macro": 0.333
+        },
+        "sempre_sim": {
+          "n": 4,
+          "precisao_sim": 0.25,
+          "recall_sim": 1.0,
+          "f1_sim": 0.4,
+          "precisao_nao": 0.0,
+          "recall_nao": 0.0,
+          "f1_nao": 0.0,
+          "f1_macro": 0.2
+        }
+      },
+      "MME": {
+        "escolhida_v2": {
+          "n": 14,
+          "precisao_sim": 1.0,
+          "recall_sim": 1.0,
+          "f1_sim": 1.0,
+          "precisao_nao": 0.0,
+          "recall_nao": 0.0,
+          "f1_nao": 0.0,
+          "f1_macro": 0.5
+        },
+        "atual": {
+          "n": 14,
+          "precisao_sim": 1.0,
+          "recall_sim": 0.786,
+          "f1_sim": 0.88,
+          "precisao_nao": 0.0,
+          "recall_nao": 0.0,
+          "f1_nao": 0.0,
+          "f1_macro": 0.44
+        },
+        "sempre_sim": {
+          "n": 14,
+          "precisao_sim": 1.0,
+          "recall_sim": 1.0,
+          "f1_sim": 1.0,
+          "precisao_nao": 0.0,
+          "recall_nao": 0.0,
+          "f1_nao": 0.0,
+          "f1_macro": 0.5
+        }
+      }
+    }
+  },
+  "escolhida_vence": true,
+  "sha256_teste": "3233b8176ad38bb377f5a2f9ac8d04379b2d1cb04fc987fc4b942627612e8577"
+}

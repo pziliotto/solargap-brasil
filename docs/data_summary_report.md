@@ -179,6 +179,14 @@ Fontes avaliadas para ampliar o corpus, com foco em energia solar. Os critérios
 
 1. **Acesso:** livre, sem cadastro.
 2. **Termos e licença:** todo o gov.br está sob CC BY-ND 3.0, que autoriza copiar e redistribuir o conteúdo literalmente, inclusive em repositório público, desde que citada a fonte. Os Termos de Uso do gov.br (`/pt-br/termos-de-uso`) tratam de cookies e do uso dos serviços e não proíbem coleta automatizada. **Ressalva:** a cláusula "SemDerivações" proíbe distribuir obra adaptada. O texto do corpus é literal e cumpre a licença. Já o resumo gerado pelo modelo (`corpus_ia.csv`) é curto e não reproduz a obra, mas a fronteira entre resumo e adaptação não é nítida: se o projeto quiser eliminar esse risco, basta não publicar o resumo dessas duas fontes e manter só a relevância.
+
+**Decisão sobre a cláusula SemDerivações (22/11/2026).** O projeto não gera, não guarda e não exibe resumo automático das fontes do gov.br. Elas são ANEEL, MME e **Agência Gov**, incluída pela autora na mesma regra por ser o portal de notícias do governo federal. Para essas fontes, o painel e a API mostram título, link para a matéria original, fonte e a classificação de relevância. O resumo continua para as fontes cuja licença permite derivações (Agência Brasil). Implementação:
+
+- **Regra única:** `esquema.FONTES_SEM_DERIVACAO`, conferida por teste contra `permite_derivacao=False` no cadastro de fontes (`fontes.py`).
+- **Painel e API:** `servicos/dados.anexar_ia` apaga o resumo dessas fontes, e as duas camadas leem por ele. Na tabela da página Notícias, a coluna de resumo mostra "licença CC BY-ND: abra a original".
+- **Processamento de uma notícia:** em `POST /noticias/{id}/processar`, o padrão passa a ser só a relevância, e pedir o resumo explicitamente devolve 403.
+- **Lote:** `processar_corpus` não gera resumo para essas fontes. Os 7 resumos da Agência Gov que já estavam em `corpus_ia.csv` foram removidos do arquivo atual, sem alterar nenhuma outra linha. Eles **continuam no histórico do Git**, nos commits até 4d1b386. O histórico não foi reescrito: reescrever commits já publicados quebraria os clones existentes, e o conteúdo do histórico é um resumo curto de matérias públicas, não um dado pessoal.
+- **Fora da regra:** `POST /processar_texto` resume o texto que o próprio usuário envia e não está ligado a uma fonte.
 3. **robots.txt:** o de `www.gov.br` (salvo em `tests/fixtures/robots_govbr.txt`) não tem regras para `/aneel` nem `/mme` e não tem `Crawl-delay`; vale a pausa padrão de 1,5 s. Os bloqueios com `?` (`Disallow: /mre/*?`, `/ebserh/*?`) valem só para outros órgãos.
 4. **Estrutura:**
    - **ANEEL:** usa Plone Volto. A listagem de notícias é montada por JavaScript e vem vazia no HTML, por isso a descoberta é pelo sitemap do órgão (`/aneel/sitemap.xml.gz`, 2.355 matérias de 2022 a 2026). Na matéria, o corpo não vem como `<p>`: vem nos blocos do objeto `window.__data`, escrito no próprio HTML. O coletor lê esse objeto (`base.extrair_volto`) sem executar JavaScript.
@@ -453,7 +461,9 @@ Cruza a adoção per capita (W/hab acumulado até outubro de 2026) com o crescim
 |Divergência de potência com o painel oficial|Resolvida com a base 10/2026 (seção 3.6)|
 |Registros de 75 kW no Paraná|**Tratamento aplicado** (seção 3.4.3): sinalização por diagnóstico entre distribuidoras e imputação da potência na visão corrigida. Resta registrar a inconsistência junto à ANEEL e rever a regra se a base mudar (a margem da segunda distribuidora é estreita)|
 |Agência Gov pelo sitemap|Coleta feita em 20/11/2026 (seção 2.3). O sitemap cobre sobretudo os meses recentes; matérias antigas só entram se aparecerem nele ou na editoria Energia|
-|IA nas notícias da ANEEL e do MME|As 412 notícias coletadas em 20/11/2026 ainda não passaram por `processar_corpus`. Antes de publicar os resumos dessas fontes, decidir sobre a cláusula SemDerivações da CC BY-ND 3.0 (seção 2.4)|
+|~~Resumo das fontes CC BY-ND~~|**Resolvida em 22/11/2026:** sem resumo para ANEEL, MME e Agência Gov (seção 2.4)|
+|~~Relevância das notícias da ANEEL e do MME~~|**Resolvida em 22/11/2026:** o corpus inteiro (553) foi reprocessado com a estratégia híbrida adotada no benchmark v2 (seção 5.2)|
+|Novo conjunto de teste rotulado|O teste congelado do benchmark v2 já foi consultado duas vezes (seção 5.2). Confirmar a estratégia híbrida exige um conjunto novo, nunca consultado|
 |Inclusão de PB, PI, RO e SE no Convênio 16/15|Inferida da redação dada pelo Conv. ICMS 75/16. Confirmar no texto consolidado atual do CONFAZ, por consulta manual|
 |Termos de uso de CNN Brasil e R7|Não localizados; as fontes permanecem fora do corpus até verificação|
 
@@ -549,6 +559,22 @@ Achado de qualidade do corpus: em 56 das 119 notícias, a "linha fina" coletada 
 
 **Planilha do benchmark v2 (20/11/2026).** `docs/benchmark/rotulos_benchmark_v2_pendentes.csv` tem **120 notícias reais**, com rótulos vazios para a autora preencher: ANEEL 74, MME 23, Agência Brasil 21 e Agência Gov 2. Elas foram sorteadas, com semente fixa, entre as 525 notícias do corpus que estão fora do gabarito v1. Ficaram de fora também as 2 notícias do v1 descobertas por caminho proibido que não voltaram pelo sitemap (seção 2.3). Entre as 120, **33 são de GD sem "solar"** (30 da ANEEL e 3 do MME): 20 entram pela cota reservada a esse caso, e as demais vieram do sorteio estratificado por fonte e palavra-chave.
 
+**Benchmark v2 (22/11/2026).** A autora rotulou as 120 notícias da planilha. Junto com o v1, sem as 2 notícias fora do v2, o gabarito ficou com 148 notícias, divididas em desenvolvimento (59) e teste congelado (89). A divisão foi estratificada por rótulo, fonte e GD sem "solar", com semente fixa (`src/ia/benchmark_relevancia.py`). O subconjunto GD sem "solar" é 23% do gabarito e 14% do corpus: a sobre-representação é proposital. Resultado da primeira consulta ao teste (detalhes em `docs/escolha_modelo.md`, seção 9):
+
+- **Relevância.** A estratégia escolhida no desenvolvimento (máximo de três hipóteses curtas) superou a atual no F1 da classe "sim" (0,834 contra 0,712; diferença +0,123, IC 95% [0,035; 0,208]). Mas empatou com responder sempre "sim" (0,837; diferença −0,002, IC 95% [−0,022; 0,016]) e por isso não foi adotada. A configuração atual continua no catálogo e erra todas as 12 notícias relevantes de GD sem "solar" do teste.
+- **Tom.** O F1 macro foi de 0,248, contra 0,286 da linha de base de classe majoritária. Continua reprovado.
+- **Resumo.** O benchmark de resumo não foi reexecutado. Com o corpus de 553 notícias, a amostra seria de **356 notícias**, contra 56.
+
+**Correção de métrica e segunda consulta ao teste (22/11/2026).** O critério da primeira escolha, F1 da classe "sim", estava errado para este corpus: com 72% de relevantes, "sempre sim" vence quase automaticamente. A escolha foi refeita só no desenvolvimento, pelo **F1 macro**, com as probabilidades já salvas e sem nova inferência. As restrições foram superar "sempre sim" e ter F1 maior que zero em GD sem "solar". A escolha caiu no **híbrido**: a notícia é relevante se o título cita um termo de geração distribuída OU se a hipótese "Esta notícia trata de energia solar." passa de 0,4.
+
+Na **segunda consulta** ao teste congelado, o F1 macro foi 0,678 [IC 95% 0,572; 0,783]. A configuração anterior teve 0,573 e "sempre sim", 0,418, com as duas diferenças pareadas acima de zero. No subconjunto GD sem "solar", foi 0,903, contra 0,300. A estratégia foi adotada em `src/ia/catalogo.py`. Por ser a segunda consulta, feita depois de corrigir a métrica, a evidência é mais fraca que a de uma consulta única, e um novo conjunto de teste ficou como pendência (seção 3.9). A primeira avaliação continua em `resultado_teste_congelado.json` e a segunda está em `resultado_teste_congelado_v2.json`.
+
+**Reprocessamento do corpus.** As 553 notícias foram reprocessadas com a nova estratégia:
+
+- **Relevância:** 399 julgadas relevantes (72%). Em 71 delas, foi a regra de palavra do título que decidiu (coluna `relevancia_por_termo`): ANEEL 36, MME 33, Agência Brasil 1 e Agência Gov 1.
+- **Resumo:** só as 134 notícias da Agência Brasil têm resumo, idênticos aos anteriores. As fontes do gov.br ficaram sem resumo (seção 2.4).
+- **Rastreio da configuração:** `modelo_relevancia` passou a registrar o modelo e a estratégia (`… | hibrido_titulo@0.4`), para que uma troca futura torne as notícias pendentes de novo.
+
 ### 5.3 Processamento em lote e armazenamento
 
 `python -m src.ia.processar_corpus` resume e avalia a relevância de cada notícia e grava `data/processed/corpus_ia.csv`:
@@ -571,8 +597,8 @@ Achado de qualidade do corpus: em 56 das 119 notícias, a "linha fina" coletada 
 
 - **Truncamento:** 64% das notícias passam do limite no resumo e 80% na classificação. O modelo lê o início, onde o texto jornalístico concentra o essencial.
 - **Resumo não é fonte:** resumos automáticos podem omitir ou distorcer detalhes. O painel sempre mostra o link da matéria original ao lado, e o resumo nunca alimenta um indicador numérico.
-- **Relevância mais estrita que a rotulagem:** quatro dos cinco falsos negativos do benchmark são notícias sobre renováveis em geral. O filtro tende a excluir esse tipo de notícia. No lote completo, 28 das 119 notícias foram julgadas fora do tema; entre elas há notícias de geração distribuída que não mencionam "solar", por isso o filtro do painel vem desligado por padrão.
-- **Licença:** resumos são obras derivadas. Agência Brasil e Agência Gov autorizam reprodução com citação; cada resumo mantém a ligação com a URL de origem.
+- **Relevância mais estrita que a rotulagem:** quatro dos cinco falsos negativos do benchmark são notícias sobre renováveis em geral. O filtro tende a excluir esse tipo de notícia. No lote de 16/11/2026, 28 das 119 notícias foram julgadas fora do tema, e entre elas havia notícias de geração distribuída que não mencionam "solar". Desde 22/11/2026, a estratégia híbrida (termo de GD no título OU zero-shot) cobre esse caso (seção 5.2). GD citada só no corpo ainda depende do modelo, e o filtro do painel continua desligado por padrão.
+- **Licença:** resumos são obras derivadas. Só a Agência Brasil recebe resumo, e cada resumo mantém a ligação com a URL de origem. As fontes sob CC BY-ND (ANEEL, MME e Agência Gov) não recebem resumo (seção 2.4).
 
 ## 6. Governança e Privacidade
 

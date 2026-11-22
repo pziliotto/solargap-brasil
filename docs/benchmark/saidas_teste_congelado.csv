@@ -1,0 +1,90 @@
+﻿id;fonte;gd_sem_solar;relevante;tom;p_atual;p_ampla;p_gd;p_lei;prev_escolhida;prev_atual;prev_sempre_sim;tom_zero_shot
+00a2ad009b6e;MME;False;sim;favoravel;0.9998;0.9989;0.9997;0.9675;sim;sim;sim;neutro
+0163fa329566;MME;False;sim;favoravel;0.0001;0.1579;0.9982;0.5815;sim;nao;sim;neutro
+03e5eebe9e7a;ANEEL;True;nao;;0.0001;0.9183;0.969;0.7956;sim;nao;sim;
+05f21f153ade;Agência Brasil;False;sim;favoravel;0.9997;0.9808;0.0409;0.9183;sim;sim;sim;neutro
+07d2dd6d612e;ANEEL;False;sim;favoravel;0.9927;0.9741;0.1986;0.9583;sim;sim;sim;favoravel
+0c072d51c25c;Agência Brasil;False;sim;favoravel;0.9994;0.9201;0.9798;0.7313;sim;sim;sim;neutro
+0e3ebb222b63;MME;True;sim;favoravel;0.0002;0.9931;0.9997;0.6618;sim;nao;sim;neutro
+13a0a4903179;Agência Gov;False;nao;;0.0003;0.0272;0.9981;0.0873;sim;nao;sim;
+191806478dae;ANEEL;False;sim;desfavoravel;0.9996;0.8854;0.991;0.0114;sim;sim;sim;favoravel
+1fa09cb514dc;ANEEL;False;sim;favoravel;0.9997;0.7953;0.9997;0.9983;sim;sim;sim;favoravel
+20be0f8e1f48;Agência Brasil;False;sim;favoravel;0.0005;0.3611;0.9704;0.9775;sim;nao;sim;neutro
+2ae13b7eb187;ANEEL;True;nao;;0.0003;0.954;0.9996;0.5609;sim;nao;sim;
+2ae7072b1de2;ANEEL;True;nao;;0.0001;0.1421;0.9965;0.2161;sim;nao;sim;
+2af613bd8c39;Agência Gov;False;nao;;0.5143;0.9575;0.8666;0.1982;sim;sim;sim;
+3172bddf59b6;ANEEL;False;sim;favoravel;0.9989;0.9954;0.9926;0.5549;sim;sim;sim;neutro
+386836d3ca8f;ANEEL;True;nao;;0.0003;0.0622;0.994;0.6983;sim;nao;sim;
+39d24a6d633e;ANEEL;False;nao;;0.9983;0.9837;0.9985;0.6871;sim;sim;sim;
+3a5f1f1e59d0;ANEEL;False;nao;;0.9762;0.518;0.8925;0.0917;sim;sim;sim;
+4515d2a94baa;Agência Brasil;False;nao;;0.9995;0.9975;0.9809;0.9765;sim;sim;sim;
+4521222ef262;ANEEL;True;sim;favoravel;0.0003;0.4634;0.9996;0.9949;sim;nao;sim;neutro
+455e55ed9144;Agência Brasil;False;sim;favoravel;0.9992;0.9978;0.9735;0.9659;sim;sim;sim;neutro
+4650953c7135;ANEEL;True;sim;neutro;0.0001;0.5207;0.9992;0.9186;sim;nao;sim;neutro
+48b895f763a3;ANEEL;False;nao;;0.0005;0.3494;0.9995;0.558;sim;nao;sim;
+4ee99d08a14e;Agência Brasil;False;sim;favoravel;0.9997;0.7585;0.9995;0.653;sim;sim;sim;favoravel
+4f7e3afdfed8;Agência Brasil;False;sim;favoravel;0.9997;0.9892;0.7889;0.6552;sim;sim;sim;favoravel
+52e9f00e9584;ANEEL;False;nao;;0.9859;0.987;0.9894;0.5775;sim;sim;sim;
+56ef57ba5029;MME;False;sim;neutro;0.9973;0.9993;0.9997;0.078;sim;sim;sim;favoravel
+57906999b883;ANEEL;True;nao;;0.0001;0.3363;0.9644;0.023;sim;nao;sim;
+5e83506eb3a5;Agência Brasil;False;sim;favoravel;0.9996;0.9894;0.9998;0.8682;sim;sim;sim;favoravel
+5ef0c382eb11;MME;False;sim;favoravel;0.9995;0.7241;0.7308;0.3159;sim;sim;sim;favoravel
+60b5e1f2884f;ANEEL;False;sim;neutro;0.8997;0.8736;0.9987;0.4784;sim;sim;sim;neutro
+6156d6755a1f;ANEEL;True;sim;neutro;0.0001;0.0065;0.999;0.0022;sim;nao;sim;neutro
+649053c5c86b;ANEEL;False;sim;favoravel;0.9938;0.9711;0.9108;0.3919;sim;sim;sim;favoravel
+66f2d868a9b2;ANEEL;False;nao;;0.5215;0.9952;0.999;0.976;sim;sim;sim;
+6ce1aea39207;ANEEL;False;sim;favoravel;0.155;0.1992;0.659;0.1048;sim;nao;sim;neutro
+6e3b297f888e;Agência Brasil;False;nao;;0.0009;0.1951;0.9859;0.9977;sim;nao;sim;
+71ebc2a77ab6;MME;False;sim;neutro;0.9996;0.991;0.8251;0.8513;sim;sim;sim;favoravel
+74adb5b6e57b;Agência Gov;True;sim;desfavoravel;0.0001;0.7337;0.9997;0.0608;sim;nao;sim;neutro
+766f66d1cf64;Agência Brasil;False;sim;favoravel;0.9998;0.9245;0.9835;0.8609;sim;sim;sim;neutro
+7de9ee11932c;ANEEL;False;sim;favoravel;0.7312;0.9863;0.9986;0.8029;sim;sim;sim;neutro
+82b3635e6300;MME;False;sim;favoravel;0.9998;0.9968;0.9936;0.1361;sim;sim;sim;neutro
+8423de685b20;ANEEL;True;sim;neutro;0.0001;0.4175;0.9996;0.831;sim;nao;sim;neutro
+84b89ad3a3ba;Agência Brasil;False;sim;favoravel;0.9998;0.9363;0.9727;0.7633;sim;sim;sim;favoravel
+87b3ee213cfb;Agência Brasil;False;nao;;0.9987;0.9833;0.9972;0.6981;sim;sim;sim;
+8a385a177eec;Agência Brasil;False;sim;neutro;0.9994;0.9995;0.9975;0.8351;sim;sim;sim;neutro
+8ab0148d96f8;ANEEL;False;sim;favoravel;0.7623;0.9986;0.9997;0.3435;sim;sim;sim;neutro
+8bc1cf2ba568;Agência Brasil;False;sim;favoravel;0.0052;0.991;0.1234;0.8773;sim;nao;sim;neutro
+8ce2c56502ad;Agência Brasil;False;sim;favoravel;0.9999;0.9964;0.9976;0.9939;sim;sim;sim;desfavoravel
+91645a426470;Agência Brasil;False;sim;favoravel;0.9907;0.9087;0.9964;0.3124;sim;sim;sim;neutro
+9203af6d1c10;Agência Brasil;False;sim;neutro;0.9999;0.7786;0.9952;0.6282;sim;sim;sim;favoravel
+9283cab60b73;ANEEL;True;sim;neutro;0.4873;0.9626;0.9997;0.8603;sim;nao;sim;desfavoravel
+93d314695144;MME;False;sim;favoravel;0.9994;0.9885;0.7933;0.501;sim;sim;sim;neutro
+963f81783d6d;ANEEL;False;sim;desfavoravel;0.2049;0.6559;0.7774;0.0031;sim;nao;sim;favoravel
+9a31bb5f46e5;Agência Brasil;False;sim;favoravel;0.9998;0.9974;0.9893;0.9554;sim;sim;sim;favoravel
+9b0bbb6b87da;ANEEL;False;sim;favoravel;0.9653;0.9987;0.9996;0.7082;sim;sim;sim;neutro
+9b97558b25e9;Agência Gov;False;nao;;0.0002;0.6364;0.2862;0.3355;nao;nao;sim;
+9caf51b5b8f0;Agência Brasil;False;sim;favoravel;0.9996;0.9968;0.5132;0.9528;sim;sim;sim;neutro
+ab5f3a9b2bb8;ANEEL;False;nao;;0.9994;0.9993;0.9812;0.9161;sim;sim;sim;
+ab67137b0792;ANEEL;False;nao;;0.9991;0.8632;0.9772;0.0458;sim;sim;sim;
+aff2c432c20d;ANEEL;False;sim;favoravel;0.9984;0.6506;0.9863;0.0657;sim;sim;sim;desfavoravel
+b11477576f3a;Agência Brasil;False;sim;favoravel;0.9998;0.9932;0.6914;0.8866;sim;sim;sim;neutro
+b1c568c17ace;ANEEL;False;nao;;0.5536;0.9857;0.9996;0.8163;sim;sim;sim;
+b5f631296b1d;ANEEL;True;nao;;0.0025;0.1979;0.9745;0.4541;sim;nao;sim;
+bd7da3de15b9;MME;False;sim;favoravel;0.9996;0.2905;0.9014;0.0161;sim;sim;sim;favoravel
+c0403cccafde;MME;False;sim;favoravel;0.9982;0.9796;0.6831;0.9796;sim;sim;sim;neutro
+c30de567cb41;Agência Brasil;False;sim;favoravel;0.9997;0.8935;0.4182;0.8092;sim;sim;sim;favoravel
+c77c84322a08;Agência Brasil;False;sim;favoravel;0.9994;0.9879;0.0859;0.963;sim;sim;sim;neutro
+ca8817d20389;ANEEL;True;sim;desfavoravel;0.0002;0.0212;0.9986;0.9199;sim;nao;sim;neutro
+cad3c8963338;Agência Brasil;False;sim;favoravel;0.0012;0.9747;0.9814;0.2709;sim;nao;sim;neutro
+cca5b3c2041e;MME;True;sim;neutro;0.0015;0.971;0.999;0.9567;sim;nao;sim;neutro
+ce16a2e248f6;ANEEL;True;nao;;0.0001;0.0176;0.9967;0.6953;sim;nao;sim;
+d17e9ad9df3d;Agência Brasil;False;sim;favoravel;0.9997;0.9995;0.9961;0.985;sim;sim;sim;favoravel
+d84de66db302;Agência Brasil;False;sim;favoravel;0.9995;0.987;0.9094;0.747;sim;sim;sim;neutro
+d95d51172892;ANEEL;True;sim;neutro;0.0005;0.4756;0.9994;0.4639;sim;nao;sim;neutro
+da9ccd767a58;ANEEL;True;nao;;0.0876;0.954;0.9997;0.6714;sim;nao;sim;
+dd14a4775234;MME;False;sim;favoravel;0.9996;0.957;0.9952;0.8167;sim;sim;sim;favoravel
+df1ebc3308c9;ANEEL;False;sim;favoravel;0.4395;0.7542;0.9922;0.321;sim;nao;sim;neutro
+e12ee715c299;ANEEL;True;sim;neutro;0.0001;0.4683;0.9993;0.3474;sim;nao;sim;neutro
+e5f8739f00f9;ANEEL;True;nao;;0.0001;0.0026;0.8592;0.2508;sim;nao;sim;
+ec8b42b65938;Agência Brasil;False;sim;favoravel;0.9994;0.9971;0.5315;0.9592;sim;sim;sim;neutro
+f054d5e9e4fd;ANEEL;False;sim;favoravel;0.0238;0.3643;0.9984;0.5347;sim;nao;sim;neutro
+f1b90c24f67a;Agência Brasil;False;sim;favoravel;0.9985;0.9067;0.9768;0.6038;sim;sim;sim;favoravel
+f4bcda2a7ec1;ANEEL;False;sim;favoravel;0.0002;0.027;0.018;0.0128;nao;nao;sim;neutro
+f5814d868895;ANEEL;True;sim;favoravel;0.0001;0.0244;0.9991;0.7553;sim;nao;sim;neutro
+fb38b9798328;ANEEL;False;nao;;0.905;0.7015;0.9911;0.1619;sim;sim;sim;
+fb53f84f5b74;MME;False;sim;favoravel;0.9998;0.9977;0.9948;0.9976;sim;sim;sim;neutro
+fc731cb5df5c;ANEEL;False;sim;favoravel;0.0004;0.0419;0.755;0.3548;sim;nao;sim;neutro
+fd211beb919a;ANEEL;False;nao;;0.6479;0.4477;0.9693;0.4924;sim;sim;sim;
+fdd3ed5f9cfb;MME;False;sim;favoravel;0.9977;0.4797;0.0335;0.8826;sim;sim;sim;favoravel
