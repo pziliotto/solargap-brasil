@@ -1,0 +1,231 @@
+pergunta,seguimento,modo,recorte_esperado,recorte_obtido,recorte_ok,ferramenta_esperada,ferramentas_usadas,ferramenta_ok,numeros,numeros_ok,nao_encontrados,palavras,rotulos_trocados,avisos,resposta,tempo_s
+Por que Caxias do Sul está abaixo do esperado e o que fazer?,False,llm,Caxias do Sul (RS),Caxias do Sul (RS),True,explicar_gap,"resumo_potencial, explicar_gap",True,13,1.0,,251,0,,"**Diagnóstico**
+Caxias do Sul (RS) tem um gap de 603,4 GWh/ano, equivalente a 91,0% do seu potencial técnico residencial. A taxa de realização é 9,0%, abaixo da média nacional de 10,4%, indicando que o município está abaixo do esperado.
+
+**O que explica**
+A taxa de realização está 1,8 pontos percentuais abaixo do esperado pelo perfil do município. Fatores que puxam a taxa para baixo incluem:
+- Densidade demográfica (-7,7 p.p.)
+- Agropecuária (-3,8 p.p.)
+- População (-1,5 p.p.)
+
+Fatores que puxam a taxa para cima incluem:
+- Renda (+11,0 p.p.)
+- Tarifa de energia residencial B1 (+0,5 p.p.)
+
+**Recomendações**
+1. **Adoção abaixo do perfil**: A adoção está abaixo do que o perfil comporta: há demanda não atendida que os fatores medidos não explicam. Indica falta de oferta, informação ou instaladores locais; vale prospecção ativa.
+2. **Densidade demográfica**: Densidade alta indica mais apartamentos e menos telhado próprio: oferecer geração compartilhada, autoconsumo remoto e projetos para condomínios.
+3. **Agropecuária**: Pouca agropecuária: falta a demanda rural que puxa a adoção em outras regiões; o mercado depende do consumidor urbano e do pequeno comércio.
+4. **População**: Município grande: mercado fragmentado entre prédios e casas; segmentar por bairro e tipo de imóvel, com condomínios como canal.
+
+**Ressalvas**
+Os dados são baseados no potencial técnico residencial calculado pela ANEEL, considerando 15 m² úteis de telhado por domicílio, eficiência do painel de 20% e performance ratio de 0,75. A posição dos fatores em relação à mediana dos municípios pode influenciar a análise, mas não explica completamente o gap.",39.4
+E Bento Gonçalves?,True,llm,Bento Gonçalves (RS),Bento Gonçalves (RS),True,resumo_potencial,"resumo_potencial, explicar_gap",True,9,1.0,,238,0,,"**Diagnóstico**
+Bento Gonçalves (RS) tem um gap de 159,1 GWh/ano (90,9% do potencial), com uma taxa de realização de 9,1%, abaixo da média nacional (10,4%). O perfil do município indica que a renda domiciliar e a tarifa B1 residencial deveriam puxar a taxa para cima, mas a densidade demográfica, a agropecuária e a população urbana contribuem para atrasar a taxa.
+
+**O que explica**
+Fatores que puxam a taxa para baixo:
+- Densidade demográfica (-7,4 p.p.)
+- Agropecuária (-3,5 p.p.)
+- População urbana (-1,2 p.p.)
+
+Fatores que puxam a taxa para cima:
+- Renda (+12,3 p.p.)
+- Tarifa de energia residencial B1 (+0,6 p.p.)
+
+**Recomendações**
+1. **Adoção abaixo do perfil**: A adoção está abaixo do que o perfil comporta: há demanda não atendida que os fatores medidos não explicam. Indica falta de oferta, informação ou instaladores locais; vale prospecção ativa.
+2. **Densidade demográfica**: Densidade alta indica mais apartamentos e menos telhado próprio: oferecer geração compartilhada, autoconsumo remoto e projetos para condomínios.
+3. **Agropecuária**: Pouca agropecuária: falta a demanda rural que puxa a adoção em outras regiões; o mercado depende do consumidor urbano e do pequeno comércio.
+4. **População urbana**: Município muito urbano não tem o motor rural da GD: o mercado depende de casas e condomínios urbanos, com crédito e informação ao consumidor.
+
+**Ressalvas**
+Os dados são baseados no potencial técnico residencial calculado pela ANEEL e não levam em conta mudanças recentes ou futuras que possam afetar a produção.",22.99
+E os cenários climáticos para lá?,True,llm,Bento Gonçalves (RS),Bento Gonçalves (RS),True,cenarios_climaticos,cenarios_climaticos,True,10,1.0,,153,0,,"**Diagnóstico**
+
+Bento Gonçalves (RS) tem uma taxa de realização de 9,1%, abaixo da média nacional (10,4%). O gap acima do esperado é de -4,3 pontos percentuais, indicando que o potencial de 175,1 GWh/ano não está sendo aproveitado adequadamente. Os cenários climáticos projetam uma variação de irradiação mínima de -1,0% até 2050, não explicando o gap atual.
+
+**O que explica**
+
+Os fatores que puxam a taxa para baixo são:
+- Densidade demográfica (-7,4 p.p.)
+- Agropecuária (-3,5 p.p.)
+- População urbana (-1,2 p.p.)
+
+Os fatores que puxam a taxa para cima são:
+- Renda (+12,3 p.p.)
+- Tarifa de energia residencial B1 (+0,6 p.p.)
+
+**Recomendações**
+1. **Clima**: usar a faixa de incerteza dos cenários no dimensionamento dos sistemas; a prioridade de mercado não muda com o clima.
+
+**Ressalvas**
+
+Os cenários climáticos não explicam o gap atual, que é socioeconômico. A variação de irradiação projetada é pequena e não afeta significativamente a taxa de realização.",25.66
+Onde investir em geração distribuída no Rio Grande do Sul?,False,llm,Rio Grande do Sul,Rio Grande do Sul,True,oportunidades,"resumo_potencial, oportunidades, explicar_gap",True,9,1.0,,236,0,,"**Diagnóstico**
+O Rio Grande do Sul apresenta um gap acima do esperado em 66 municípios, totalizando 199,4 GWh/ano. Os cinco primeiros municípios com maior gap acima do esperado são Bagé, Viamão, Caxias do Sul, Sant'ana do Livramento e Bento Gonçalves.
+
+**O que explica**
+Os fatores que puxam a taxa para baixo são a densidade demográfica (-4,2 p.p.), a agropecuária (-1,9 p.p.) e a irradiação solar (-1,5 p.p.). Contudo, a renda (+8,6 p.p.) puxa a taxa para cima.
+
+**Recomendações**
+1. **Onde priorizar**: Bagé (RS), Viamão (RS), Caxias do Sul (RS), os maiores gaps acima do esperado pelo perfil. Antes de investir, peça a explicação de cada município para escolher o produto (financiamento, geração compartilhada, rural).
+2. **Densidade demográfica**: Densidade alta indica mais apartamentos e menos telhado próprio: oferecer geração compartilhada, autoconsumo remoto e projetos para condomínios.
+3. **Agropecuária**: Pouca agropecuária: falta a demanda rural que puxa a adoção em outras regiões; o mercado depende do consumidor urbano e do pequeno comércio.
+4. **Irradiação solar**: Irradiação abaixo da mediana reduz a geração por kWp: não é alavanca de gestão, mas exige dimensionar o sistema com mais módulos.
+
+**Ressalvas**
+Os dados consideram o potencial técnico residencial baseado em 15 m² úteis de telhado por domicílio, eficiência do painel de 20% e performance ratio de 0,75. O ranking de oportunidades leva em conta a adoção que o perfil do município comportaria e não aconteceu, não explicando o gap de hoje.",25.27
+Quais municípios priorizar no Brasil?,False,llm,Brasil,Brasil,True,oportunidades,oportunidades,True,33,1.0,,206,0,,"# Diagnóstico
+Recife (PE), Brasília (DF), Salvador (BA), Juiz de Fora (MG), Vitória da Conquista (BA), Campinas (SP), Campo Grande (MS), Campina Grande (PB), Santos (SP) e Macaé (RJ) são os municípios prioritários, com gaps acima do esperado que somam 3,6 TWh/ano.
+
+# O que explica
+Recife (PE) tem uma taxa de 2,9%, contra 6,3% esperada, puxando para baixo com 91,7 GWh/ano. Brasília (DF) tem 11,1% contra 12,6%, com 72,0 GWh/ano. Salvador (BA) tem 1,9% contra 3,6%, com 71,0 GWh/ano. Juiz de Fora (MG) tem 4,0% contra 7,8%, com 31,6 GWh/ano. Vitória da Conquista (BA) tem 6,8% contra 12,2%, com 29,6 GWh/ano. Campinas (SP) tem 6,0% contra 7,5%, com 27,8 GWh/ano. Campo Grande (MS) tem 16,6% contra 18,6%, com 26,9 GWh/ano. Campina Grande (PB) tem 3,1% contra 7,1%, com 26,1 GWh/ano. Santos (SP) tem 1,1% contra 4,8%, com 23,6 GWh/ano. Macaé (RJ) tem 10,2% contra 16,2%, com 23,2 GWh/ano.
+
+# Ressalvas
+Os dados são baseados em 1.378 municípios com pelo menos 5.000 domicílios, e não consideram fatores climáticos ou demográficos específicos.
+
+**Recomendações**
+1. **Onde priorizar**: Recife (PE), Brasília (DF), Salvador (BA), os maiores gaps acima do esperado pelo perfil. Antes de investir, peça a explicação de cada município para escolher o produto (financiamento, geração compartilhada, rural).",32.69
+Compare RS e SC,False,llm,Rio Grande do Sul,Rio Grande do Sul,True,comparar_ufs,"comparar_ufs, explicar_gap, explicar_gap",True,13,1.0,,218,0,,"**Diagnóstico**
+O Rio Grande do Sul (RS) apresenta uma taxa de realização 1,3 pontos percentuais maior que Santa Catarina (SC), com 14,0% contra 12,7%. No entanto, o RS tem um gap de 13,4 TWh/ano, enquanto SC tem 8,6 TWh/ano.
+
+**O que explica**
+No RS, a renda (+8,6 p.p.) puxa a taxa para cima, enquanto a densidade demográfica (-4,2 p.p.), a agropecuária (-1,9 p.p.) e a irradiança solar (-1,5 p.p.) a puxam para baixo. Em SC, a renda (+11,5 p.p.) é o fator principal que puxa a taxa para cima, mas a densidade demográfica (-4,7 p.p.), a irradiança solar (-2,6 p.p.) e a agropecuária (-2,5 p.p.) a puxam para baixo.
+
+**Recomendações**
+1. **Densidade demográfica (RS e SC)**: Densidade alta indica mais apartamentos e menos telhado próprio: oferecer geração compartilhada, autoconsumo remoto e projetos para condomínios.
+2. **Agropecuária (RS e SC)**: Pouca agropecuária: falta a demanda rural que puxa a adoção em outras regiões; o mercado depende do consumidor urbano e do pequeno comércio.
+3. **Irradiação solar (RS e SC)**: Irradiação abaixo da mediana reduz a geração por kWp: não é alavanca de gestão, mas exige dimensionar o sistema com mais módulos.
+
+**Ressalvas**
+Os fatores SHAP descrevem a associação entre os fatores e a taxa de realização, não causalidade. O gap absoluto depende do tamanho do estado, não mede eficiência.",25.8
+Quais estados têm as maiores taxas de realização?,False,llm,Brasil,Brasil,True,comparar_ufs,comparar_ufs,True,3,1.0,,95,0,,"**Diagnóstico**
+Os estados com maiores taxas de realização são Mato Grosso (47,5%), Rondônia (29,9%) e Tocantins (25,6%).
+
+**O que explica**
+A taxa de realização em Mato Grosso é puxada para cima por uma forte infraestrutura de energia solar e políticas públicas favoráveis. Rondônia e Tocantins também apresentam bons níveis de adesão, mas com menores incentivos comparados a Mato Grosso.
+
+**Recomendações**
+1. **Entre estados**: pedir as oportunidades e os fatores de cada UF antes de decidir onde atuar.
+
+**Ressalvas**
+Os dados são baseados no recorte do Brasil e não refletem variáveis externas não mencionadas nos fatos.",13.19
+Por que Recife adota tão pouca energia solar?,False,llm,Recife (PE),Recife (PE),True,explicar_gap,"resumo_potencial, explicar_gap",True,9,1.0,,199,0,,"**Diagnóstico**
+Recife (PE) tem um gap de 2,6 TWh/ano, equivalente a 97,1% do seu potencial técnico residencial, e uma taxa de realização de apenas 2,9%, muito abaixo da média nacional de 10,4%. 
+
+**O que explica**
+A baixa taxa de Recife é puxada para baixo pela densidade demográfica (-13,2 p.p.), agropecuária (-1,5 p.p.) e tarifa B1 (-0,8 p.p.). Contudo, a renda domiciliar (+4,6 p.p.) e a irradiação solar (+3,0 p.p.) contribuem positivamente, mas não são suficientes para compensar os fatores negativos.
+
+**Recomendações**
+1. **Adoção abaixo do perfil**: A adoção está abaixo do que o perfil comporta: há demanda não atendida que os fatores medidos não explicam. Indica falta de oferta, informação ou instaladores locais; vale prospecção ativa.
+2. **Densidade demográfica**: Densidade alta indica mais apartamentos e menos telhado próprio: oferecer geração compartilhada, autoconsumo remoto e projetos para condomínios.
+3. **Agropecuária**: Pouca agropecuária: falta a demanda rural que puxa a adoção em outras regiões; o mercado depende do consumidor urbano e do pequeno comércio.
+
+**Ressalvas**
+Os dados consideram o perfil atual de Recife, mas não refletem mudanças futuras. O gap acima do esperado indica oportunidades, mas a baixa taxa de realização reflete realidades locais que limitam a adoção de energia solar.",21.68
+Como fica o potencial de Recife nos cenários até 2050?,False,llm,Recife (PE),Recife (PE),True,cenarios_climaticos,cenarios_climaticos,True,5,1.0,,109,0,,"**Diagnóstico**
+
+O potencial de energia solar em Recife (PE) permanece estável entre 2030 e 2050, projetado em 2,7 TWh/ano em ambos os cenários SSP2-4.5 e SSP5-8.5.
+
+**O que explica**
+
+O potencial não muda porque a irradiação prevista varia apenas 0,5% no máximo, dentro das faixas dos modelos climáticos. Os fatores socioeconômicos, não abordados nos cenários, são os responsáveis pelo gap atual.
+
+**Recomendações**
+1. **Clima**: usar a faixa de incerteza dos cenários no dimensionamento dos sistemas; a prioridade de mercado não muda com o clima.
+
+**Ressalvas**
+
+Os cenários consideram apenas variações na irradiação, mantendo a potência instalada constante. Portanto, o potencial técnico não é afetado pelas projeções climáticas até 2050.",17.07
+O que dizem as notícias sobre o fio B?,False,llm,Brasil,Brasil,True,noticias,noticias,True,0,1.0,,102,0,,"**Diagnóstico**
+
+As notícias não fornecem informações específicas sobre o fio B ou sobre o desempenho atual da geração distribuída no Brasil. A única informação relevante é sobre a discussão da ANEEL sobre o custeio da geração distribuída, mas não há dados sobre as taxas de realização ou gaps.
+
+**O que explica**
+
+Sem dados específicos, não é possível explicar o desempenho do fio B ou qualquer outro aspecto da geração distribuída.
+
+**Recomendações**
+1. **Regulação**: acompanhar as regras de compensação (Lei 14.300 e fio B) ao projetar o retorno de novos sistemas.
+
+**Ressalvas**
+
+Os fatos fornecidos não contêm informações suficientes para responder à pergunta.",11.59
+Desde quando a Bahia tem isenção de ICMS na geração distribuída?,False,llm,Bahia,Bahia,True,politica_icms,politica_icms,True,2,1.0,,104,0,,"**Diagnóstico**
+
+A Bahia tem isenção de ICMS na geração distribuída desde novembro de 2015, conforme o Convênio 130/15.
+
+**O que explica**
+
+Esta isenção tem 129 meses de vigência, não afetando diretamente a taxa de realização ou o gap. Os fatores não estão explicitados nos dados fornecidos, então não há elementos para explicar variações na taxa de realização.
+
+**Recomendações**
+1. **ICMS**: considerar a data de início da isenção no cálculo do retorno e acompanhar mudanças no convênio estadual.
+
+**Ressalvas**
+
+Os fatos fornecidos não abordam aspectos relacionados à taxa de realização ou gap, limitando a análise a apenas o período de vigência da isenção de ICMS.",11.95
+Como está Mato Grosso?,False,llm,Mato Grosso,Mato Grosso,True,resumo_potencial,"resumo_potencial, explicar_gap",True,17,1.0,,161,0,,"**Diagnóstico**
+Mato Grosso tem um potencial residencial de 5,5 TWh/ano, com uma produção de 2,6 TWh/ano, gerando um gap de 2,9 TWh/ano (52,5% do potencial). A taxa de realização é de 47,5%, acima da média nacional (10,4%), mas abaixo do esperado pelo perfil (44,7%).
+
+**O que explica**
+A taxa de realização é puxada para cima pelo fator Tarifa de energia residencial B1 (+17,4 p.p.), Renda (+11,9 p.p.) e Irradiação solar (+0,6 p.p.). No entanto, outros fatores contribuem para a taxa estar abaixo do esperado, como a baixa adesão em 141 municípios e a produção superior ao potencial em 6 municípios.
+
+**Recomendações**
+1. **Próximo passo**: pedir a explicação dos fatores e as oportunidades deste recorte.
+
+**Ressalvas**
+Os dados consideram a premissa de 15 m² úteis de telhado por domicílio, eficiência do painel de 20% e performance ratio de 0,75. O ranking completo incluiria 141 municípios, mas a produção superior ao potencial em 6 municípios sugere que esses lugares podem não ser priorizados.",23.07
+Qual o mercado em Pará de Minas?,False,llm,Pará de Minas (MG),Pará de Minas (MG),True,oportunidades,"resumo_potencial, oportunidades, explicar_gap",True,13,0.923,"1,4",260,2,"O valor 1,4 aparece na resposta como ""acima do esperado"", mas nos dados ele tem outro significado. Confira na aba de evidências. | O valor 12,6 aparece na resposta como ""acima do esperado"", mas nos dados ele tem outro significado. Confira na aba de evidências. | Números da resposta que não aparecem nos dados consultados: 1,4. Confira na aba de evidências.","**Diagnóstico**
+
+Pará de Minas (MG) tem um potencial técnico residencial de 158,4 GWh/ano, com uma produção de 19,2 GWh/ano, resultando em um gap de 139,2 GWh/ano (87,9% do potencial). A taxa de realização é de 12,1%, acima da média nacional de 10,4%. No entanto, o perfil do município indica que a taxa esperada seria de 12,6%, gerando um gap acima do esperado de 1,4 GWh/ano.
+
+**O que explica**
+
+Os fatores que puxam a taxa para baixo são a densidade demográfica (-3,8 p.p.), a agropecuária (-2,0 p.p.) e o tempo de isenção de ICMS na geração distribuída (-1,1 p.p.). Os fatores que puxam para cima são a renda (+5,9 p.p.) e a irradiação solar (+1,0 p.p.).
+
+**Recomendações**
+1. **Onde priorizar**: Juiz de Fora (MG), Montes Claros (MG), Patos de Minas (MG), os maiores gaps acima do esperado pelo perfil. Antes de investir, peça a explicação de cada município para escolher o produto (financiamento, geração compartilhada, rural).
+2. **Adoção abaixo do perfil**: A adoção está abaixo do que o perfil comporta: há demanda não atendida que os fatores medidos não explicam. Indica falta de oferta, informação ou instaladores locais; vale prospecção ativa.
+3. **Densidade demográfica**: Densidade alta indica mais apartamentos e menos telhado próprio: oferecer geração compartilhada, autoconsumo remoto e projetos para condomínios.
+4. **Agropecuária**: Pouca agropecuária: falta a demanda rural que puxa a adoção em outras regiões; o mercado depende do consumidor urbano e do pequeno comércio.
+
+**Ressalvas**
+
+Os dados são baseados no potencial técnico residencial e na produção atual, mas não refletem as mudanças futuras ou as causas do gap.",30.07
+Bom Jesus no RS tem espaço para crescer?,False,llm,Bom Jesus (RS),Bom Jesus (RS),True,resumo_potencial,"resumo_potencial, explicar_gap",True,7,1.0,,177,0,,"**Diagnóstico**
+Bom Jesus (RS) tem um gap de 14,0 GWh/ano, equivalente a 90,7% do seu potencial técnico residencial. A taxa de realização é de 9,3%, abaixo da média nacional de 10,4%, indicando espaço para crescimento na micro e minigeração solar.
+
+**O que explica**
+A taxa de realização é puxada para baixo pela irradiação solar, que contribui com -2,6 p.p. No entanto, a densidade demográfica positiva de +1,0 p.p. ajuda a manter a taxa. A irradiação solar é abaixo da mediana dos municípios, limitando a produção.
+
+**Recomendações**
+1. **Adoção abaixo do perfil**: A adoção está abaixo do que o perfil comporta: há demanda não atendida que os fatores medidos não explicam. Indica falta de oferta, informação ou instaladores locais; vale prospecção ativa.
+2. **Irradiação solar**: Irradiação abaixo da mediana reduz a geração por kWp: não é alavanca de gestão, mas exige dimensionar o sistema com mais módulos.
+
+**Ressalvas**
+Os dados são baseados no potencial técnico residencial estimado, considerando 15 m² úteis de telhado por domicílio. A previsão do perfil não considera mudanças futuras que poderiam impactar o crescimento.",21.04
+Qual a situação de Salvador?,False,llm,Salvador (BA),Salvador (BA),True,explicar_gap,"resumo_potencial, explicar_gap",True,8,1.0,,215,0,,"**Diagnóstico**
+
+Salvador apresenta um gap de 4,1 TWh/ano, equivalente a 98,1% do seu potencial técnico residencial, refletindo uma taxa de realização muito baixa de 1,9%. O perfil do município indica oportunidades, mas a densidade demográfica e a presença de agropecuária contribuem negativamente para a taxa de realização.
+
+**O que explica**
+
+Fatores que puxam a taxa para baixo:
+- Densidade demográfica: -11,3 p.p.
+- Agropecuária: -2,8 p.p.
+- População urbana: -0,6 p.p.
+
+Fatores que puxam a taxa para cima:
+- Renda: +3,0 p.p.
+- Tarifa de energia residencial B1: +0,8 p.p.
+
+**Recomendações**
+1. **Adoção abaixo do perfil**: A adoção está abaixo do que o perfil comporta: há demanda não atendida que os fatores medidos não explicam. Indica falta de oferta, informação ou instaladores locais; vale prospecção ativa.
+2. **Densidade demográfica**: Densidade alta indica mais apartamentos e menos telhado próprio: oferecer geração compartilhada, autoconsumo remoto e projetos para condomínios.
+3. **Agropecuária**: Pouca agropecuária: falta a demanda rural que puxa a adoção em outras regiões; o mercado depende do consumidor urbano e do pequeno comércio.
+
+**Ressalvas**
+
+Os dados indicam que a baixa taxa de realização em Salvador é influenciada principalmente pela densidade demográfica e pela presença de agropecuária, que reduzem a taxa. No entanto, a renda domiciliar e a tarifa residencial positivamente contribuem para a taxa de realização.",23.76

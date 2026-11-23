@@ -6,6 +6,7 @@ CRIAÇÃO: 21/10/2026
 ATUALIZAÇÃO: 16/11/2026 — TP4: rotas de IA, carga dos modelos em segundo plano,
              503 com Retry-After para modelo indisponível
              22/11/2026 — TP4.5, Tarefa 7: rotas /potencial
+             22/11/2026 — TP5: rotas /agente (agente de apoio à decisão)
 
 DESCRIÇÃO:
     Aplicação FastAPI: metadados da documentação, registro das rotas, carga
@@ -49,6 +50,7 @@ from fastapi.responses import JSONResponse  # noqa: E402
 
 from src.api.dependencias import Repositorio  # noqa: E402
 from src.api.rotas import (  # noqa: E402
+    agente,
     comparacoes,
     ia,
     indicadores,
@@ -78,6 +80,9 @@ adesão estadual ao Convênio ICMS 16/15. Os cálculos são os mesmos do dashboa
 * **Potencial solar** — potencial técnico residencial, produção estimada, gap e taxa de
   realização por UF e município; fatores associados (SHAP) e cenários de irradiação
   2030–2050. Parâmetro `visao`: corrigida (padrão), aneel ou conservadora.
+* **Agente** — agente inteligente de apoio à decisão (TP5): responde perguntas em
+  português com diagnóstico, fatores e recomendações, usando as rotas acima como
+  ferramentas, com memória da conversa e verificação dos números.
 * **IA** — resumo e relevância de textos com modelos de linguagem locais (HuggingFace),
   sem serviço externo. Tom em caráter experimental.
 
@@ -102,6 +107,10 @@ TAGS = [
     {
         "name": "Potencial solar",
         "description": "Potencial x produção, fatores (SHAP) e cenários 2030–2050 (TP4.5).",
+    },
+    {
+        "name": "Agente",
+        "description": "Agente de apoio à decisão com LLM local (Ollama) ou por API — TP5.",
     },
     {
         "name": "IA",
@@ -144,7 +153,7 @@ app = FastAPI(
     },
 )
 
-for modulo in (sistema, indicadores, potencial, noticias, politicas, comparacoes, ia):
+for modulo in (sistema, indicadores, potencial, agente, noticias, politicas, comparacoes, ia):
     app.include_router(modulo.roteador)
 
 
