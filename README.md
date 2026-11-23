@@ -22,6 +22,7 @@ Documentação completa:
 - 🧠 [Escolha dos modelos de linguagem](docs/escolha_modelo.md) — benchmark de cinco modelos locais (TP4)
 - 🔄 [Atualização da base ANEEL 08/2026 → 10/2026](docs/potencial/atualizacao_base_10_2026.md) — antes × depois e tratamento dos 75 kW no PR
 - 🏠 [Potencial solar municipal](docs/potencial/README.md) — potencial x produção, fatores (SHAP), validação e projeção 2030–2050 (TP4.5)
+- 🤖 [Agente de decisão](docs/agente/README.md) — agente inteligente com LLM local, ferramentas sobre a Gold, memória e verificação dos números (TP5)
 
 ### Indicadores
 
@@ -31,6 +32,7 @@ Documentação completa:
 | Empreendimentos por 100 mil hab. | Difusão: sistemas conectados para cada 100 mil habitantes |
 | Ranking de disparidade | Posição das 27 UFs em cada métrica, com a média nacional como referência |
 | Taxa de crescimento | Crescimento anual do parque instalado e CAGR por UF desde a Lei 14.300 (2022–2025) |
+| Gap acima do esperado (TP5) | (taxa prevista pelo perfil − taxa observada) × potencial, em MWh/ano: adoção que o perfil comportaria e não aconteceu; critério de priorização do agente |
 | Taxa de realização (TP4.5) | Produção estimada da MMGD residencial e rural (y) sobre o potencial técnico dos telhados residenciais (x), por município e UF; gap = x − y |
 
 ### Principais achados (base ANEEL 10/2026, visão corrigida)
@@ -44,6 +46,8 @@ Valores na visão corrigida, padrão do painel; entre parênteses, o critério A
 - Na base de 10/2026, a ANEEL retirou os ~73 mil registros do Maranhão sem fonte de geração, que o projeto imputava como solares. O MA passou a ser "mercado emergente" nas duas visões do painel.
 - O momento de adesão à isenção de ICMS (Convênio 16/15) não se relaciona com a adoção atual (Spearman −0,02; −0,06 no critério ANEEL).
 - **Potencial solar residencial (TP4.5):** os telhados residenciais poderiam gerar 302,6 TWh/ano; a micro e minigeração residencial e rural produz cerca de 31,5 TWh/ano, ou **10,4% do potencial** (11,4% no critério ANEEL; 10,6% no limite conservador). A taxa está associada sobretudo à densidade demográfica (municípios densos aproveitam menos) e à renda (associação, não causalidade). Até 2050, a irradiação muda poucos por cento nos cenários climáticos, com faixa de incerteza que cruza o zero na maioria das UFs. Detalhes em [`docs/potencial/README.md`](docs/potencial/README.md).
+
+- **Onde priorizar (TP5):** 1.378 municípios com pelo menos 5.000 domicílios estão abaixo da taxa que o próprio perfil sugere, somando **3,6 TWh/ano de gap acima do esperado**. Os maiores estão em capitais do Nordeste e no DF (Recife, Brasília, Salvador); no RS, em Bagé, Viamão e Caxias do Sul. O agente de decisão responde a esse tipo de pergunta em português, com recomendações por barreira ([`docs/agente/README.md`](docs/agente/README.md)).
 
 ---
 
@@ -76,6 +80,7 @@ solargap-brasil/
 │   ├── api.md
 │   ├── escolha_modelo.md         # justificativa dos modelos de linguagem (TP4)
 │   ├── potencial/                # potencial solar municipal: método, SHAP, cenários (TP4.5)
+│   ├── agente/                   # agente de decisão: arquitetura, prompts, avaliação (TP5)
 │   └── benchmark/                # rótulos manuais, saídas e métricas do benchmark (TP4)
 ├── src/
 │   ├── data_acquisition/
@@ -94,6 +99,14 @@ solargap-brasil/
 │   │   └── ...                   # amostra e diagnósticos
 │   ├── servicos/                 # regra de negócio usada pelo app E pela API (TP3; potencial.py no TP4.5)
 │   ├── potencial/                # pipeline do potencial solar: x, y, fatores, SHAP, CMIP6 (TP4.5)
+│   ├── agente/                   # agente de decisão (TP5)
+│   │   ├── recortes.py           #   localiza UF e município na pergunta (sem LLM)
+│   │   ├── ferramentas.py        #   8 consultas à Gold, com fatos formatados e ações por barreira
+│   │   ├── llm.py                #   cliente Ollama ou API compatível com OpenAI
+│   │   ├── prompts.py            #   prompts de planejamento (JSON) e de redação
+│   │   ├── verificacao.py        #   confere os números da resposta com os fatos
+│   │   ├── agente.py             #   ciclo perceber, planejar, agir, redigir, verificar, com memória
+│   │   └── avaliacao.py          #   15 perguntas com gabarito (regras x LLM)
 │   ├── ia/                       # modelos de linguagem locais (TP4)
 │   │   ├── catalogo.py           #   candidatos, modelo de cada tarefa, hipóteses zero-shot
 │   │   ├── modelos_hf.py         #   carga e inferência (único módulo que importa torch)
@@ -103,11 +116,11 @@ solargap-brasil/
 │   ├── api/                      # API FastAPI (TP3)
 │   │   ├── main.py               #   aplicação e tratamento de erros
 │   │   ├── modelos.py            #   modelos Pydantic de entrada e resposta
-│   │   └── rotas/                #   sistema, indicadores, potencial, notícias, políticas, comparações, ia
+│   │   └── rotas/                #   sistema, indicadores, potencial, agente, notícias, políticas, comparações, ia
 │   └── app/                      # dashboard Streamlit multipáginas (TP3)
 │       ├── app.py                #   entrada: menu, seletor de visão (todas as páginas) e filtros
-│       └── paginas/              #   Início, Panorama, Evolução, Oportunidades, Potencial Solar, Notícias, Laboratório de IA, Dados, API
-├── tests/                        # 402 testes automatizados (pytest)
+│       └── paginas/              #   Início, Agente de decisão, Panorama, Evolução, Oportunidades, Potencial Solar, Notícias, Laboratório de IA, Dados, API
+├── tests/                        # 472 testes automatizados (pytest)
 ├── requirements.txt
 ├── setup_project.py
 └── README.md
@@ -117,8 +130,9 @@ solargap-brasil/
 
 ```
  Fontes ──> data_acquisition ──> Bronze ──> Silver ──> Gold ──┐
-                                                              ├──> servicos ──┬──> app (Streamlit)
- data/external (referências) ─────────────────────────────────┘               └──> api (FastAPI) ──> TP5: agente
+                                                              ├──> servicos ──┬──> agente (TP5) ──> LLM local (Ollama)
+ data/external (referências) ─────────────────────────────────┘               ├──> app (Streamlit)
+                                                                              └──> api (FastAPI)
 ```
 
 | Camada | Diretório | Conteúdo | Versionado |
@@ -169,6 +183,16 @@ python -m streamlit run src/app/app.py
 uvicorn src.api.main:app --reload
 # Documentação interativa: http://127.0.0.1:8000/docs
 ```
+
+**Agente de decisão (TP5).** A página *Agente de decisão* funciona logo após o clone, no modo por regras. Para ativar o modelo de linguagem local, instale o [Ollama](https://ollama.com) e baixe o modelo (uma vez, ~4,7 GB):
+
+```bash
+ollama pull qwen2.5:7b      # alternativa leve: qwen2.5:3b (defina SOLARGAP_LLM_MODELO)
+# o Ollama sobe sozinho no Windows; se não, rode: ollama serve
+python -m src.agente.avaliacao --llm   # avaliação com o LLM (opcional)
+```
+
+Para usar uma API online compatível com OpenAI: `SOLARGAP_LLM_PROVEDOR=openai`, `SOLARGAP_LLM_MODELO=<modelo>` e `SOLARGAP_LLM_API_KEY=<chave>`.
 
 **Visão dos dados.** O seletor da barra lateral vale para todas as páginas: **visão corrigida** (padrão; imputa a potência dos registros de 75 kW da COPEL-DIS e conta como solares os 156 registros sem fonte), **critério ANEEL** (dado oficial) e **limite conservador** (corrige só os residenciais de 75 kW). Na API, as rotas `/potencial` recebem o parâmetro `visao`; as de indicadores, `incluir_imputados`. Ver [`docs/api.md`](docs/api.md).
 
@@ -236,7 +260,13 @@ python -m src.preparacao.construir_gold         # camada Gold
   - Benchmark de relevância v2: corpus de 553 notícias, ANEEL e MME no gov.br, robots.txt com protego, relevância híbrida
   - Projeção 2030–2050 com NEX-GDDP-CMIP6: o recurso solar é estável até 2050 (+0,2% a +0,6% no potencial do Brasil); **o gap é socioeconômico, não físico**
   - Página Potencial Solar e rotas `/potencial`
-- [ ] **TP5** — Agente inteligente que consulta essas tabelas (indicadores, potencial, fatores e cenários, via API) para responder perguntas de gestão e de investimento
+- [x] **TP5** — Agente inteligente de apoio à decisão ([`docs/agente/README.md`](docs/agente/README.md))
+  - Oito ferramentas sobre a Gold (potencial, SHAP, oportunidades, cenários, ICMS, adoção, notícias), com o mesmo código do painel e da API
+  - LLM local (Qwen2.5-7B via Ollama) para planejar e redigir; modo por regras quando o modelo não está no ar
+  - Verificação automática: todo número da resposta tem de estar nos dados consultados
+  - Memória conversacional (perguntas de seguimento herdam o recorte)
+  - Indicador "gap acima do esperado" para priorizar municípios
+  - Página *Agente de decisão* e rotas `/agente`; 61 testes novos (472 no total)
 
 ---
 

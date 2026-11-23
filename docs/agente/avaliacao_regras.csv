@@ -1,0 +1,16 @@
+pergunta,seguimento,modo,recorte_esperado,recorte_obtido,recorte_ok,ferramenta_esperada,ferramentas_usadas,ferramenta_ok,numeros,numeros_ok,nao_encontrados,palavras,tempo_s
+Por que Caxias do Sul está abaixo do esperado e o que fazer?,False,regras,Caxias do Sul (RS),Caxias do Sul (RS),True,explicar_gap,"resumo_potencial, explicar_gap",True,23,1.0,,335,0.03
+E Bento Gonçalves?,True,regras,Bento Gonçalves (RS),Bento Gonçalves (RS),True,resumo_potencial,"resumo_potencial, explicar_gap",True,23,1.0,,335,0.02
+E os cenários climáticos para lá?,True,regras,Bento Gonçalves (RS),Bento Gonçalves (RS),True,cenarios_climaticos,"resumo_potencial, cenarios_climaticos",True,35,1.0,,195,0.01
+Onde investir em geração distribuída no Rio Grande do Sul?,False,regras,Rio Grande do Sul,Rio Grande do Sul,True,oportunidades,"resumo_potencial, oportunidades",True,42,1.0,,285,0.02
+Quais municípios priorizar no Brasil?,False,regras,Brasil,Brasil,True,oportunidades,"resumo_potencial, oportunidades",True,41,1.0,,280,0.01
+Compare RS e SC,False,regras,Rio Grande do Sul,Rio Grande do Sul,True,comparar_ufs,"comparar_ufs, explicar_gap, explicar_gap",True,26,1.0,,323,0.05
+Quais estados têm as maiores taxas de realização?,False,regras,Brasil,Brasil,True,comparar_ufs,"resumo_potencial, comparar_ufs, oportunidades",True,50,1.0,,315,0.02
+Por que Recife adota tão pouca energia solar?,False,regras,Recife (PE),Recife (PE),True,explicar_gap,"resumo_potencial, explicar_gap",True,23,1.0,,295,0.01
+Como fica o potencial de Recife nos cenários até 2050?,False,regras,Recife (PE),Recife (PE),True,cenarios_climaticos,"resumo_potencial, cenarios_climaticos",True,35,1.0,,188,0.01
+O que dizem as notícias sobre o fio B?,False,regras,Brasil,Brasil,True,noticias,"noticias, politica_icms",True,11,1.0,,95,0.01
+Desde quando a Bahia tem isenção de ICMS na geração distribuída?,False,regras,Bahia,Bahia,True,politica_icms,"noticias, politica_icms",True,11,1.0,,75,0.01
+Como está Mato Grosso?,False,regras,Mato Grosso,Mato Grosso,True,resumo_potencial,"resumo_potencial, explicar_gap, adocao_uf",True,25,1.0,,188,0.04
+Qual o mercado em Pará de Minas?,False,regras,Pará de Minas (MG),Pará de Minas (MG),True,oportunidades,"resumo_potencial, oportunidades, explicar_gap",True,51,1.0,,504,0.03
+Bom Jesus no RS tem espaço para crescer?,False,regras,Bom Jesus (RS),Bom Jesus (RS),True,resumo_potencial,"resumo_potencial, explicar_gap",True,20,1.0,,265,0.01
+Qual a situação de Salvador?,False,regras,Salvador (BA),Salvador (BA),True,explicar_gap,"resumo_potencial, explicar_gap",True,23,1.0,,295,0.01

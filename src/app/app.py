@@ -6,6 +6,7 @@ CRIAÇÃO: 21/10/2026 (substitui demo_app.py, de 20/08/2026)
 ATUALIZAÇÃO: 16/11/2026 — TP4: página Laboratório de IA
              22/11/2026 — TP4.5, Tarefa 7: página Potencial Solar; seletor de
              visão (corrigida, ANEEL, conservadora) em todas as páginas
+             22/11/2026 — TP5: página Agente de decisão (agente inteligente)
 
 DESCRIÇÃO:
     Arquivo de entrada do dashboard multipáginas (TP3). Configura a página,
@@ -25,7 +26,7 @@ POR QUE st.navigation E NÃO A PASTA pages/:
     toda página. É nele que ficam os filtros globais, sem repetição.
 
 ESTRUTURA DO MENU:
-    Visão geral  — Início
+    Visão geral  — Início · Agente de decisão
     Análises     — Panorama · Evolução e crescimento · Oportunidades ·
                    Potencial Solar
     Contexto     — Notícias
@@ -59,6 +60,7 @@ st.set_page_config(page_title="SolarGap - Brasil", page_icon="☀️", layout="w
 PAGINAS = {
     "Visão geral": [
         st.Page("paginas/inicio.py", title="Início", icon="☀️", default=True),
+        st.Page("paginas/agente.py", title="Agente de decisão", icon="🤖"),
     ],
     "Análises": [
         st.Page("paginas/panorama.py", title="Panorama", icon="📊"),

@@ -661,3 +661,99 @@ class CenariosMunicipio(BaseModel):
     )
     aviso: str
     itens: list[CenarioPotencial]
+
+
+# ═══════════════════ Agente (TP5) ═══════════════════
+
+
+class TrocaHistorico(BaseModel):
+    pergunta: str = Field(max_length=1000)
+    resposta: str = Field(default="", max_length=8000)
+
+
+class PedidoAgente(BaseModel):
+    pergunta: str = Field(
+        min_length=3,
+        max_length=1000,
+        description="Pergunta em português sobre potencial, gap, fatores ou cenários.",
+        examples=["Por que Caxias do Sul está abaixo do esperado e o que fazer?"],
+    )
+    historico: list[TrocaHistorico] = Field(
+        default_factory=list,
+        max_length=20,
+        description="Trocas anteriores da conversa (memória). O painel envia as últimas.",
+    )
+    contexto: dict = Field(
+        default_factory=dict,
+        description="O campo 'contexto' da resposta anterior (recorte da conversa).",
+    )
+    visao: NomeVisao = NomeVisao.corrigida
+    usar_llm: bool = Field(
+        default=True,
+        description="False força o modo por regras (sem modelo de linguagem).",
+    )
+
+    @field_validator("pergunta")
+    @classmethod
+    def sem_espacos_vazios(cls, valor: str) -> str:
+        if not valor.strip():
+            raise ValueError("A pergunta não pode ser vazia.")
+        return valor.strip()
+
+
+class RecorteAgente(BaseModel):
+    nivel: Literal["brasil", "uf", "municipio"]
+    uf: str | None
+    cod_ibge: str | None
+    municipio: str | None
+    descricao: str
+    ufs_citadas: list[str]
+    homonimos: list[str]
+
+
+class FerramentaUsada(BaseModel):
+    nome: str
+    argumentos: dict
+    fatos: list[str]
+    dados: dict | list
+    erro: str | None
+
+
+class AcaoRecomendada(BaseModel):
+    fator: str
+    nivel: str | None = Field(description="alto/baixo em relação à mediana dos municípios.")
+    acao: str
+    recorte: str | None = Field(default=None, description="Lugar a que a ação se refere.")
+
+
+class VerificacaoNumeros(BaseModel):
+    numeros: int
+    verificados: int
+    nao_encontrados: list[str]
+    taxa: float = Field(description="Fração dos números da resposta presentes nos fatos.")
+
+
+class RespostaAgenteAPI(BaseModel):
+    pergunta: str
+    resposta: str = Field(description="Diagnóstico e recomendações em markdown.")
+    modo: Literal["llm", "regras", "misto"]
+    modelo: str | None
+    intencoes: list[str]
+    recorte: RecorteAgente
+    recorte_herdado: bool = Field(description="True se o recorte veio da conversa anterior.")
+    ferramentas: list[FerramentaUsada]
+    acoes: list[AcaoRecomendada]
+    fatos: list[str]
+    verificacao: VerificacaoNumeros
+    avisos: list[str]
+    tempo_s: float
+    visao: NomeVisao
+    contexto: dict = Field(description="Envie de volta na próxima pergunta (memória).")
+
+
+class StatusAgente(BaseModel):
+    provedor: str
+    modelo: str
+    url: str
+    llm_disponivel: bool = Field(description="O serviço do modelo respondeu agora.")
+    ferramentas: list[str]

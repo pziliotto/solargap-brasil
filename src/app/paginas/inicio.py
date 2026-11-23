@@ -92,6 +92,11 @@ with c1:
     )
 with c2:
     st.page_link(
+        "paginas/agente.py",
+        label="**Agente de decisão** — pergunte onde investir e o que fazer (IA)",
+        icon="🤖",
+    )
+    st.page_link(
         "paginas/noticias.py",
         label=f"**Notícias** — corpus de {len(corpus)} notícias e nuvem de palavras",
         icon="📰",

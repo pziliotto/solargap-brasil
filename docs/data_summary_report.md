@@ -2,8 +2,8 @@
 
 **Projeto:** SolarGap Brasil — Onde está o próximo mercado solar?
 **Autora:** Pâmela Lima Ziliotto
-**Etapa:** TP4 (base ANEEL atualizada para a referência 10/2026 em 20/11/2026)
-**Última atualização:** 20/11/2026
+**Etapa:** TP5 — entrega final (base ANEEL de referência 10/2026)
+**Última atualização:** 23/11/2026
 
 ---
 
@@ -600,6 +600,35 @@ Na **segunda consulta** ao teste congelado, o F1 macro foi 0,678 [IC 95% 0,572; 
 - **Relevância mais estrita que a rotulagem:** quatro dos cinco falsos negativos do benchmark são notícias sobre renováveis em geral. O filtro tende a excluir esse tipo de notícia. No lote de 16/11/2026, 28 das 119 notícias foram julgadas fora do tema, e entre elas havia notícias de geração distribuída que não mencionam "solar". Desde 22/11/2026, a estratégia híbrida (termo de GD no título OU zero-shot) cobre esse caso (seção 5.2). GD citada só no corpo ainda depende do modelo, e o filtro do painel continua desligado por padrão.
 - **Licença:** resumos são obras derivadas. Só a Agência Brasil recebe resumo, e cada resumo mantém a ligação com a URL de origem. As fontes sob CC BY-ND (ANEEL, MME e Agência Gov) não recebem resumo (seção 2.4).
 
+## 5A. Agente de Decisão (TP5)
+
+O agente é a última camada do ciclo de dados: transforma a Gold de todas as etapas em respostas para gestão e investimento. Metodologia completa em `docs/agente/README.md`.
+
+### 5A.1 Como cada dado coletado chega ao agente
+
+|Dado (etapa)|Coleta|Tratamento|Ferramenta do agente|
+|---|---|---|---|
+|MMGD da ANEEL (TP1–TP4.5)|API de dados abertos (CKAN), download em streaming|Silver/Gold, três visões dos 75 kW|`resumo_potencial`, `adocao_uf`, `comparar_ufs`, `oportunidades`|
+|População e domicílios, IBGE (TP1, TP4.5)|API de Agregados v3 (SIDRA)|Gold municipal, peso do potencial|`resumo_potencial`, `adocao_uf`|
+|Irradiação NASA POWER (TP4.5)|API REST, ponto por município|média 2023–2025|`resumo_potencial`, `explicar_gap`|
+|Fatores municipais (TP4.5)|SIDRA, PIB dos Municípios, tarifas ANEEL, MapBiomas|`fatores_municipais.parquet`|`explicar_gap` (valores e mediana)|
+|Modelo explicativo e SHAP (TP4.5)|—|LightGBM, validação agrupada por UF|`explicar_gap`, `oportunidades` (taxa prevista)|
+|NEX-GDDP-CMIP6 (TP4.5)|leitura parcial do bucket público da AWS|método delta, 5 modelos|`cenarios_climaticos`|
+|CONFAZ, Convênio ICMS 16/15 (TP3)|web scraping (BeautifulSoup), com robots.txt|`gold_icms_uf.csv`|`politica_icms`|
+|Notícias EBC e gov.br (TP2–TP4)|web scraping multifonte|relevância (mDeBERTa) e resumo (PTT5)|`noticias` (só relevantes; resumo só onde a licença permite)|
+
+### 5A.2 Dados gerados pelo agente
+
+- **Gap acima do esperado** (`ferramentas.tabela_oportunidades`): `max(0, taxa prevista − observada) × potencial`, calculado na hora a partir de `shap_municipal.parquet` e `potencial_municipal.parquet`. Não é gravado na Gold, para não duplicar dado derivável.
+- **Respostas do agente:** não são gravadas pelo servidor. A conversa fica na sessão do navegador e pode ser baixada pelo usuário (.md).
+- **Avaliação:** `docs/agente/avaliacao_regras.csv` e `avaliacao_llm.csv`, com 15 perguntas de gabarito.
+
+### 5A.3 Qualidade e limites dos dados no agente
+
+- **Verificação de números:** toda resposta passa por `verificacao.py`. Número que não está nos fatos consultados gera aviso visível ao usuário.
+- **Visões:** o agente segue o seletor de visão. Nas visões ANEEL e conservadora, as contribuições SHAP continuam as do modelo treinado na visão corrigida, com aviso explícito (mesma regra da página Potencial Solar).
+- **Privacidade:** o agente só lê a Gold agregada por município, sem dado pessoal. Com o provedor padrão (Ollama), nada sai da máquina. Com um provedor online, só os fatos agregados e a pergunta são enviados.
+
 ## 6. Governança e Privacidade
 
 A base original da ANEEL contém duas colunas com dado pessoal identificável: `NumCPFCNPJ` e `NomTitularEmpreendimento`.
@@ -668,7 +697,11 @@ A ODbL exige atribuição e tem cláusula _share-alike_: bases derivadas distrib
 - **Pendências herdadas para o TP5:**
   - ~~atualizar a base da ANEEL para a referência 10/2026~~ — concluído em 20/11/2026 (`docs/potencial/atualizacao_base_10_2026.md`), com tratamento aplicado aos registros de 75 kW do Paraná (seção 3.4.3);
   - ampliar o corpus (Agência Senado, Agência Câmara e agências estaduais), com verificação de termos de uso fonte a fonte.
-- **TP5:**
-  - agente inteligente de recomendação que use as rotas da API como ferramentas, lendo só as notícias relevantes e já resumidas;
-  - reavaliar o tom com o LLM online permitido no TP5, contra os mesmos 30 rótulos;
-  - dashboard final consolidado.
+- **TP5 (concluído):**
+  - agente inteligente de apoio à decisão (seção 5A), que usa a camada de serviços da API como ferramentas e lê só as notícias relevantes e já resumidas;
+  - página *Agente de decisão* no painel e rotas `/agente` na API;
+  - 472 testes automatizados.
+- **Depois do TP5:**
+  - reavaliar o tom das notícias com um LLM, contra os mesmos 30 rótulos (planejado para o TP5, não realizado: o foco foi o agente);
+  - revisar as regras de ação do agente com profissionais do setor solar;
+  - unificar o parâmetro `visao` nas rotas de indicadores (pendência registrada em `docs/api.md`).

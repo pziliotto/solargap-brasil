@@ -39,6 +39,8 @@ No mesmo startup, os **modelos de linguagem** começam a carregar em segundo pla
 | GET | `/potencial/municipio/{cod_ibge}` | Ficha de potencial de um município, com a taxa nas três visões (TP4.5) |
 | GET | `/potencial/explicacao/{cod_ibge}` | Fatores associados à taxa de realização (SHAP), em linguagem simples (TP4.5) |
 | GET | `/potencial/cenarios/{cod_ibge}` | Irradiação, x, y e gap em SSP2-4.5 e SSP5-8.5, 2030–2050, com faixa de incerteza (TP4.5) |
+| GET | `/agente/status` | Provedor, modelo e se o LLM do agente está no ar (TP5) |
+| **POST** | `/agente/perguntar` | **Pergunta ao agente de decisão: diagnóstico, fatores, recomendações e verificação dos números** (TP5) |
 | GET | `/noticias` | Lista paginada e filtrável de notícias |
 | GET | `/noticias/fontes` | Fontes do corpus, quantidade e nível de texto |
 | GET | `/noticias/{id}` | Notícia completa, com `texto_para_modelo` (entrada dos modelos de linguagem) |
@@ -250,6 +252,35 @@ curl -X POST http://127.0.0.1:8000/processar_texto \
 
 **`POST /noticias/{id}/processar?tarefas=resumo&tarefas=tom`** usa como entrada o `texto_para_modelo` da notícia, a mesma do processamento em lote (`python -m src.ia.processar_corpus`).
 
+## Agente de decisão (TP5)
+
+`POST /agente/perguntar` recebe uma pergunta em português e devolve a resposta em markdown com a trilha completa: recorte identificado, intenções, ferramentas usadas (com os fatos e os dados brutos de cada uma), ações recomendadas e verificação dos números. Sem LLM no ar, a rota **não falha**: responde no modo por regras (`"modo": "regras"`) e informa em `avisos`. Metodologia em [`docs/agente/README.md`](agente/README.md).
+
+```bash
+curl -X POST http://127.0.0.1:8000/agente/perguntar \
+  -H "Content-Type: application/json" \
+  -d '{"pergunta": "Por que Caxias do Sul está abaixo do esperado e o que fazer?"}'
+```
+
+Resposta (trecho):
+
+```json
+{
+  "modo": "llm",
+  "modelo": "qwen2.5:7b via ollama",
+  "intencoes": ["explicacao"],
+  "recorte": {"nivel": "municipio", "uf": "RS", "cod_ibge": "4305108", "descricao": "Caxias do Sul (RS)"},
+  "ferramentas": [{"nome": "resumo_potencial", "fatos": ["Caxias do Sul (RS): taxa de realização de 9,0% (Brasil: 10,4%)."]}],
+  "acoes": [{"fator": "Densidade demográfica", "nivel": "alto", "acao": "Densidade alta indica mais apartamentos..."}],
+  "verificacao": {"numeros": 12, "verificados": 12, "nao_encontrados": [], "taxa": 1.0},
+  "contexto": {"recorte": {"nivel": "municipio", "cod_ibge": "4305108"}}
+}
+```
+
+**Memória.** Para uma pergunta de seguimento ("E os cenários climáticos?"), envie `historico` (lista de `{pergunta, resposta}`) e o `contexto` da resposta anterior. O recorte é herdado e a resposta traz `recorte_herdado: true`.
+
+**Parâmetros do corpo:** `pergunta` (3 a 1.000 caracteres), `historico` (até 20 trocas), `contexto`, `visao` (corrigida, aneel ou conservadora) e `usar_llm` (false força o modo por regras).
+
 ## Códigos de resposta
 
 Todas as respostas de erro têm o formato `{"detail": "..."}`.
@@ -272,11 +303,11 @@ Todas as respostas de erro têm o formato `{"detail": "..."}`.
 ## Preparação para os próximos TPs
 
 - **TP4 (concluído):** rotas de IA em `src/api/rotas/ia.py`, com modelos de resposta, 503 e 504. A inferência roda em uma thread, com uma inferência por vez (fila), para não disputar a memória da GPU; enquanto isso, as demais rotas continuam respondendo.
-- **TP5 (agente):** as rotas GET são as ferramentas naturais do agente. `/ufs/{sigla}` reúne em uma chamada tudo o que uma recomendação sobre um estado precisa; `/potencial/explicacao/{cod_ibge}` dá a leitura de um município em linguagem simples.
+- **TP5 (concluído):** rotas `/agente`. As ferramentas do agente chamam a mesma camada de serviços das rotas `/potencial` e de indicadores, sem HTTP. Os números são idênticos aos da API, e o agente funciona mesmo dentro do painel, com a API fora do ar.
 
 ## Testes
 
-`tests/test_api.py`, `tests/test_api_potencial.py` e `tests/test_ia_api.py` cobrem todas as rotas e todos os códigos de erro acima com o `TestClient` da FastAPI. As rotas de IA usam um gerenciador de modelos falso, que simula carga lenta, falha de carga e inferência demorada sem PyTorch e sem download; a inferência real é testada em `tests/test_ia.py` com modelos minúsculos criados na hora. As gravações vão para uma pasta temporária.
+`tests/test_api.py`, `tests/test_api_potencial.py`, `tests/test_ia_api.py` e `tests/test_api_agente.py` cobrem todas as rotas e todos os códigos de erro acima com o `TestClient` da FastAPI. As rotas de IA usam um gerenciador de modelos falso, que simula carga lenta, falha de carga e inferência demorada sem PyTorch e sem download; a inferência real é testada em `tests/test_ia.py` com modelos minúsculos criados na hora. As gravações vão para uma pasta temporária.
 
 ```bash
 python -m pytest tests/test_api.py tests/test_api_potencial.py tests/test_ia_api.py
